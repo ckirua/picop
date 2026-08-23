@@ -1,0 +1,13 @@
+warmup_iters: 500
+count: 10000
+payloads: [1024]
+modes: [sequential]
+python_threaded_count: 10000
+cpp_reference: true
+correctness:
+  - cpp_roundtrip
+  - cpp_stress
+  - py_roundtrip
+  - py_cpp_xlang
+max_wall_s: 90
+throughput_multiplier: 1.25

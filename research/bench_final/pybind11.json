@@ -1,0 +1,21 @@
+{
+  "impl": "pybind11",
+  "gil_enabled": true,
+  "python": "/usr/bin/python3",
+  "git_sha": "74e3de1",
+  "timestamp": "2026-08-23T00:55:44.723104+00:00",
+  "config": "bench/config_smoke.yaml",
+  "correctness": {
+    "cpp_roundtrip": true,
+    "cpp_stress": true,
+    "py_roundtrip": true,
+    "py_cpp_xlang": true
+  },
+  "correctness_ok": true,
+  "correctness_pass": true,
+  "max_wall_s": 90.0,
+  "throughput_multiplier": 1.25,
+  "sequential_msgs_per_sec_64b": 2010923.0689419908,
+  "cpp_sequential_msgs_per_sec_64b": 6412739.0,
+  "wall_s": 0.037
+}

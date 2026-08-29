@@ -127,9 +127,12 @@ See [`bench/BENCH.md`](bench/BENCH.md). Quick Tier A run:
 
 ## Docs
 
+**User documentation:** [https://ckirua.github.io/cypy/](https://ckirua.github.io/cypy/) (Sphinx; sources under [`doc/`](doc/)). Local build: `pip install -e ".[docs]" --no-build-isolation` then `cd doc && make html`.
+
 | Doc | Audience |
 |-----|----------|
-| This README + [`examples/`](examples/) | External users |
+| [GitHub Pages site](https://ckirua.github.io/cypy/) + [`doc/`](doc/) | External users (guides + API) |
+| This README + [`examples/`](examples/) | External users (quick install / smoke) |
 | [`COVERAGE.md`](COVERAGE.md) | What the library covers / does not (product map) |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Setup, checks, PR / freeze policy |
 | [`SECURITY.md`](SECURITY.md) | Vulnerability reporting |

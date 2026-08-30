@@ -246,7 +246,7 @@ print(f'''## Highlights
 ## Install
 \`\`\`bash
 pip install \"picop=={ver}\"
-# or: pip install \"picop @ git+https://github.com/ckirua/cypy.git@v{ver}\"
+# or: pip install \"picop @ git+https://github.com/ckirua/picop.git@v{ver}\"
 \`\`\`
 ''')
 " >"$NOTES_TMP"

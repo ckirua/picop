@@ -1,6 +1,6 @@
 # Agent loops for eq-helper issues
 
-How to grind through open `[eq/…]` enhancement issues on [ckirua/cypy](https://github.com/ckirua/cypy) with Cursor — in chat (`/loop`) or unattended in **tmux** (CLI / SDK).
+How to grind through open `[eq/…]` enhancement issues on [ckirua/picop](https://github.com/ckirua/picop) with Cursor — in chat (`/loop`) or unattended in **tmux** (CLI / SDK).
 
 ## Resume pointer (2026-07-22)
 
@@ -12,7 +12,7 @@ How to grind through open `[eq/…]` enhancement issues on [ckirua/cypy](https:/
 
 | Filter | Value |
 |--------|--------|
-| Repo | `ckirua/cypy` (workspace `/home/dev/cypy` or clone) |
+| Repo | `ckirua/picop` (workspace `/home/dev/cypy` or clone) |
 | Titles | start with `[eq/` (tiers: buffer, string, container, scalar, misc, new-module, stretch) |
 | Skip | stretch umbrellas only when already closed / documented |
 | Order | tier tag in title, then issue number ascending (`#4`–`#6`, then `#8`+) |
@@ -25,7 +25,7 @@ Shipped already (do not re-file): `str_eq` / `str_ne`, `bytes_eq`. Early buffer 
 Issue list:
 
 ```bash
-gh issue list -R ckirua/cypy --state open --search 'in:title [eq/'
+gh issue list -R ckirua/picop --state open --search 'in:title [eq/'
 ```
 
 ---
@@ -52,7 +52,7 @@ You type `/loop …` in chat; the agent arms the wake loop. To stop: ask to stop
 Paste as the `/loop` body (or `/loop` alone then the body):
 
 ```text
-Repo: ckirua/cypy. One eq-helper enhancement issue per iteration.
+Repo: ckirua/picop. One eq-helper enhancement issue per iteration.
 
 Each tick:
 1. List open issues whose title starts with `[eq/` (exclude #44). Order by tier tag in the title, then by issue number ascending (#4–#6, then #8+).
@@ -92,7 +92,7 @@ cd /home/dev/cypy   # or your clone
 
 agent -p --trust --force \
   --workspace /home/dev/cypy \
-  "Repo ckirua/cypy. Next open issue titled [eq/ (skip #44), lowest number / tier order.
+  "Repo ckirua/picop. Next open issue titled [eq/ (skip #44), lowest number / tier order.
    Implement only that issue, open PR with Closes, merge if CI green; else stop and report."
 
 # detach: Ctrl-b d
@@ -119,7 +119,7 @@ Do not touch non-[eq/ issues.'
 
 while true; do
   # rough emptiness check — refine with jq to exclude #44 if needed
-  n=$(gh issue list -R ckirua/cypy --state open --search 'in:title [eq/' --json number -q 'length')
+  n=$(gh issue list -R ckirua/picop --state open --search 'in:title [eq/' --json number -q 'length')
   if [ "$n" -eq 0 ]; then
     echo "No open [eq/ issues left."
     break
@@ -173,6 +173,6 @@ See [TypeScript SDK](https://cursor.com/docs/sdk/typescript) / [Python SDK](http
 
 ## See also
 
-- Issue backlog: https://github.com/ckirua/cypy/issues?q=is%3Aissue+is%3Aopen+in%3Atitle+%5Beq%2F
+- Issue backlog: https://github.com/ckirua/picop/issues?q=is%3Aissue+is%3Aopen+in%3Atitle+%5Beq%2F
 - Ship flow: [`PIPELINE.md`](PIPELINE.md)
 - Agent norms: [`../AGENTS.md`](../AGENTS.md)

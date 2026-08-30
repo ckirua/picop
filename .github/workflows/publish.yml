@@ -3,7 +3,7 @@
 # One-time setup (before the first tag publish):
 #   1. Create a PyPI account and claim the pending publisher for project "picop":
 #        https://pypi.org/manage/account/publishing/
-#      Owner: ckirua  ·  Repo: cypy  ·  Workflow: publish.yml  ·  Environment: pypi
+#      Owner: ckirua  ·  Repo: picop  ·  Workflow: publish.yml  ·  Environment: pypi
 #   2. (Optional) Same for TestPyPI with environment: testpypi
 #   3. Create matching GitHub Environments "pypi" / "testpypi" (optional protection rules).
 #

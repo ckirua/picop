@@ -4,7 +4,7 @@
 
 Please report vulnerabilities privately:
 
-- GitHub **private vulnerability reporting** on [ckirua/cypy](https://github.com/ckirua/cypy), or
+- GitHub **private vulnerability reporting** on [ckirua/picop](https://github.com/ckirua/picop), or
 - Email: **aquipongoalgo.dsz@gmail.com**
 
 Do not open a public issue for unfixed security bugs.

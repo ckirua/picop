@@ -83,10 +83,10 @@ html_theme = "pydata_sphinx_theme"
 html_static_path = ["_static"]
 html_title = "picop"
 html_short_title = "picop"
-html_baseurl = "https://ckirua.github.io/cypy/"
+html_baseurl = "https://ckirua.github.io/picop/"
 
 html_theme_options = {
-    "github_url": "https://github.com/ckirua/cypy",
+    "github_url": "https://github.com/ckirua/picop",
     "use_edit_page_button": False,
     "show_toc_level": 2,
     "navigation_with_keys": True,
@@ -95,7 +95,7 @@ html_theme_options = {
     },
     # Stub for a future multi-version Pages layout; v1 ships a single latest build.
     "switcher": {
-        "json_url": "https://ckirua.github.io/cypy/_static/switcher.json",
+        "json_url": "https://ckirua.github.io/picop/_static/switcher.json",
         "version_match": release,
     },
     "check_switcher": False,
@@ -104,7 +104,7 @@ html_theme_options = {
 
 html_context = {
     "github_user": "ckirua",
-    "github_repo": "cypy",
+    "github_repo": "picop",
     "github_version": "main",
     "doc_path": "doc",
 }

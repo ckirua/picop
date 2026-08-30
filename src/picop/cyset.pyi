@@ -1,13 +1,21 @@
-"""Public :mod:`cypy.cyset` stubs (signatures + docstrings for IDE / typecheckers).
+"""Typed C-API helpers for :class:`set` / :class:`frozenset` hot paths.
 
-Tier A losers (ratio > 1.02 vs Python) are omitted from stubs but remain
-``cpdef`` on the extension for Cython / future work.
+Prefer :mod:`picop.cyset` (or starters in :mod:`picop.hot`) when the concrete
+set type is known; use protocol helpers only for unknown containers. Tier A
+losers (ratio > 1.02 vs Python) are omitted from stubs but remain ``cpdef``.
+See :doc:`/user_guide/quickstart` for import patterns.
 """
 
 # Preferred public names (0.3 hard trim)
 
 def set_add(s: set, value: object) -> int:
-    """Add ``value`` via ``PySet_Add`` (``0`` / raises). Returns 0 on success; errors raise — do not use as bool."""
+    """Add ``value`` via ``PySet_Add``.
+
+    Notes
+    -----
+    Returns ``0`` on success; errors raise. Do not use the status int as a
+    bool.
+    """
     ...
 
 def set_any_check(p: object) -> bool:
@@ -27,7 +35,13 @@ def set_check_exact(p: object) -> bool:
     ...
 
 def set_clear(s: set) -> int:
-    """Clear ``s`` via ``PySet_Clear`` (``0`` / raises). Returns 0 on success; errors raise — do not use as bool."""
+    """Clear ``s`` via ``PySet_Clear``.
+
+    Notes
+    -----
+    Returns ``0`` on success; errors raise. Do not use the status int as a
+    bool.
+    """
     ...
 
 def set_contains(anyset: object, value: object) -> bool:
@@ -39,7 +53,13 @@ def set_copy(s: set) -> set:
     ...
 
 def set_discard(s: set, value: object) -> int:
-    """Discard ``value`` via ``PySet_Discard`` (``1`` removed / ``0`` absent; no ``KeyError``). Returns 0 on success; errors raise — do not use as bool."""
+    """Discard ``value`` via ``PySet_Discard``.
+
+    Notes
+    -----
+    Returns ``1`` if removed, ``0`` if absent (no ``KeyError``). Errors raise.
+    Do not treat the status int as a plain bool for success/failure.
+    """
     ...
 
 def set_empty() -> set:
@@ -79,10 +99,21 @@ def set_new(iterable: object) -> set:
     ...
 
 def set_size(anyset: object) -> int:
-    """Return ``len(anyset)`` via checked ``PySet_Size`` (set/frozenset/subtypes)."""
+    """Return ``len(anyset)`` via checked ``PySet_Size``.
+
+    Notes
+    -----
+    Accepts set/frozenset/subtypes. Prefer ``set_len`` on a typed exact
+    ``set`` hot path.
+    """
     ...
 
 def set_update(s: set, iterable: object) -> int:
-    """Update ``s`` from ``iterable`` via ``_PySet_Update`` (``0`` / raises). Returns 0 on success; errors raise — do not use as bool."""
-    ...
+    """Update ``s`` from ``iterable`` via ``_PySet_Update``.
 
+    Notes
+    -----
+    Returns ``0`` on success; errors raise. Do not use the status int as a
+    bool.
+    """
+    ...

@@ -1,7 +1,8 @@
-"""Public :mod:`cypy.cyiterobject` stubs.
+"""Sequence and callable iterator type checks via ``PySeqIter_*`` / ``PyCallIter_*``.
 
-Tier A losers (ratio > 1.02 vs Python) are omitted from stubs but remain
-``cpdef`` on the extension for Cython / future work.
+Prefer :func:`iter` / iterator protocol from Python unless you need exact
+iterator-kind checks. Tier A losers remain ``cpdef`` but are omitted from
+stubs. See :doc:`/user_guide/quickstart`.
 """
 
 def seqiter_check(op: object) -> bool:
@@ -11,4 +12,3 @@ def seqiter_check(op: object) -> bool:
 def calliter_check(op: object) -> bool:
     """Return True if ``op`` is a callable iterator (``PyCallIter_Check``)."""
     ...
-

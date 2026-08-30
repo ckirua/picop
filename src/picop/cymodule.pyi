@@ -1,4 +1,9 @@
-"""Public :mod:`cypy.cymodule` stubs (signatures + docstrings for IDE / typecheckers)."""
+"""Module creation, import, and constant-registration helpers via ``PyModule_*``.
+
+Prefer stdlib ``importlib`` / module attributes from Python unless you need
+C-API module construction. ``*_cstr`` / ``bytes`` names are C strings, not
+``str``. See :doc:`/user_guide/safety`.
+"""
 
 def mod_check(p: object) -> bool:
     """Return True if ``p`` is a module or subtype (``PyModule_Check``)."""
@@ -13,7 +18,12 @@ def mod_eq(a: object, b: object) -> bool:
     ...
 
 def mod_new(name: bytes) -> object:
-    """Return a new module named ``name`` via ``PyModule_New``."""
+    """Return a new module named ``name`` via ``PyModule_New``.
+
+    Notes
+    -----
+    ``name`` must be ``bytes``, not ``str``.
+    """
     ...
 
 def mod_new_object(name: object) -> object:
@@ -29,15 +39,32 @@ def mod_get_filename(module: object) -> object:
     ...
 
 def mod_add_object_ref(module: object, name: bytes, value: object) -> int:
-    """Add ``value`` as ``name`` without stealing the reference (``PyModule_AddObjectRef``). Returns 0 on success; errors raise — do not use as bool."""
+    """Add ``value`` as ``name`` without stealing the reference (``PyModule_AddObjectRef``).
+
+    Notes
+    -----
+    ``name`` must be ``bytes``. Returns ``0`` on success; errors raise — do not
+    use the status as a bool.
+    """
     ...
 
 def mod_add_int(module: object, name: bytes, value: int) -> int:
-    """Add integer constant ``name`` via ``PyModule_AddIntConstant``. Returns 0 on success; errors raise — do not use as bool."""
+    """Add integer constant ``name`` via ``PyModule_AddIntConstant``.
+
+    Notes
+    -----
+    ``name`` must be ``bytes``. Returns ``0`` on success; errors raise — do not
+    use the status as a bool.
+    """
     ...
 
 def mod_import(name: bytes) -> object:
-    """Import module ``name`` via ``PyImport_ImportModule``."""
+    """Import module ``name`` via ``PyImport_ImportModule``.
+
+    Notes
+    -----
+    ``name`` must be ``bytes``, not ``str``.
+    """
     ...
 
 def mod_import_object(name: object) -> object:
@@ -52,8 +79,13 @@ def mod_magic_number() -> int:
     """Return the ``.pyc`` magic number via ``PyImport_GetMagicNumber``."""
     ...
 
-# N2 preferred ``*_cstr`` (0.3: ``*_string`` removed from stubs)
 def mod_add_cstr(module: object, name: bytes, value: bytes) -> int:
-    """Add string constant ``name`` via ``PyModule_AddStringConstant``. Returns 0 on success; errors raise — do not use as bool. Alias of ``mod_add_string`` (prefer ``*_cstr`` naming)."""
-    ...
+    """Add string constant ``name`` via ``PyModule_AddStringConstant``.
 
+    Notes
+    -----
+    ``name`` and ``value`` must be ``bytes``, not ``str``. Returns ``0`` on
+    success; errors raise — do not use the status as a bool. Alias of
+    ``mod_add_string`` (prefer ``*_cstr`` naming).
+    """
+    ...

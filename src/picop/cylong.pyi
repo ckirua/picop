@@ -1,7 +1,8 @@
-"""Public :mod:`cypy.cylong` stubs (signatures + docstrings for IDE / typecheckers).
+"""Integer (``PyLong``) conversion and checks for known-type hot paths.
 
-Tier A losers (ratio > 1.02 vs Python) are omitted from stubs but remain
-``cpdef`` on the extension for Cython / future work.
+Prefer builtins for ordinary arithmetic from Python. Tier A losers remain
+``cpdef`` but are omitted from stubs. Mask helpers wrap on overflow without
+raising — trusted-caller. See :doc:`/user_guide/safety`.
 """
 
 def long_check(p: object) -> bool:
@@ -53,10 +54,21 @@ def long_as_ulonglong(pylong: object) -> int:
     ...
 
 def long_as_ulong_mask(io: object) -> int:
-    """Return ``PyLong_AsUnsignedLongMask`` (wrap on overflow; no exception)."""
+    """Return ``PyLong_AsUnsignedLongMask``.
+
+    Notes
+    -----
+    Wraps on overflow and does not raise — trusted-caller. See
+    :doc:`/user_guide/safety`.
+    """
     ...
 
 def long_as_ulonglong_mask(io: object) -> int:
-    """Return ``PyLong_AsUnsignedLongLongMask`` (wrap on overflow; no exception)."""
-    ...
+    """Return ``PyLong_AsUnsignedLongLongMask``.
 
+    Notes
+    -----
+    Wraps on overflow and does not raise — trusted-caller. See
+    :doc:`/user_guide/safety`.
+    """
+    ...

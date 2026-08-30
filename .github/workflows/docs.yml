@@ -6,6 +6,8 @@ on:
     paths:
       - "doc/**"
       - "src/picop/**"
+      - "docs/PIPELINE.md"
+      - "scripts/check_pyi_docstrings.py"
       - "pyproject.toml"
       - "setup.py"
       - "CHANGELOG.md"
@@ -39,6 +41,9 @@ jobs:
         run: |
           pip install setuptools wheel Cython picobuild
           pip install -e ".[docs]" --no-build-isolation
+
+      - name: Check public .pyi docstrings
+        run: python scripts/check_pyi_docstrings.py
 
       - name: Build Sphinx HTML
         run: sphinx-build -b html doc/ doc/_build/html

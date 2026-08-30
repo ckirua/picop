@@ -1,4 +1,8 @@
-"""Public :mod:`cypy.cygenobject` stubs."""
+"""Generator type checks and identity equality via ``PyGen_*``.
+
+Prefer :mod:`types` / builtins from Python unless you need exact generator
+checks on a hot path. See :doc:`/user_guide/quickstart`.
+"""
 
 def gen_check(ob: object) -> bool:
     """Return True if ``ob`` is a generator (``PyGen_Check``)."""

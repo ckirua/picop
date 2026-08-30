@@ -1,8 +1,8 @@
-"""Public :mod:`cypy.cynumber` stubs (signatures + docstrings for IDE / typecheckers).
+"""Abstract number-protocol helpers via the CPython C-API.
 
-Tier A losers (ratio > 1.02 vs Python) are omitted from stubs but remain
-``cpdef`` on the extension. Prefer builtins for binary/unary ops from Python;
-keep checks / ``num_eq`` / measured wins / unmeasured siblings stubbed.
+Prefer builtins for binary/unary ops from Python; keep checks, ``num_eq``,
+and measured wins here when the operand type is unknown. Tier A losers remain
+``cpdef`` but are omitted from stubs. See :doc:`/user_guide/quickstart`.
 """
 
 def num_check(o: object) -> bool:

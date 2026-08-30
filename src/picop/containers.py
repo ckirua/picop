@@ -1,7 +1,8 @@
 """Category facade: typed Core containers (dict / list / set / tuple).
 
-Prefer ``from cypy.hot import …`` for micro-opt starters. This module groups
+Prefer ``from picop.hot import …`` for micro-opt starters. This module groups
 word-prefix container helpers for discovery without a flat barrel dump.
+See :doc:`/user_guide/safety` for unchecked accessors.
 """
 
 from __future__ import annotations

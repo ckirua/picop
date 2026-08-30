@@ -1,47 +1,99 @@
-"""Public :mod:`cypy.cycodecs` stubs.
+"""Codec registry and error-handler helpers wrapping ``PyCodec_*``.
 
-Tier A losers (ratio > 1.02 vs Python) are omitted from stubs but remain
-``cpdef`` on the extension for Cython / future work.
+Prefer :mod:`codecs` from Python unless you need C-API registration or lookup
+on hot paths. Encoding / error names take ``bytes``, not ``str``. See
+:doc:`/user_guide/safety`.
 """
 
 def codec_register(search_function: object) -> int:
-    """Register a codec search function (``PyCodec_Register``). Returns 0 on success; errors raise — do not use as bool."""
+    """Register a codec search function (``PyCodec_Register``).
+
+    Notes
+    -----
+    Returns ``0`` on success; errors raise — do not use the status as a bool.
+    """
     ...
 
 def codec_known(encoding: bytes) -> bool:
-    """Return True if ``encoding`` is a known codec (``PyCodec_KnownEncoding``; ``encoding`` must be ``bytes``, not ``str``)."""
+    """Return True if ``encoding`` is a known codec (``PyCodec_KnownEncoding``).
+
+    Notes
+    -----
+    ``encoding`` must be ``bytes``, not ``str``. See :doc:`/user_guide/safety`.
+    """
     ...
 
 def codec_encoder(encoding: bytes) -> object:
-    """Return the encoder for ``encoding`` (``PyCodec_Encoder``)."""
+    """Return the encoder for ``encoding`` (``PyCodec_Encoder``).
+
+    Notes
+    -----
+    ``encoding`` must be ``bytes``, not ``str``.
+    """
     ...
 
 def codec_decoder(encoding: bytes) -> object:
-    """Return the decoder for ``encoding`` (``PyCodec_Decoder``)."""
+    """Return the decoder for ``encoding`` (``PyCodec_Decoder``).
+
+    Notes
+    -----
+    ``encoding`` must be ``bytes``, not ``str``.
+    """
     ...
 
 def codec_incremental_encoder(encoding: bytes, errors: bytes | None = None) -> object:
-    """Return an incremental encoder (``PyCodec_IncrementalEncoder``)."""
+    """Return an incremental encoder (``PyCodec_IncrementalEncoder``).
+
+    Notes
+    -----
+    ``encoding`` / ``errors`` must be ``bytes`` when provided, not ``str``.
+    """
     ...
 
 def codec_incremental_decoder(encoding: bytes, errors: bytes | None = None) -> object:
-    """Return an incremental decoder (``PyCodec_IncrementalDecoder``)."""
+    """Return an incremental decoder (``PyCodec_IncrementalDecoder``).
+
+    Notes
+    -----
+    ``encoding`` / ``errors`` must be ``bytes`` when provided, not ``str``.
+    """
     ...
 
 def codec_stream_reader(encoding: bytes, stream: object, errors: bytes | None = None) -> object:
-    """Return a stream reader (``PyCodec_StreamReader``)."""
+    """Return a stream reader (``PyCodec_StreamReader``).
+
+    Notes
+    -----
+    ``encoding`` / ``errors`` must be ``bytes`` when provided, not ``str``.
+    """
     ...
 
 def codec_stream_writer(encoding: bytes, stream: object, errors: bytes | None = None) -> object:
-    """Return a stream writer (``PyCodec_StreamWriter``)."""
+    """Return a stream writer (``PyCodec_StreamWriter``).
+
+    Notes
+    -----
+    ``encoding`` / ``errors`` must be ``bytes`` when provided, not ``str``.
+    """
     ...
 
 def codec_register_error(name: bytes, error: object) -> int:
-    """Register a codec error callback (``PyCodec_RegisterError``). Returns 0 on success; errors raise — do not use as bool."""
+    """Register a codec error callback (``PyCodec_RegisterError``).
+
+    Notes
+    -----
+    ``name`` must be ``bytes``. Returns ``0`` on success; errors raise — do not
+    use the status as a bool.
+    """
     ...
 
 def codec_lookup_error(name: bytes) -> object:
-    """Lookup a codec error callback (``PyCodec_LookupError``)."""
+    """Lookup a codec error callback (``PyCodec_LookupError``).
+
+    Notes
+    -----
+    ``name`` must be ``bytes``, not ``str``.
+    """
     ...
 
 def codec_strict_errors(exc: object) -> object:

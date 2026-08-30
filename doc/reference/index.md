@@ -2,7 +2,7 @@
 
 Public Python / `cpdef` surface only. Cimport-only and `cdef` symbols stay in the Cython SDK (see {doc}`/user_guide/quickstart`) and are not listed here.
 
-Docstrings for compiled helpers are taken from adjacent `.pyi` stubs when the runtime object has no `__doc__`.
+Docstrings for compiled helpers are taken from adjacent `.pyi` stubs when the runtime object has no `__doc__`. Each symbol has an imperative summary; optional **Notes** cover trusted-caller caveats (unchecked OOB, borrowed pointers, vs builtin). Types live in the signature — there are no Args/Returns blocks.
 
 ## Module map
 

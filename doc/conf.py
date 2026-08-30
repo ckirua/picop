@@ -115,10 +115,14 @@ suppress_warnings = [
 ]
 
 # -- Stub docstring bridge ----------------------------------------------------
-# Public one-liners live in adjacent ``.pyi`` stubs. Compiled Cython modules
-# often ship empty ``__doc__``; inject stub docs during autodoc.
+# Public summary (+ Notes) live in adjacent ``.pyi`` stubs. Compiled Cython
+# modules often ship empty ``__doc__``; inject stub docs during autodoc *before*
+# Napoleon / typehints so ``Notes`` sections render.
 
 _STUB_DOC_CACHE: dict[str, dict[str, str]] = {}
+
+# Run before Napoleon (default ~500) and sphinx_autodoc_typehints.
+_STUB_BRIDGE_PRIORITY = -100
 
 
 def _stub_path_for_module(modname: str) -> Path | None:
@@ -129,19 +133,18 @@ def _stub_path_for_module(modname: str) -> Path | None:
     if len(parts) == 1:
         return None
     rest = parts[1:]
-    if rest == ["uuid"] or (len(rest) >= 1 and rest[0] == "uuid"):
+    if rest[0] == "uuid":
         candidate = PACKAGE_SRC / "uuid" / "_uuid.pyi"
         return candidate if candidate.is_file() else None
     if len(rest) == 1:
         candidate = PACKAGE_SRC / f"{rest[0]}.pyi"
         return candidate if candidate.is_file() else None
-    # Nested: picop.uuid._uuid already covered; other nests unlikely.
     candidate = PACKAGE_SRC.joinpath(*rest[:-1]) / f"{rest[-1]}.pyi"
     return candidate if candidate.is_file() else None
 
 
 def _walk_stub_docs(node: ast.AST, prefix: str = "") -> dict[str, str]:
-    """Collect docstrings for functions/classes (and nested methods) from a stub AST."""
+    """Collect docstrings for functions/classes/properties from a stub AST."""
     out: dict[str, str] = {}
     body = getattr(node, "body", None)
     if body is None:
@@ -155,10 +158,6 @@ def _walk_stub_docs(node: ast.AST, prefix: str = "") -> dict[str, str]:
                 out[child.name] = doc  # bare name for member lookup
             if isinstance(child, ast.ClassDef):
                 out.update(_walk_stub_docs(child, qual))
-        elif isinstance(child, ast.Assign):
-            # Rare: documented constants via preceding Expr docstring are not
-            # attached by get_docstring; skip for now.
-            pass
     return out
 
 
@@ -179,12 +178,15 @@ def _load_stub_docs(modname: str) -> dict[str, str]:
             if mod_doc:
                 docs[""] = mod_doc
             docs.update(_walk_stub_docs(tree))
+    # Alias uuid._uuid → uuid for runtime module names.
     _STUB_DOC_CACHE[modname] = docs
+    if modname == "picop.uuid":
+        _STUB_DOC_CACHE["picop.uuid._uuid"] = docs
     return docs
 
 
 def _regex_stub_docs(text: str) -> dict[str, str]:
-    """Best-effort ``def name`` + following docstring extraction when AST parse fails."""
+    """Best-effort ``def`` / ``@property`` docstring extraction when AST parse fails."""
     import re
 
     docs: dict[str, str] = {}
@@ -192,8 +194,8 @@ def _regex_stub_docs(text: str) -> dict[str, str]:
     if mod:
         docs[""] = mod.group(1).strip()
     for m in re.finditer(
-        r"^(?:async\s+)?def\s+(\w+)\s*\([^)]*\)\s*(?:->[^:]+)?:\s*\n"
-        r'\s+"""(.*?)"""',
+        r"^(?:[ \t]*@[^\n]+\n)*[ \t]*(?:async\s+)?def\s+(\w+)\s*\([^)]*\)\s*(?:->[^:]+)?:\s*\n"
+        r'[ \t]+"""(.*?)"""',
         text,
         re.MULTILINE | re.DOTALL,
     ):
@@ -216,7 +218,11 @@ def _stub_doc_for(what: str, name: str, obj: object) -> str | None:
         else:
             return None
     stub = _load_stub_docs(str(modname))
-    return stub.get(attr) or stub.get(".".join(parts[2:])) if len(parts) > 2 else stub.get(attr)
+    if attr in stub:
+        return stub[attr]
+    if len(parts) > 2:
+        return stub.get(".".join(parts[2:]))
+    return None
 
 
 def _has_prose_docstring(lines: list[str]) -> bool:
@@ -234,8 +240,9 @@ def _has_prose_docstring(lines: list[str]) -> bool:
 def _process_docstring(app, what, name, obj, options, lines):  # noqa: ARG001
     """If the live object has no prose docstring, inject the adjacent ``.pyi`` one.
 
+    Runs early so Napoleon can expand ``Notes`` and typehints can append fields.
     ``sphinx_autodoc_typehints`` may already have inserted ``:param:`` / ``:rtype:``
-    fields into ``lines``; treat those as non-prose so stubs still win.
+    when this runs later in some configs; treat those as non-prose so stubs still win.
     """
     if _has_prose_docstring(lines):
         return
@@ -255,14 +262,23 @@ def _skip_member(app, what, name, obj, skip, options):  # noqa: ARG001
         return False
     modname = getattr(obj, "__module__", None)
     if not modname or not str(modname).startswith("picop"):
+        # Class members: resolve via fully-qualified autodoc name when present.
         return None
     stub = _load_stub_docs(str(modname))
     if name in stub:
+        return False
+    # Properties / methods may appear as Class.attr in some autodoc paths.
+    bare = name.rsplit(".", 1)[-1]
+    if bare in stub:
         return False
     return None
 
 
 def setup(app):
-    app.connect("autodoc-process-docstring", _process_docstring)
-    app.connect("autodoc-skip-member", _skip_member)
+    app.connect(
+        "autodoc-process-docstring",
+        _process_docstring,
+        priority=_STUB_BRIDGE_PRIORITY,
+    )
+    app.connect("autodoc-skip-member", _skip_member, priority=_STUB_BRIDGE_PRIORITY)
     return {"parallel_read_safe": True, "parallel_write_safe": True}

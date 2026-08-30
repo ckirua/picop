@@ -1,4 +1,9 @@
-"""Public :mod:`cypy.cybytearray` stubs (signatures + docstrings for IDE / typecheckers)."""
+"""Typed C-API helpers for :class:`bytearray` hot paths.
+
+Prefer :mod:`picop.cybytearray` (or starters in :mod:`picop.hot`) over builtin
+``bytearray`` methods when the concrete type is known. See
+:doc:`/user_guide/quickstart` for import patterns.
+"""
 
 # Preferred public names (0.3 hard trim)
 
@@ -23,7 +28,12 @@ def bytearray_len(ba: bytearray) -> int:
     ...
 
 def bytearray_eq(a: bytearray, b: bytearray) -> bool:
-    """Return True if typed ``bytearray`` values are equal (identity/len/`memcmp`)."""
+    """Return True if typed ``bytearray`` values are equal.
+
+    Notes
+    -----
+    Identity/len short-circuit plus ``memcmp``.
+    """
     ...
 
 def bytearray_ne(a: bytearray, b: bytearray) -> bool:
@@ -31,14 +41,29 @@ def bytearray_ne(a: bytearray, b: bytearray) -> bool:
     ...
 
 def bytearray_contains(haystack: bytearray, needle: bytes) -> bool:
-    """Return True if ``needle`` is found in typed ``haystack`` (mirror ``bytes_contains``)."""
+    """Return True if ``needle`` is found in typed ``haystack``.
+
+    Notes
+    -----
+    Mirrors ``bytes_contains`` search strategy on a typed ``bytearray``.
+    """
     ...
 
 def bytearray_resize(ba: bytearray, n: int) -> int:
-    """Resize ``ba`` in place via ``PyByteArray_Resize`` (``0`` / ``-1``). Returns 0 on success; errors raise — do not use as bool."""
+    """Resize ``ba`` in place via ``PyByteArray_Resize``.
+
+    Notes
+    -----
+    Returns ``0`` on success and ``-1`` on error; errors raise. Do not use the
+    status int as a bool.
+    """
     ...
 
 def bytearray_size(ba: object) -> int:
-    """Return ``len(ba)`` via checked ``PyByteArray_Size`` (prefer ``balen`` on typed ``bytearray``)."""
-    ...
+    """Return ``len(ba)`` via checked ``PyByteArray_Size``.
 
+    Notes
+    -----
+    Prefer ``bytearray_len`` on a typed ``bytearray`` hot path.
+    """
+    ...

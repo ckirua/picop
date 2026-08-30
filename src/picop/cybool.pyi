@@ -1,4 +1,8 @@
-"""Public :mod:`cypy.cybool` stubs (signatures + docstrings for IDE / typecheckers)."""
+"""Bool construction and checks wrapping ``PyBool_*``.
+
+Prefer builtins for ordinary Python code; use these on known-type hot paths
+that need C-API parity. See :doc:`/user_guide/quickstart`.
+"""
 
 def bool_check(o: object) -> bool:
     """Return True if ``o`` is a :class:`bool` (``PyBool_Check``)."""

@@ -12,7 +12,7 @@ Process docs live under [`docs/`](.) — trackers only under [`docs/modules/`](m
 2. Index      v2 tracker if legacy/stub — full inventory, no skim
 3. Measure    present / promoted: try-all + **depth investigation** (below)
 4. Evidence   **must** update `docs/modules/NNN_cy{name}.md` — Bench results + Experiment conclusions (**no skip**; never “see harness” / “see PR” only)
-5. Docs API   public PEP 257 one-liners in `cy{name}.pyi`; lean `.pxd`
+5. Docs API   public PEP 257 summary (+ optional Notes) in `cy{name}.pyi`; lean `.pxd`
 6. Tracker    ensure `docs/modules/NNN_cy{name}.md` Lifecycle / decisions match the PR
 7. Ship       commit → push → PR (Short / Brief / Detailed + benches + probe notes)
 8. Merge      when checklist green → next Order on a NEW branch (if any)
@@ -98,7 +98,7 @@ Thin `Check` / `Size` wrappers may share one short note; hot paths and builders 
 | Try-all | Every inventory candidate tried; no silent TODO |
 | **Depth** | Depth checklist covered for primary + demotions/rejects |
 | **Tracker updated** | `docs/modules/NNN_cy{name}.md` has current Bench results **and** Experiment conclusions (**no skip**) |
-| **Public `.pyi` docs** | Every public `cpdef` has a PEP 257 **one-liner** (style below) |
+| **Public `.pyi` docs** | Every public `cpdef` has a PEP 257 **summary** (+ optional Notes; style below) |
 | Lean `.pxd` | Cython/safety `#` comments only; `cdef` not in `.pyi` |
 | Exports | `__init__.py` / `__init__.pxd` / `__all__` match decisions |
 | QUEUE + PR | State updated; PR includes depth highlights |
@@ -109,11 +109,30 @@ Exemplar trackers: [`modules/001_cytuple.md`](modules/001_cytuple.md), [`modules
 
 | Rule | Detail |
 |------|--------|
-| Form | **One-liner** (PEP 257): imperative summary |
-| Skip | No `Args:` / `Returns:` / `Raises:` — signature owns types |
-| Add | Caveats: no bounds check, raises `IndexError`, uninit buffer, etc. |
-| Example | `"""Return ``t[i]`` via bounds-checked ``PyTuple_GetItem`` (raises ``IndexError``)."""` |
+| Form | **Summary + optional Notes** (PEP 257): imperative first line; NumPy-style `Notes` for caveats |
+| Skip | No `Args:` / `Parameters:` / `Returns:` / `Raises:` — signature + summary own types/outcomes |
+| Add | Caveats in `Notes`: no bounds check, raises `IndexError`, uninit buffer, trusted-caller, vs builtin |
+| Thin | Obvious `*_check` / `*_len` may stay **summary-only** (no Notes) |
+| Sphinx | Napoleon enabled so `Notes` renders; stub→autodoc bridge in `doc/conf.py` |
 | `.pxd` | No duplicate user prose — one-line `#` safety comments only |
+
+```python
+def dict_get(mp: dict, key: object, default: object = None) -> object:
+    """Return ``mp[key]`` via ``PyDict_GetItemWithError``, or ``default``.
+
+    Notes
+    -----
+    Prefer over ``mp.get`` on typed hot paths. Key lookup still uses
+    normal hashing / equality.
+    """
+```
+
+Shorter form still fine when the summary already carries the only caveat:
+
+```python
+def tuple_get(t: tuple, i: int) -> object:
+    """Return ``t[i]`` via bounds-checked ``PyTuple_GetItem`` (raises ``IndexError``)."""
+```
 
 ## Branch
 

@@ -1,4 +1,8 @@
-"""Public :mod:`cypy.cyansi` stubs (signatures + docstrings for IDE / typecheckers)."""
+"""ANSI/SGR escape helpers built on unicode intern (not a CPython C-API wrap).
+
+Prefer :mod:`picop.cyansi` (or starters in :mod:`picop.hot`) for terminal color
+wraps and CSI stripping. See :doc:`/user_guide/quickstart` for import patterns.
+"""
 
 RESET: str
 
@@ -45,7 +49,12 @@ class BOLD_COLORS_256:
 # Preferred public names (0.3 hard trim)
 
 def ansi_bg8(code: int) -> str:
-    """Return an 8-color background SGR for ``code`` (table hit for 40–47)."""
+    """Return an 8-color background SGR for ``code``.
+
+    Notes
+    -----
+    Table hit for codes ``40``–``47``.
+    """
     ...
 
 def ansi_bold(on: bool = True) -> str:
@@ -53,11 +62,21 @@ def ansi_bold(on: bool = True) -> str:
     ...
 
 def ansi_fg256(n: int) -> str:
-    """Return a 256-color foreground SGR for palette index ``n`` (table for 0–255)."""
+    """Return a 256-color foreground SGR for palette index ``n``.
+
+    Notes
+    -----
+    Table lookup for indices ``0``–``255``.
+    """
     ...
 
 def ansi_fg8(code: int) -> str:
-    """Return an 8-color foreground SGR for ``code`` (table hit for 30–37)."""
+    """Return an 8-color foreground SGR for ``code``.
+
+    Notes
+    -----
+    Table hit for codes ``30``–``37``.
+    """
     ...
 
 def ansi_reset() -> str:
@@ -65,10 +84,19 @@ def ansi_reset() -> str:
     ...
 
 def ansi_strip(s: str) -> str:
-    """Remove CSI sequences from ``s`` in a single pass (returns ``s`` if none)."""
+    """Remove CSI sequences from ``s`` in a single pass.
+
+    Notes
+    -----
+    Returns ``s`` unchanged when no CSI sequences are present.
+    """
     ...
 
 def ansi_wrap(prefix: str, text: str, suffix: str | None = ...) -> str:
-    """Return ``prefix + text + suffix`` (default suffix = reset)."""
-    ...
+    """Return ``prefix + text + suffix``.
 
+    Notes
+    -----
+    Default ``suffix`` is the ANSI reset sequence.
+    """
+    ...

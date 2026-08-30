@@ -1,7 +1,7 @@
 """Category facade: abstract Protocols (mapping / sequence / number / object).
 
-**Provisional after 1.0** — not part of the Core freeze. Prefer ``cypy.containers`` /
-``cypy.hot`` when you know ``dict`` / ``list`` / ``tuple`` / …. Use this facade only
+**Provisional after 1.0** — not part of the Core freeze. Prefer ``picop.containers`` /
+``picop.hot`` when you know ``dict`` / ``list`` / ``tuple`` / …. Use this facade only
 when the concrete type is unknown. May still evolve under post-1.0 minors.
 """
 

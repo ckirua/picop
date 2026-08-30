@@ -1,7 +1,8 @@
-"""Public :mod:`cypy.cytype` stubs (signatures + docstrings for IDE / typecheckers).
+"""Type-object checks and identity equality via ``PyType_*``.
 
-Tier A losers (ratio > 1.02 vs Python) are omitted from stubs but remain
-``cpdef`` on the extension for Cython / future work.
+Prefer builtins for ordinary ``isinstance`` / ``type`` work from Python.
+Tier A losers remain ``cpdef`` but are omitted from stubs. See
+:doc:`/user_guide/quickstart`.
 """
 
 def type_check(o: object) -> bool:

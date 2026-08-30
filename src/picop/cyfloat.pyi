@@ -1,7 +1,7 @@
-"""Public :mod:`cypy.cyfloat` stubs (signatures + docstrings for IDE / typecheckers).
+"""Float checks and equality with CPython float parity.
 
-Tier A losers (ratio > 1.02 vs Python) are omitted from stubs but remain
-``cpdef`` on the extension for Cython / future work.
+Prefer builtins for ordinary float work from Python. Tier A losers remain
+``cpdef`` but are omitted from stubs. See :doc:`/user_guide/quickstart`.
 """
 
 def float_check(p: object) -> bool:
@@ -13,6 +13,10 @@ def float_check_exact(p: object) -> bool:
     ...
 
 def float_eq(a: object, b: object) -> bool:
-    """Return True if values are equal with Python float parity (NaN != NaN, ``+0.0 == -0.0``)."""
-    ...
+    """Return True if values are equal with Python float parity.
 
+    Notes
+    -----
+    Matches CPython: ``NaN != NaN``, and ``+0.0 == -0.0``.
+    """
+    ...

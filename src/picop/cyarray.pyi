@@ -1,4 +1,8 @@
-"""Public :mod:`cypy.cyarray` stubs (signatures + docstrings for IDE / typecheckers)."""
+"""Typed helpers for :class:`array.array` buffers.
+
+Prefer :mod:`picop.cyarray` (or starters in :mod:`picop.hot`) when the concrete
+array type is known. See :doc:`/user_guide/quickstart` for import patterns.
+"""
 
 from array import array
 
@@ -13,7 +17,12 @@ def array_check_exact(p: object) -> bool:
     ...
 
 def array_clone(template: array, length: int, zero: bool = True) -> array:
-    """Return a new array like ``template`` with ``length`` items (optionally zeroed)."""
+    """Return a new array like ``template`` with ``length`` items.
+
+    Notes
+    -----
+    Optionally zero-fills the new buffer when ``zero`` is true.
+    """
     ...
 
 def array_copy(a: array) -> array:
@@ -21,7 +30,13 @@ def array_copy(a: array) -> array:
     ...
 
 def array_extend(self: array, other: array) -> int:
-    """Extend ``self`` from ``other`` (same typecode) via Cython ``array.extend`` (``0`` / ``-1``). Returns 0 on success; errors raise — do not use as bool."""
+    """Extend ``self`` from ``other`` via Cython ``array.extend``.
+
+    Notes
+    -----
+    Requires the same typecode. Returns ``0`` on success and ``-1`` on error;
+    errors raise. Do not use the status int as a bool.
+    """
     ...
 
 def array_len(a: array) -> int:
@@ -29,7 +44,12 @@ def array_len(a: array) -> int:
     ...
 
 def array_eq(a: array, b: array) -> bool:
-    """Return True if typed ``array.array`` values are equal (typecode/len/`memcmp`)."""
+    """Return True if typed ``array.array`` values are equal.
+
+    Notes
+    -----
+    Compares typecode/len then ``memcmp``.
+    """
     ...
 
 def array_ne(a: array, b: array) -> bool:
@@ -37,14 +57,31 @@ def array_ne(a: array, b: array) -> bool:
     ...
 
 def array_resize(a: array, n: int) -> int:
-    """Resize ``a`` to ``n`` elements via Cython ``array.resize`` (``0`` / ``-1``). Returns 0 on success; errors raise — do not use as bool."""
+    """Resize ``a`` to ``n`` elements via Cython ``array.resize``.
+
+    Notes
+    -----
+    Returns ``0`` on success and ``-1`` on error; errors raise. Do not use the
+    status int as a bool.
+    """
     ...
 
 def array_resize_smart(a: array, n: int) -> int:
-    """Resize ``a`` to ``n`` via Cython ``array.resize_smart`` (small-grow friendly; ``0`` / ``-1``). Returns 0 on success; errors raise — do not use as bool."""
+    """Resize ``a`` to ``n`` via Cython ``array.resize_smart``.
+
+    Notes
+    -----
+    Small-grow friendly. Returns ``0`` on success and ``-1`` on error; errors
+    raise. Do not use the status int as a bool.
+    """
     ...
 
 def array_zero(a: array) -> int:
-    """Zero all elements of ``a`` via ``memset`` (``0``). Returns 0 on success; errors raise — do not use as bool."""
-    ...
+    """Zero all elements of ``a`` via ``memset``.
 
+    Notes
+    -----
+    Returns ``0`` on success; errors raise. Do not use the status int as a
+    bool.
+    """
+    ...

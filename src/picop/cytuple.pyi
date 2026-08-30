@@ -1,4 +1,10 @@
-"""Public :mod:`picop.cytuple` stubs (signatures + docstrings for IDE / typecheckers)."""
+"""Typed C-API helpers for :class:`tuple` hot paths.
+
+Prefer :mod:`picop.cytuple` (or starters in :mod:`picop.hot`) over builtin
+``tuple`` access when the concrete type is known. Unchecked getters are
+trusted-caller tools — see :doc:`/user_guide/safety`. Import patterns:
+:doc:`/user_guide/quickstart`.
+"""
 
 # Preferred public names (0.3 hard trim)
 
@@ -11,11 +17,23 @@ def tuple_check_exact(p: object) -> bool:
     ...
 
 def tuple_get(t: tuple[object, ...], i: int) -> object:
-    """Return ``t[i]`` via ``PyTuple_GET_ITEM``."""
+    """Return ``t[i]`` via ``PyTuple_GET_ITEM``.
+
+    Notes
+    -----
+    Unchecked: out-of-bounds is undefined behavior. Prefer
+    ``tuple_get_checked`` when the index may be OOB, or bound the index
+    yourself before calling.
+    """
     ...
 
 def tuple_get_checked(t: tuple[object, ...], i: int) -> object:
-    """Return ``t[i]`` via bounds-checked ``PyTuple_GetItem`` (raises ``IndexError``)."""
+    """Return ``t[i]`` via bounds-checked ``PyTuple_GetItem``.
+
+    Notes
+    -----
+    Raises ``IndexError`` on out-of-bounds (unlike unchecked ``tuple_get``).
+    """
     ...
 
 def tuple_len(t: tuple[object, ...]) -> int:
@@ -41,7 +59,12 @@ def tuple_pack4(
     ...
 
 def tuple_size(t: tuple[object, ...]) -> int:
-    """Return ``len(t)`` via checked ``PyTuple_Size`` (prefer ``tuple_len`` in hot paths)."""
+    """Return ``len(t)`` via checked ``PyTuple_Size``.
+
+    Notes
+    -----
+    Prefer ``tuple_len`` on typed hot paths.
+    """
     ...
 
 def tuple_slice(t: tuple[object, ...], low: int, high: int) -> tuple[object, ...]:

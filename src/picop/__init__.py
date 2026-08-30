@@ -1,13 +1,9 @@
-"""
-Fast CPython helpers for common dict and string operations.
+"""Fast CPython C-API helpers for typed hot paths (dict, str, bytes, …).
 
-Re-exports compiled Cython helpers from ``cypy.*`` submodules.
-
-**1.0:** Core discovery (``__all__``) + ``cypy.hot`` are frozen — see
-``COVERAGE.md`` / ``docs/RELEASE.md``. Soft Strategy B aliases were removed in
-0.3 — see ``cypy.compat.COMPAT_MAP`` / ``__getattr__`` migration hints. Prefer
-word-prefix / ``str_*`` / ``ansi_*`` / ``*_cstr`` names. Protocols / Runtime
-remain provisional under post-1.0 minor policy.
+Re-exports compiled Cython helpers from ``picop.cy*`` submodules. Prefer
+:mod:`picop.hot` for micro-opt starters; full surface stays on ``picop`` /
+``picop.cy*``. Soft Strategy B aliases were removed in 0.3 — see
+``picop.compat.COMPAT_MAP`` / ``__getattr__`` migration hints.
 """
 
 from __future__ import annotations

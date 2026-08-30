@@ -1,7 +1,8 @@
-"""Public :mod:`cypy.cymethod` stubs (signatures + docstrings for IDE / typecheckers).
+"""Bound-method checks and accessors wrapping ``PyMethod_*``.
 
-Tier A losers (ratio > 1.02 vs Python) are omitted from stubs but remain
-``cpdef`` on the extension for Cython / future work.
+Prefer attribute access from Python unless you need checked C-API getters on
+a known method. Tier A losers remain ``cpdef`` but are omitted from stubs.
+See :doc:`/user_guide/quickstart`.
 """
 
 def method_check(o: object) -> bool:
@@ -13,9 +14,19 @@ def method_eq(a: object, b: object) -> bool:
     ...
 
 def method_get_function(meth: object) -> object:
-    """Preferred spelling of ``method_function`` (checked ``PyMethod_Function``)."""
+    """Return the underlying function via checked ``PyMethod_Function``.
+
+    Notes
+    -----
+    Preferred spelling of ``method_function``.
+    """
     ...
 
 def method_get_self(meth: object) -> object | None:
-    """Preferred spelling of ``method_self`` (checked ``PyMethod_Self``)."""
+    """Return ``__self__`` via checked ``PyMethod_Self``.
+
+    Notes
+    -----
+    Preferred spelling of ``method_self``.
+    """
     ...

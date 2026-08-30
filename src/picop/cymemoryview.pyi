@@ -1,4 +1,9 @@
-"""Public :mod:`cypy.cymemoryview` stubs (signatures + docstrings for IDE / typecheckers)."""
+"""Typed helpers for :class:`memoryview`.
+
+Prefer :mod:`picop.cymemoryview` (or starters in :mod:`picop.hot`) for typed
+view equality and contiguous views. See :doc:`/user_guide/quickstart` for
+import patterns.
+"""
 
 # Preferred public names (0.3 hard trim)
 
@@ -7,11 +12,22 @@ def memoryview_check(p: object) -> bool:
     ...
 
 def memoryview_eq(a: memoryview, b: memoryview) -> bool:
-    """Return True if views are equal (C-contiguous ``memcmp`` fast path; else richcompare)."""
+    """Return True if views are equal.
+
+    Notes
+    -----
+    C-contiguous buffers use a ``memcmp`` fast path; otherwise falls back to
+    richcompare.
+    """
     ...
 
 def memoryview_ne(a: memoryview, b: memoryview) -> bool:
-    """Return True if views differ (``not memoryview_eq``; same contig/richcompare rules)."""
+    """Return True if views differ.
+
+    Notes
+    -----
+    Inverse of ``memoryview_eq``; same contig/richcompare rules.
+    """
     ...
 
 def memoryview_from_object(obj: object) -> memoryview:
@@ -19,6 +35,10 @@ def memoryview_from_object(obj: object) -> memoryview:
     ...
 
 def memoryview_get_contiguous(obj: object, buffertype: int = ..., order: str = "C") -> memoryview:
-    """Return a contiguous memoryview of ``obj`` via ``PyMemoryView_GetContiguous`` (``order`` is ``C``/``F``/``A``)."""
-    ...
+    """Return a contiguous memoryview of ``obj`` via ``PyMemoryView_GetContiguous``.
 
+    Notes
+    -----
+    ``order`` is ``C``, ``F``, or ``A``.
+    """
+    ...

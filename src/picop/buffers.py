@@ -1,7 +1,8 @@
 """Category facade: bytes / bytearray / array / memoryview / buffer / slice.
 
 Typed buffer-adjacent Core helpers. Prefer ``bytes_len`` / ``bytes_contains`` /
-``bytes_eq`` from ``cypy.hot`` for the common bytes hot path.
+``bytes_eq`` from ``picop.hot`` for the common bytes hot path.
+See :doc:`/user_guide/safety` for borrowed C-string footguns.
 """
 
 from __future__ import annotations

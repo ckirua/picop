@@ -1,7 +1,7 @@
-"""Public :mod:`cypy.cyiterator` stubs (signatures + docstrings for IDE / typecheckers).
+"""Iterator-protocol check and identity equality via ``PyIter_*``.
 
-Tier A losers (ratio > 1.02 vs Python) are omitted from stubs but remain
-``cpdef`` on the extension for Cython / future work.
+Prefer builtins for ordinary iteration from Python. Tier A losers remain
+``cpdef`` but are omitted from stubs. See :doc:`/user_guide/quickstart`.
 """
 
 def iter_check(o: object) -> bool:
@@ -11,4 +11,3 @@ def iter_check(o: object) -> bool:
 def iter_eq(a: object, b: object) -> bool:
     """Return True if ``a is b`` (iterator identity; typical CPython ``object.__eq__``)."""
     ...
-

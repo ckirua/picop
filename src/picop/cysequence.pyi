@@ -1,8 +1,8 @@
-"""Public :mod:`cypy.cysequence` stubs (signatures + docstrings for IDE / typecheckers).
+"""Abstract sequence-protocol helpers via the CPython C-API.
 
-Tier A losers (ratio > 1.02 vs Python) are omitted from stubs but remain
-``cpdef``. Prefer ``len`` / typed ``list_len`` / ``tuple_len`` from Python when
-the concrete type is known.
+Use when the concrete type is unknown. Prefer typed ``list_*`` / ``tuple_*``
+from Core or :mod:`picop.hot` when the type is known. Tier A losers remain
+``cpdef`` but are omitted from these stubs. See :doc:`/user_guide/safety`.
 """
 
 def seq_check(o: object) -> bool:
@@ -18,15 +18,30 @@ def seq_contains(o: object, value: object) -> bool:
     ...
 
 def seq_del(o: object, i: int) -> int:
-    """Delete ``o[i]`` via ``PySequence_DelItem`` (``0`` / ``-1``). Returns 0 on success; errors raise — do not use as bool."""
+    """Delete ``o[i]`` via ``PySequence_DelItem``.
+
+    Notes
+    -----
+    Returns ``0`` on success; errors raise — do not use the status as a bool.
+    """
     ...
 
 def seq_eq(a: object, b: object) -> bool:
-    """Return True if sequences are equal (identity/size short-circuit + richcompare; prefer ``list_eq``/``tuple_eq`` when typed)."""
+    """Return True if sequences are equal via identity/size short-circuit + richcompare.
+
+    Notes
+    -----
+    Prefer ``list_eq`` / ``tuple_eq`` when both operands are typed.
+    """
     ...
 
 def seq_del_slice(o: object, i1: int, i2: int) -> int:
-    """Delete ``o[i1:i2]`` via ``PySequence_DelSlice`` (``0`` / ``-1``). Returns 0 on success; errors raise — do not use as bool."""
+    """Delete ``o[i1:i2]`` via ``PySequence_DelSlice``.
+
+    Notes
+    -----
+    Returns ``0`` on success; errors raise — do not use the status as a bool.
+    """
     ...
 
 def seq_get(o: object, i: int) -> object:
@@ -54,11 +69,21 @@ def seq_repeat(o: object, count: int) -> object:
     ...
 
 def seq_set(o: object, i: int, v: object) -> int:
-    """Assign ``o[i] = v`` via ``PySequence_SetItem`` (``0`` / ``-1``). Returns 0 on success; errors raise — do not use as bool."""
+    """Assign ``o[i] = v`` via ``PySequence_SetItem``.
+
+    Notes
+    -----
+    Returns ``0`` on success; errors raise — do not use the status as a bool.
+    """
     ...
 
 def seq_set_slice(o: object, i1: int, i2: int, v: object) -> int:
-    """Assign ``o[i1:i2] = v`` via ``PySequence_SetSlice`` (``0`` / ``-1``). Returns 0 on success; errors raise — do not use as bool."""
+    """Assign ``o[i1:i2] = v`` via ``PySequence_SetSlice``.
+
+    Notes
+    -----
+    Returns ``0`` on success; errors raise — do not use the status as a bool.
+    """
     ...
 
 def seq_slice(o: object, i1: int, i2: int) -> object:

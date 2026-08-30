@@ -1,8 +1,9 @@
-"""Curated micro-opt starters — prefer ``from cypy.hot import …`` over the flat barrel.
+"""Curated micro-opt starters — prefer ``from picop.hot import …`` over the flat barrel.
 
 **Core frozen at 1.0** — this ``__all__`` is part of the stable Core surface
 (additive minors OK; removals need a major). Full public surface remains on
-``cypy`` / ``cypy.cy*``. Soft letter/bare aliases were removed in 0.3.
+``picop`` / ``picop.cy*``. Soft letter/bare aliases were removed in 0.3.
+See :doc:`/user_guide/quickstart` and :doc:`/user_guide/safety`.
 """
 
 from __future__ import annotations

@@ -1,9 +1,21 @@
-"""Public :mod:`cypy.cylist` stubs (signatures + docstrings for IDE / typecheckers)."""
+"""Typed C-API helpers for :class:`list` hot paths.
+
+Prefer :mod:`picop.cylist` (or starters in :mod:`picop.hot`) over builtin
+``list`` methods when the concrete type is known. Unchecked getters are
+trusted-caller tools — see :doc:`/user_guide/safety`. Import patterns:
+:doc:`/user_guide/quickstart`.
+"""
 
 # Preferred public names (0.3 hard trim)
 
 def list_append(l: list, value: object) -> int:
-    """Append ``value`` via ``PyList_Append`` (``0`` / ``-1``). Returns 0 on success; errors raise — do not use as bool."""
+    """Append ``value`` via ``PyList_Append``.
+
+    Notes
+    -----
+    Returns ``0`` on success and ``-1`` on error; errors raise. Do not use the
+    status int as a bool.
+    """
     ...
 
 def list_as_tuple(l: list) -> tuple:
@@ -19,7 +31,13 @@ def list_check_exact(p: object) -> bool:
     ...
 
 def list_clear(l: list) -> int:
-    """Clear ``l`` via ``PyList_Clear`` (``0`` / ``-1``). Returns 0 on success; errors raise — do not use as bool."""
+    """Clear ``l`` via ``PyList_Clear``.
+
+    Notes
+    -----
+    Returns ``0`` on success and ``-1`` on error; errors raise. Do not use the
+    status int as a bool.
+    """
     ...
 
 def list_copy(l: list) -> list:
@@ -31,23 +49,52 @@ def list_empty() -> list:
     ...
 
 def list_extend(l: list, iterable: object) -> int:
-    """Extend ``l`` from ``iterable`` via ``PyList_Extend`` (``0`` / ``-1``). Returns 0 on success; errors raise — do not use as bool."""
+    """Extend ``l`` from ``iterable`` via ``PyList_Extend``.
+
+    Notes
+    -----
+    Returns ``0`` on success and ``-1`` on error; errors raise. Do not use the
+    status int as a bool.
+    """
     ...
 
 def list_get(l: list, i: int) -> object:
-    """Return ``l[i]`` via ``PyList_GET_ITEM`` (**unchecked** — OOB is undefined; prefer ``lget_checked`` when unsure)."""
+    """Return ``l[i]`` via ``PyList_GET_ITEM``.
+
+    Notes
+    -----
+    Unchecked: out-of-bounds is undefined behavior. Prefer
+    ``list_get_checked`` / ``list_get_ref`` when the index may be OOB, or bound
+    the index yourself before calling.
+    """
     ...
 
 def list_get_checked(l: list, i: int) -> object:
-    """Return ``l[i]`` via bounds-checked ``PyList_GetItem`` (raises ``IndexError``)."""
+    """Return ``l[i]`` via bounds-checked ``PyList_GetItem``.
+
+    Notes
+    -----
+    Raises ``IndexError`` on out-of-bounds (unlike unchecked ``list_get``).
+    """
     ...
 
 def list_get_ref(l: list, i: int) -> object:
-    """Return a strong ref to ``l[i]`` via ``PyList_GetItemRef`` (raises ``IndexError``)."""
+    """Return a strong ref to ``l[i]`` via ``PyList_GetItemRef``.
+
+    Notes
+    -----
+    Raises ``IndexError`` on out-of-bounds (unlike unchecked ``list_get``).
+    """
     ...
 
 def list_insert(l: list, i: int, value: object) -> int:
-    """Insert ``value`` at ``i`` via ``PyList_Insert`` (``0`` / ``-1``). Returns 0 on success; errors raise — do not use as bool."""
+    """Insert ``value`` at ``i`` via ``PyList_Insert``.
+
+    Notes
+    -----
+    Returns ``0`` on success and ``-1`` on error; errors raise. Do not use the
+    status int as a bool.
+    """
     ...
 
 def list_len(l: list) -> int:
@@ -60,19 +107,44 @@ def list_eq(a: list, b: list) -> bool:
 
 
 def list_reverse(l: list) -> int:
-    """Reverse ``l`` in place via ``PyList_Reverse`` (``0`` / ``-1``). Returns 0 on success; errors raise — do not use as bool."""
+    """Reverse ``l`` in place via ``PyList_Reverse``.
+
+    Notes
+    -----
+    Returns ``0`` on success and ``-1`` on error; errors raise. Do not use the
+    status int as a bool.
+    """
     ...
 
 def list_set_item(l: list, i: int, value: object) -> int:
-    """Set ``l[i] = value`` via ``PyList_SetItem`` (INCREF then steal; ``0`` / ``-1``). Returns 0 on success; errors raise — do not use as bool."""
+    """Set ``l[i] = value`` via ``PyList_SetItem``.
+
+    Notes
+    -----
+    INCREFs ``value`` then steals the new reference into the list slot. Returns
+    ``0`` on success and ``-1`` on error; errors raise. Do not use the status
+    int as a bool.
+    """
     ...
 
 def list_set_slice(l: list, low: int, high: int, itemlist: object = None) -> int:
-    """Assign ``l[low:high] = itemlist`` via ``PyList_SetSlice`` (``None`` deletes the slice). Returns 0 on success; errors raise — do not use as bool."""
+    """Assign ``l[low:high] = itemlist`` via ``PyList_SetSlice``.
+
+    Notes
+    -----
+    Pass ``None`` for ``itemlist`` to delete the slice. Returns ``0`` on
+    success and ``-1`` on error; errors raise. Do not use the status int as a
+    bool.
+    """
     ...
 
 def list_size(l: object) -> int:
-    """Return ``len(l)`` via checked ``PyList_Size`` (prefer ``llen`` on typed ``list``)."""
+    """Return ``len(l)`` via checked ``PyList_Size``.
+
+    Notes
+    -----
+    Prefer ``list_len`` on a typed ``list`` hot path.
+    """
     ...
 
 def list_slice(l: list, low: int, high: int) -> list:
@@ -80,6 +152,11 @@ def list_slice(l: list, low: int, high: int) -> list:
     ...
 
 def list_sort(l: list) -> int:
-    """Sort ``l`` in place via ``PyList_Sort`` (``0`` / ``-1``). Returns 0 on success; errors raise — do not use as bool."""
-    ...
+    """Sort ``l`` in place via ``PyList_Sort``.
 
+    Notes
+    -----
+    Returns ``0`` on success and ``-1`` on error; errors raise. Do not use the
+    status int as a bool.
+    """
+    ...

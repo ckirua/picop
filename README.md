@@ -22,9 +22,9 @@ Build deps (`setuptools`, `wheel`, `Cython`, `picobuild`) are pulled via `pyproj
 ### From git (users)
 
 ```bash
-pip install "picop @ git+https://github.com/ckirua/cypy.git@v2.0.0"
+pip install "picop @ git+https://github.com/ckirua/picop.git@v2.0.0"
 # or unpinned tip of main:
-# pip install "git+https://github.com/ckirua/cypy.git"
+# pip install "git+https://github.com/ckirua/picop.git"
 ```
 
 ### Editable (contributors)
@@ -127,9 +127,12 @@ See [`bench/BENCH.md`](bench/BENCH.md). Quick Tier A run:
 
 ## Docs
 
+**User documentation:** [https://ckirua.github.io/picop/](https://ckirua.github.io/picop/) (Sphinx; sources under [`doc/`](doc/)). Local build: `pip install -e ".[docs]" --no-build-isolation` then `cd doc && make html`.
+
 | Doc | Audience |
 |-----|----------|
-| This README + [`examples/`](examples/) | External users |
+| [GitHub Pages site](https://ckirua.github.io/picop/) + [`doc/`](doc/) | External users (guides + API) |
+| This README + [`examples/`](examples/) | External users (quick install / smoke) |
 | [`COVERAGE.md`](COVERAGE.md) | What the library covers / does not (product map) |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Setup, checks, PR / freeze policy |
 | [`SECURITY.md`](SECURITY.md) | Vulnerability reporting |

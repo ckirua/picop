@@ -43,7 +43,7 @@ Status key: **done** · **skip** · **n/a** (no comparable value type)
 - No `code_eq` without a `cycode` module (already noted under misc eq batch).
 - No mass identity wrappers that only alias `obj_eq`.
 
-Closes the acceptance checklist for [#44](https://github.com/ckirua/cypy/issues/44).
+Closes the acceptance checklist for [#44](https://github.com/ckirua/picop/issues/44).
 
 
 ## Bench follow-up (2026-07-22)

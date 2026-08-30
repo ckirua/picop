@@ -100,7 +100,7 @@ gh release create "vX.Y.Z" --title "picop vX.Y.Z" --notes-file - <<'EOF'
 ## Install
 ```bash
 pip install "picop==X.Y.Z"
-# or: pip install "picop @ git+https://github.com/ckirua/cypy.git@vX.Y.Z"
+# or: pip install "picop @ git+https://github.com/ckirua/picop.git@vX.Y.Z"
 ```
 EOF
 ```

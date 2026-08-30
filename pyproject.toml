@@ -44,13 +44,21 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/ckirua/cypy"
-Repository = "https://github.com/ckirua/cypy"
-Issues = "https://github.com/ckirua/cypy/issues"
-Documentation = "https://github.com/ckirua/cypy#readme"
+Homepage = "https://github.com/ckirua/picop"
+Repository = "https://github.com/ckirua/picop"
+Issues = "https://github.com/ckirua/picop/issues"
+Documentation = "https://ckirua.github.io/picop/"
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0.0", "pyperf>=2.10.0", "build", "twine"]
+docs = [
+    "sphinx>=8.0",
+    "pydata-sphinx-theme>=0.15",
+    "myst-parser>=4.0",
+    "sphinx-copybutton>=0.5",
+    "sphinx-autodoc-typehints>=2.0",
+    "linkify-it-py>=2.0",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

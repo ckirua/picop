@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Headless eq-issue grind for ckirua/cypy (run inside tmux).
+# Headless eq-issue grind for ckirua/picop (run inside tmux).
 # Usage: scripts/eq_loop_tmux.sh
 # Stop:  tmux kill-session -t cypy-eq
 set -euo pipefail
@@ -11,7 +11,7 @@ mkdir -p "$LOG_DIR"
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 LOG="${LOG_DIR}/run_${STAMP}.log"
 
-PROMPT='Repo ckirua/cypy at /home/dev/cypy. Continue the [eq/…] helper loop.
+PROMPT='Repo ckirua/picop at /home/dev/cypy. Continue the [eq/…] helper loop.
 
 Rules (strict):
 - One open GitHub issue whose title starts with "[eq/" per run. Skip #44 unless asked.
@@ -30,7 +30,7 @@ echo "log: $LOG" | tee -a "$LOG"
 
 while true; do
   # Stop when only #44 (or nothing) remains
-  LEFT=$(gh issue list -R ckirua/cypy --state open --limit 100 --json number,title \
+  LEFT=$(gh issue list -R ckirua/picop --state open --limit 100 --json number,title \
     --jq '[.[] | select(.title | startswith("[eq/")) | select(.number != 44)] | length' 2>/dev/null || echo "?")
   echo "$(date -u +%H:%M:%SZ) open_eq_excluding_44=${LEFT}" | tee -a "$LOG"
   if [[ "$LEFT" == "0" ]]; then

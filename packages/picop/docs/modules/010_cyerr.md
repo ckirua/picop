@@ -4,9 +4,9 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.exc` (thin slice) |
-| Sources | `src/cypy/cyerr.pxd` |
+| Sources | `src/picop/cyerr.pxd` |
 | Surface | cimport only |
-| Tracker lifecycle | decided (try-all slice + depth; no public tier A) |
+| Tracker lifecycle | decided — raised-exception lifecycle added |
 | Format | v2 |
 | Indexed | full (declared slice) |
 
@@ -25,8 +25,8 @@ GIL-held error-indicator helpers for nogil→gil boundaries in extensions.
 | err_set_object | cypy | cdef | cimport | `PyErr_SetObject` sibling |
 | err_set_none | cypy | cdef | cimport | `PyErr_SetNone` sibling |
 | err_no_memory | cypy | cdef | cimport | `PyErr_NoMemory` |
-| err_fetch / err_restore | cypy | cdef | cimport | steal/restore triple |
-| PyErr_Format / Warn* / Print / … | C-API | tried | — | deferred / out of slice |
+| err_fetch / err_restore | cypy | cdef | cimport | legacy triple; deprecated by CPython since 3.12 |
+| err_get_raised / err_set_raised | picop | cdef | cimport | preferred Python ≥3.14 lifecycle; new-ref get / stealing set |
 
 ## Workflow status
 

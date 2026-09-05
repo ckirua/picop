@@ -22,6 +22,7 @@ Gold exemplar: [`001_cytuple.md`](001_cytuple.md).
 | 11 | [011_cymem.md](011_cymem.md) | `cpython.mem` | **v2** |
 | 12 | [012_cythread.md](012_cythread.md) | `cpython.pythread` | **v2** |
 | 13 | [013_cyatomic.md](013_cyatomic.md) | custom (C11 `stdatomic`) | **v2** |
+| 56 | [056_cycall.md](056_cycall.md) | `Python.h` call / vectorcall | v2 |
 
 ## Absent
 

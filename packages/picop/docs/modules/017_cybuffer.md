@@ -24,7 +24,7 @@ Buffer-protocol check/copy for Python, plus cdef wrappers for `Py_buffer*` lifec
 | buf_get / buf_release | cypy | cdef | cimport | GetBuffer / Release |
 | buf_get_pointer / size_from_format | cypy | cdef | cimport | |
 | buf_to/from_contiguous / is_contiguous | cypy | cdef | cimport | |
-| buf_fill_* | cypy | cdef | cimport | FillInfo / strides |
+| buf_nbytes / itemsize / ndim / readonly | picop | cpdef | public | acquire/release a full read-only view internally |
 | PyBUF_* flags | C-API | tried | — | use `cpython.buffer` directly |
 | PyObject_Format | C-API | REJECTED | — | deprecated in include → `cpython.object` |
 | PyObject_CopyToObject | C-API | tried | — | covered by CopyData path; not wrapped (duplicate-ish) |

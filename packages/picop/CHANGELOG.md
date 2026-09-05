@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+- Add `cycall` zero-, one-, and two-argument CPython call helpers, including a cimport-only vectorcall primitive.
+- Add public buffer and memoryview metadata inspection helpers.
+- Prefer `cyerr` raised-exception get/set lifecycle helpers on Python 3.14+.
+
 ## [2.0.0] — 2026-08-06 — rename import package to picop (soft cypy alias)
 
 - Move implementation tree to `src/picop/` (preferred import: `from picop…` / `from picop… cimport`).

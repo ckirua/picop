@@ -25,7 +25,7 @@ Thin wrappers for memoryview construction / check / contiguous views used in buf
 | mvget_contiguous | cypy | cpdef | public | `PyMemoryView_GetContiguous` |
 | mvfrom_memory | cypy | cdef | cimport | caller-owned `char*` |
 | mvfrom_buffer | cypy | cdef | cimport | `Py_buffer*` |
-| mvget_buffer / mvget_base | cypy | cdef | cimport | macros; unchecked type |
+| memoryview_nbytes / itemsize / ndim / readonly | picop | cpdef | public | inspect existing view metadata; no new view |
 
 ## Workflow status
 

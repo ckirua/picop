@@ -1,0 +1,71 @@
+# C++ / CMake build trees
+cpp/build/
+cpp/build-*/
+build-*/
+*.o
+*.a
+*.so
+*.dylib
+*.pyd
+*.dll
+
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+compile_commands.json
+Testing/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.coverage
+.coverage.*
+htmlcov/
+.cache/
+.hypothesis/
+
+# Virtualenvs
+.venv/
+venv/
+env/
+
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.swo
+
+# Bench run artifacts (keep baseline.json)
+artifacts/bench_*.json
+artifacts/backend_compare/
+!artifacts/baseline.json
+
+# Cython / native extension build outputs
+python/smh_q/_cython_ring.c
+python/smh_q/*.so
+python/smh_q/_native*.so
+
+# Logs
+*.log

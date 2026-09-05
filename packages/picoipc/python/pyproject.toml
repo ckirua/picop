@@ -1,0 +1,19 @@
+[build-system]
+requires = ["scikit-build-core>=0.10", "pybind11>=2.11"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "smh_q"
+version = "0.1.0"
+description = "POSIX shared-memory SPSC ring demo (Linux)"
+readme = "../README.md"
+requires-python = ">=3.14"
+license = { text = "MIT" }
+
+[tool.scikit-build]
+cmake.source-dir = "../cpp"
+cmake.args = ["-DSMH_Q_BUILD_PYTHON=ON"]
+wheel.packages = ["smh_q"]
+
+[tool.scikit-build.cmake.define]
+SMH_Q_BUILD_PYTHON = "ON"

@@ -10,7 +10,7 @@ import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from smh_q import Ring
+from picoipc import Ring
 
 
 def slot_bytes(payload_bytes: int) -> int:

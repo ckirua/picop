@@ -1,8 +1,8 @@
-# io_uring decision for picosmh SPSC ring
+# io_uring decision for the picoipc SPSC ring
 
 ## Summary
 
-**picosmh does not use io_uring for the ring hot path.** The correct stack is POSIX shared memory (`shm_open` + `mmap`), SPSC sequence counters with acquire/release atomics, and Linux futex for consumer blocking.
+**picoipc does not use io_uring for the ring hot path.** The correct stack is POSIX shared memory (`shm_open` + `mmap`), SPSC sequence counters with acquire/release atomics, and Linux futex for consumer blocking.
 
 ## Why not io_uring here?
 
@@ -22,7 +22,7 @@ In typical trading/gateway C++ cores (not this repo), io_uring often appears in:
 - HTTPS clients with an `iouring` backend
 - TLS sockets integrated with those reactors
 
-The production SPSC SHM ring in those stacks uses the **same futex + mmap pattern** as picosmh, with env-tunable spin (`_SHM_SPIN_ITERS`, `_SHM_WAIT_MS`).
+The production SPSC SHM ring in those stacks uses the **same futex + mmap pattern** as picoipc, with env-tunable spin (`_SHM_SPIN_ITERS`, `_SHM_WAIT_MS`).
 
 ## Alternatives considered
 

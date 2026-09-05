@@ -14,9 +14,9 @@ if [[ "${SMH_Q_BUILD_CYTHON:-OFF}" == "ON" ]]; then
   cmake -S cpp -B cpp/build -DCMAKE_BUILD_TYPE=Release -DSMH_Q_BUILD_PYTHON=OFF
   cmake --build cpp/build -j"$(nproc)" --target smh_q_shared roundtrip stress producer consumer bench_sequential
   python3 -m pip install -q cython 2>/dev/null || true
-  if [[ -f python/pyproject.toml ]]; then mv python/pyproject.toml python/pyproject.toml.bak; fi
+  if [[ -f pyproject.toml ]]; then mv pyproject.toml pyproject.toml.bak; fi
   (cd python && python3 setup_cython.py build_ext --inplace) 2>/dev/null || true
-  if [[ -f python/pyproject.toml.bak ]]; then mv python/pyproject.toml.bak python/pyproject.toml; fi
+  if [[ -f pyproject.toml.bak ]]; then mv pyproject.toml.bak pyproject.toml; fi
 else
   PY_FLAG=OFF
   [[ "$BUILD_PY" == "ON" ]] && PY_FLAG=ON
@@ -25,8 +25,8 @@ else
   if [[ "$PY_FLAG" == "ON" ]]; then
     for _so in cpp/build/_native*.so; do
       if [[ -f "$_so" ]]; then
-        cp -f "$_so" python/smh_q/_native.so
-        cp -f "$_so" "python/smh_q/$(basename "$_so")"
+        cp -f "$_so" python/picoipc/_native.so
+        cp -f "$_so" "python/picoipc/$(basename "$_so")"
       fi
     done
   fi
@@ -35,9 +35,9 @@ fi
 BACKENDS=(pure ctypes pybind11 cython)
 
 for backend in "${BACKENDS[@]}"; do
-  export SMH_Q_BACKEND="$backend"
+  export PICOIPC_BACKEND="$backend"
   outfile="${OUT_DIR}/${backend}.json"
-  echo "==> Backend: ${SMH_Q_BACKEND}"
+  echo "==> Backend: ${PICOIPC_BACKEND}"
   set +e
   python3 bench/harness.py --config "$CONFIG" --output "$outfile"
   rc=$?
@@ -104,7 +104,7 @@ for backend in backends:
         pure_rate = rate
 
 print()
-print("=== smh_q backend comparison (smoke harness) ===")
+print("=== picoipc backend comparison (smoke harness) ===")
 print("config: bench/config_smoke.yaml")
 print()
 hdr = f"{'Backend':<10} {'Impl':<14} {'msgs/s (64B)':>16} {'vs pure':>10} {'correct':>9} {'wall_s':>8}  Note"

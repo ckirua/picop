@@ -1,0 +1,60 @@
+name: picop smoke
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packages/picop/**"
+      - ".github/workflows/picop-smoke.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "packages/picop/**"
+      - ".github/workflows/picop-smoke.yml"
+
+jobs:
+  install-smoke:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/picop
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.14
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install UUID native dependency
+        run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends libssl-dev
+
+      - name: Install build deps
+        run: pip install setuptools wheel Cython picobuild pytest
+
+      - name: Install package (portable, no native march)
+        env:
+          CPY_NATIVE: "0"
+        run: pip install .
+
+      - name: Import smoke
+        run: |
+          python -c "from picop.hot import bytes_len, dict_get, str_len; assert bytes_len(b'ok') == 2; print('ok', __import__('picop').__version__)"
+          python -W default -c "import cypy; from cypy.hot import bytes_len; assert bytes_len(b'ok') == 2; print('shim', cypy.__version__)"
+
+      - name: Run test suite
+        run: python -m pytest tests -q
+
+      - name: Export / COMPAT_MAP gates
+        run: python scripts/check_exports.py
+
+      - name: Grade trackers (53/53 A)
+        run: python scripts/grade_trackers.py
+
+      - name: Run Python examples
+        run: |
+          set -e
+          for f in examples/py*.py examples/wrap_ansi.py; do
+            echo "== $f =="
+            python "$f"
+          done

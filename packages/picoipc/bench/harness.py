@@ -44,7 +44,7 @@ def _gil_enabled() -> bool | None:
 
 
 def _backend_impl() -> str:
-    backend = os.environ.get("SMH_Q_BACKEND", "pybind11").lower()
+    backend = os.environ.get("PICOIPC_BACKEND", "pybind11").lower()
     mapping = {
         "pure": "pure_python",
         "pure_python": "pure_python",
@@ -96,7 +96,7 @@ def correctness_py_roundtrip() -> None:
 
 def correctness_py_cpp_xlang() -> None:
     _ensure_import_path()
-    from smh_q import Ring
+    from picoipc import Ring
 
     name = f"smh_q_xlang_{os.getpid()}"
     Ring.unlink(name)
@@ -176,7 +176,7 @@ def _make_publish_fn(ring, payload_buf: bytearray, payload_bytes: int, copy_payl
 
 def bench_sequential(count: int, payload_bytes: int, warmup: int) -> float:
     _ensure_import_path()
-    from smh_q import Ring
+    from picoipc import Ring
 
     name = f"smh_q_harness_seq_{os.getpid()}_{threading.get_ident()}"
     Ring.unlink(name)
@@ -211,7 +211,7 @@ def bench_sequential(count: int, payload_bytes: int, warmup: int) -> float:
 
 def bench_threaded(count: int, payload_bytes: int, warmup: int) -> float:
     _ensure_import_path()
-    from smh_q import Ring
+    from picoipc import Ring
 
     name = f"smh_q_harness_thr_{os.getpid()}_{threading.get_ident()}"
     Ring.unlink(name)
@@ -357,7 +357,7 @@ def run_harness(config_path: Path, output: Path | None = None) -> dict:
 
 
 def main() -> int:
-    p = argparse.ArgumentParser(description="smh_q unified benchmark harness")
+    p = argparse.ArgumentParser(description="picoipc unified benchmark harness")
     p.add_argument(
         "--config",
         type=Path,

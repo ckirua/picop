@@ -11,7 +11,7 @@ Each directory under `packages/` owns its build metadata, tests, documentation, 
 
 ```bash
 pip install ./packages/picop
-pip install ./packages/picoipc/python
+pip install ./packages/picoipc
 ```
 
 Changes should remain within one package unless they intentionally update shared repository automation.

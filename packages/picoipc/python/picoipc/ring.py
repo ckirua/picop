@@ -1,4 +1,4 @@
-"""POSIX SHM SPSC ring — layout matches smh_q C++ (cache-line aligned seqs)."""
+"""POSIX SHM SPSC ring — layout matches the bundled smh_q C++ engine."""
 
 from __future__ import annotations
 

@@ -63,9 +63,9 @@ artifacts/backend_compare/
 !artifacts/baseline.json
 
 # Cython / native extension build outputs
-python/smh_q/_cython_ring.c
-python/smh_q/*.so
-python/smh_q/_native*.so
+python/picoipc/_cython_ring.c
+python/picoipc/*.so
+python/picoipc/_native*.so
 
 # Logs
 *.log

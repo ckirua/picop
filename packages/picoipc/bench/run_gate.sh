@@ -10,9 +10,9 @@ if [[ "${SMH_Q_BUILD_CYTHON:-OFF}" == "ON" ]]; then
   cmake -S cpp -B cpp/build -DCMAKE_BUILD_TYPE=Release -DSMH_Q_BUILD_PYTHON=OFF
   cmake --build cpp/build -j"$(nproc)" --target smh_q_shared roundtrip stress producer consumer bench_sequential
   python3 -m pip install -q cython 2>/dev/null || true
-  if [[ -f python/pyproject.toml ]]; then mv python/pyproject.toml python/pyproject.toml.bak; fi
+  if [[ -f pyproject.toml ]]; then mv pyproject.toml pyproject.toml.bak; fi
   (cd python && python3 setup_cython.py build_ext --inplace)
-  if [[ -f python/pyproject.toml.bak ]]; then mv python/pyproject.toml.bak python/pyproject.toml; fi
+  if [[ -f pyproject.toml.bak ]]; then mv pyproject.toml.bak pyproject.toml; fi
 else
   PY_FLAG=OFF
   [[ "$BUILD_PY" == "ON" ]] && PY_FLAG=ON
@@ -21,8 +21,8 @@ else
   if [[ "$PY_FLAG" == "ON" ]]; then
     for _so in cpp/build/_native*.so; do
       if [[ -f "$_so" ]]; then
-        cp -f "$_so" python/smh_q/_native.so
-        cp -f "$_so" "python/smh_q/$(basename "$_so")"
+        cp -f "$_so" python/picoipc/_native.so
+        cp -f "$_so" "python/picoipc/$(basename "$_so")"
       fi
     done
   fi
@@ -36,7 +36,7 @@ SHA="$(git rev-parse --short HEAD 2>/dev/null || echo unknown)"
 CANDIDATE="artifacts/bench_${SHA}.json"
 python3 -m pip install -q pyyaml 2>/dev/null || true
 export PYTHONPATH="$ROOT/python:${PYTHONPATH:-}"
-export SMH_Q_BACKEND="${SMH_Q_BACKEND:-pybind11}"
+export PICOIPC_BACKEND="${PICOIPC_BACKEND:-pybind11}"
 python3 bench/harness.py --config "$CONFIG" --output "$CANDIDATE"
 if [[ ! -f "$BASELINE" ]]; then
   echo "==> No baseline — writing $BASELINE"

@@ -1,29 +1,29 @@
-"""smh_q — POSIX shared-memory SPSC ring (Linux)."""
+"""picoipc — low-latency local IPC primitives for Linux."""
 import os
-from smh_q.ring import MAGIC
+from picoipc.ring import MAGIC
 
 def _posix(name: str) -> str:
     return name if name.startswith("/") else f"/{name}"
 
 def _backend() -> str:
-    return os.environ.get("SMH_Q_BACKEND", "pybind11").strip().lower()
+    return os.environ.get("PICOIPC_BACKEND", "pybind11").strip().lower()
 
 def _load_ring_impl():
     b = _backend()
     if b in ("pure", "pure_python"):
-        from smh_q.ring import Ring as R
+        from picoipc.ring import Ring as R
         return R, "pure_python"
     if b == "ctypes":
-        from smh_q._ctypes_ring import Ring as R
+        from picoipc._ctypes_ring import Ring as R
         return R, "ctypes"
     if b == "cython":
-        from smh_q._cython_ring import Ring as R
+        from picoipc._cython_ring import Ring as R
         return R, "cython"
     try:
-        from smh_q._native import Ring as R
+        from picoipc._native import Ring as R
         return R, "pybind11"
     except ImportError:
-        from smh_q.ring import Ring as R
+        from picoipc.ring import Ring as R
         return R, "pure_python"
 
 RingImpl, _IMPL = _load_ring_impl()
@@ -43,7 +43,7 @@ class Ring(RingImpl):
     def unlink(name: str) -> None:
         name = _posix(name)
         if _IMPL == "pybind11":
-            from smh_q._native import unlink
+            from picoipc._native import unlink
             unlink(name)
         else:
             RingImpl.unlink(name)

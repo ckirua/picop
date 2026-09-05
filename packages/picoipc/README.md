@@ -1,8 +1,8 @@
-# smh_q — POSIX Shared-Memory SPSC Queue
+# picoipc — Low-Latency Local IPC
 
-A minimal, educational library demonstrating a **single-producer / single-consumer (SPSC)** ring buffer over POSIX shared memory (`shm_open` + `mmap`) with **futex** wakeups on Linux.
+Linux-focused IPC primitives for Python and C++. The current implementation is a **single-producer / single-consumer (SPSC)** ring buffer over POSIX shared memory (`shm_open` + `mmap`) with **futex** wakeups.
 
-Standalone extract of an `ull::SpscRing`-style SPSC ring. No external gateway, database, or exchange runtime dependencies.
+The ring is a standalone `smh_q` C++ engine with no external gateway, database, or exchange runtime dependencies.
 
 **Linux only.** Requires `shm_open`, `mmap`, and `futex`.
 
@@ -36,15 +36,15 @@ offset 0
 
 Default magic: `0x534D4851` (`"SMHQ"`).
 
-## Created files
+## Package layout
 
 ```
-smh_q/
+picoipc/
   README.md  LICENSE
   cpp/include/smh_q/ring.hpp  cpp/src/ring.cpp  cpp/CMakeLists.txt
   cpp/examples/{roundtrip,producer,consumer,stress}.cpp
   cpp/benchmarks/{bench_throughput,bench_sequential,bench_futex}.cpp
-  python/pyproject.toml  python/smh_q/{__init__,ring}.py
+  pyproject.toml  python/picoipc/{__init__,ring}.py
   python/examples/{roundtrip,producer,consumer,stress}.py
   python/benchmarks/bench_throughput.py
 ```
@@ -57,7 +57,7 @@ cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ```
 
-## C++ API (`smh_q::Ring`)
+## Bundled C++ API (`smh_q::Ring`)
 
 - `Ring::Config` — `name`, `slot_count`, `slot_size`, `schema_id`, `version`, `magic`
 - `Ring(cfg, create)` — create or attach POSIX shm
@@ -68,7 +68,7 @@ cmake --build build
 
 ## Python
 
-**Python 3.14+ required** (`requires-python = ">=3.14"` in `python/pyproject.toml`).
+**Python 3.14+ required** (`requires-python = ">=3.14"` in `pyproject.toml`).
 
 Use `python3.14` (default build) or `python3.14t` (free-threaded / nogil) where available; both satisfy the version gate. The smoke CI workflow installs CPython 3.14 via `actions/setup-python`.
 
@@ -78,7 +78,7 @@ Threaded free-threading A/B (full config): `./bench/run_freethreading.sh` (requi
 ## Python API
 
 ```bash
-cd python && pip install -e .
+pip install -e .
 ```
 
 - `Ring(name, create=False, slot_count=64, slot_size=256, ...)`
@@ -120,9 +120,9 @@ See also [cpp/examples/README.md](cpp/examples/README.md).
 
 ## Backends
 
-Production default is **pybind11** (`SMH_Q_BACKEND=pybind11`). ctypes and pure Python remain as fallbacks when the native extension is unavailable.
+Production default is **pybind11** (`PICOIPC_BACKEND=pybind11`). ctypes and pure Python remain as fallbacks when the native extension is unavailable.
 
-| Backend | `SMH_Q_BACKEND` | Notes |
+| Backend | `PICOIPC_BACKEND` | Notes |
 |---------|-----------------|-------|
 | pybind11 (default) | `pybind11` | Fast path; requires C++ build |
 | ctypes | `ctypes` | Loads `libsmh_q.so` via ctypes |
@@ -132,8 +132,8 @@ Production default is **pybind11** (`SMH_Q_BACKEND=pybind11`). ctypes and pure P
 Switch backend for a single command:
 
 ```bash
-export SMH_Q_BACKEND=ctypes   # or pure, pybind11
-python3 -c "from smh_q import Ring, impl_name; print(impl_name())"
+export PICOIPC_BACKEND=ctypes   # or pure, pybind11
+python3 -c "from picoipc import Ring, impl_name; print(impl_name())"
 ```
 
 Compare all backends (smoke harness, msgs/s and speedup vs pure):
@@ -176,7 +176,7 @@ ctest --test-dir build
 
 ## Relation to upstream SPSC ring
 
-The upstream `ull::SpscRing` pattern backs low-latency IPC (order events, MD notify rings, etc.). This repo uses the same header/cache-line/futex design; tune spin/futex via `SMH_Q_SHM_SPIN_ITERS` (default 2000) and `SMH_Q_SHM_WAIT_MS` (default 1), with the `SMH_Q` env prefix. For local C++ bench tuning, `SMH_Q_NATIVE_ARCH=1` enables `-march=native` on the static lib and benchmarks (off by default; pybind unchanged).
+The upstream `ull::SpscRing` pattern backs low-latency IPC (order events, MD notify rings, etc.). This package uses the same header/cache-line/futex design; tune spin/futex via `SMH_Q_SHM_SPIN_ITERS` (default 2000) and `SMH_Q_SHM_WAIT_MS` (default 1), with the engine-specific `SMH_Q` env prefix. For local C++ bench tuning, `SMH_Q_NATIVE_ARCH=1` enables `-march=native` on the static lib and benchmarks (off by default; pybind unchanged).
 
 ## License
 

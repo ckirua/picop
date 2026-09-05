@@ -1,14 +1,23 @@
-name: smoke
+name: picoipc smoke
 
 on:
   pull_request:
+    paths:
+      - "packages/picoipc/**"
+      - ".github/workflows/picoipc-smoke.yml"
   push:
     branches: [main]
+    paths:
+      - "packages/picoipc/**"
+      - ".github/workflows/picoipc-smoke.yml"
 
 jobs:
   gate:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: packages/picoipc
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -20,6 +29,5 @@ jobs:
           sudo apt-get install -y build-essential cmake python3-dev
       - name: Gate
         run: |
-          chmod +x bench/run_gate.sh
-          SMH_Q_BACKEND=pure RECORD_BASELINE=1 ./bench/run_gate.sh || true
+          PICOIPC_BACKEND=pure RECORD_BASELINE=1 ./bench/run_gate.sh || true
           ./bench/run_gate.sh

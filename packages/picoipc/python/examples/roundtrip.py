@@ -6,7 +6,7 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from smh_q import Ring
+from picoipc import Ring
 
 
 def main() -> int:

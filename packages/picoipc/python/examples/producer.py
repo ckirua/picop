@@ -8,11 +8,11 @@ import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from smh_q import Ring
+from picoipc import Ring
 
 
 def main() -> int:
-    p = argparse.ArgumentParser(description="smh_q producer")
+    p = argparse.ArgumentParser(description="picoipc SPSC producer")
     p.add_argument("name", nargs="?", default="smh_q_demo")
     p.add_argument("count", nargs="?", type=int, default=10)
     p.add_argument("delay_ms", nargs="?", type=int, default=100)

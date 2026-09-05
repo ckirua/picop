@@ -9,7 +9,7 @@
 
 Default backend after study: **pybind11** (with ctypes → pure fallback).
 
-Production migration (2026-08-23): `python/smh_q/__init__.py`, `bench/run_gate.sh`, and `artifacts/baseline.json` use pybind11. Run `./bench/run_all_backends.sh` to benchmark every backend.
+Production migration (2026-08-23): the Python package backend selector, `bench/run_gate.sh`, and `artifacts/baseline.json` use pybind11. Run `./bench/run_all_backends.sh` to benchmark every backend.
 | 2026-08-23 | opt/py-zero-copy | pybind11 | ~1,770k | ~0.87x vs main | FAIL | no |
 | 2026-08-23 | opt/py-publish-fastpath | pybind11 | ~1,770k | ~0.87x vs main | FAIL | no |
 

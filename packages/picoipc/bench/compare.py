@@ -27,7 +27,7 @@ def main() -> int:
     cand_seq = float(candidate.get("sequential_msgs_per_sec_64b", 0))
     required = base_seq * mult
     speedup = (cand_seq / base_seq) if base_seq > 0 else 0.0
-    print("=== smh_q gate comparison ===")
+    print("=== picoipc gate comparison ===")
     print(f"baseline impl:  {base_impl}")
     print(f"candidate impl: {cand_impl}")
     print(f"git sha:        {candidate.get('git_sha', '?')}")

@@ -8,11 +8,11 @@ import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from smh_q import Ring
+from picoipc import Ring
 
 
 def main() -> int:
-    p = argparse.ArgumentParser(description="smh_q consumer")
+    p = argparse.ArgumentParser(description="picoipc SPSC consumer")
     p.add_argument("name", nargs="?", default="smh_q_demo")
     p.add_argument("timeout_ms", nargs="?", type=int, default=5000)
     args = p.parse_args()

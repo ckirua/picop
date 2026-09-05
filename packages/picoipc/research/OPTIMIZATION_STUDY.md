@@ -1,10 +1,10 @@
-# smh_q / picosmh optimization study
+# picoipc SPSC backend optimization study
 
-Charter for improving Python `smh_q` throughput via native bindings while keeping a fast merge gate.
+Charter for improving Python `picoipc` throughput via native bindings while keeping a fast merge gate.
 
 ## Methods (one branch per approach)
 
-| Branch | Backend | `SMH_Q_BACKEND` |
+| Branch | Backend | `PICOIPC_BACKEND` |
 |--------|---------|-----------------|
 | `opt/ctypes` | ctypes → `libsmh_q.so` | `ctypes` |
 | `opt/pybind11` | pybind11 extension | `pybind11` |
@@ -17,7 +17,7 @@ Branch naming: `opt/<method>` off `main`. Do not stack multiple binding approach
 
 ```bash
 git checkout -b opt/ctypes
-# implement binding + set SMH_Q_BACKEND for local runs
+# implement binding + set PICOIPC_BACKEND for local runs
 ./bench/run_gate.sh
 ```
 
@@ -45,7 +45,7 @@ Record branch outcomes in `research/runs/<branch>.md` (setup, numbers, verdict).
 
 After a branch merges to `main`:
 
-1. Set default backend in `python/smh_q/__init__.py` to the winner.
+1. Set the default backend in `python/picoipc/__init__.py` to the winner.
 2. Refresh `artifacts/baseline.json` from the new default.
 3. Add a row to `research/OPTIMIZATION_LOG.md`.
 
@@ -53,4 +53,4 @@ Do **not** merge if the gate fails, C++ cross-lang breaks, or deps are heavy wit
 
 ## CI
 
-PRs run `.github/workflows/smoke.yml`: cmake build + `./bench/run_gate.sh` (~2 min).
+PRs run the repository-root `.github/workflows/picoipc-smoke.yml`: CMake build + `./bench/run_gate.sh` (~2 min).

@@ -12,15 +12,15 @@
 Build (both interpreters):
 
 ```bash
-cmake -S cpp -B cpp/build-gil -DCMAKE_BUILD_TYPE=Release -DSMH_Q_BUILD_PYTHON=ON \
+cmake -S native -B build/native-gil -DCMAKE_BUILD_TYPE=Release -DSMH_Q_BUILD_PYTHON=ON \
   -DPYBIND11_FINDPYTHON=ON -DPython_EXECUTABLE=$(which python3.14)
-cmake --build cpp/build-gil -j
-cp cpp/build-gil/_native.cpython-314-x86_64-linux-gnu.so python/smh_q/
+cmake --build build/native-gil -j
+cp build/native-gil/_native.cpython-314-x86_64-linux-gnu.so python/smh_q/
 
-cmake -S cpp -B cpp/build-ft -DCMAKE_BUILD_TYPE=Release -DSMH_Q_BUILD_PYTHON=ON \
+cmake -S native -B build/native-ft -DCMAKE_BUILD_TYPE=Release -DSMH_Q_BUILD_PYTHON=ON \
   -DPYBIND11_FINDPYTHON=ON -DPython_EXECUTABLE=$(which python3.14t)
-cmake --build cpp/build-ft -j
-cp cpp/build-ft/_native.cpython-314t-x86_64-linux-gnu.so python/smh_q/
+cmake --build build/native-ft -j
+cp build/native-ft/_native.cpython-314t-x86_64-linux-gnu.so python/smh_q/
 ```
 
 Run: `bench/run_freethreading.sh` or set `SMH_Q_FREETHREADING=1` to invoke `python3.14t` only.

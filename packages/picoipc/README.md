@@ -41,12 +41,12 @@ Default magic: `0x534D4851` (`"SMHQ"`).
 ```
 picoipc/
   README.md  LICENSE
-  cpp/include/smh_q/ring.hpp  cpp/src/ring.cpp  cpp/CMakeLists.txt
-  cpp/examples/{roundtrip,producer,consumer,stress}.cpp
-  cpp/benchmarks/{bench_throughput,bench_sequential,bench_futex}.cpp
-  pyproject.toml  python/picoipc/{__init__,ring}.py
-  python/examples/{roundtrip,producer,consumer,stress}.py
-  python/benchmarks/bench_throughput.py
+  native/include/smh_q/ring.hpp  native/src/ring.cpp  native/CMakeLists.txt
+  examples/native/{roundtrip,producer,consumer,stress}.cpp
+  benchmarks/native/{bench_throughput,bench_sequential,bench_futex}.cpp
+  pyproject.toml  src/picoipc/{__init__,ring}.py
+  examples/python/{roundtrip,producer,consumer,stress}.py
+  benchmarks/python/bench_throughput.py
 ```
 
 ## Build (C++)
@@ -90,33 +90,33 @@ Layout matches C++ — cross-language producer/consumer works.
 
 | Name | Language | What it demonstrates | Command |
 |------|----------|----------------------|---------|
-| `roundtrip` | C++ | Single-process create → publish → consume | `./cpp/build/roundtrip` |
-| `producer` | C++ | Multi-process producer with backpressure retry | `./cpp/build/producer [name] [count] [delay_ms]` |
-| `consumer` | C++ | Multi-process consumer with futex wait | `./cpp/build/consumer [name] [timeout_ms]` |
-| `stress` | C++ | Fill ring until full; verify `try_publish` backpressure | `./cpp/build/stress` |
-| `roundtrip.py` | Python | Same as C++ roundtrip | `python3 python/examples/roundtrip.py` |
-| `producer.py` | Python | Same as C++ producer | `python3 python/examples/producer.py [name] [count] [delay_ms]` |
-| `consumer.py` | Python | Same as C++ consumer | `python3 python/examples/consumer.py [name] [timeout_ms]` |
-| `stress.py` | Python | Same as C++ stress / backpressure | `python3 python/examples/stress.py` |
+| `roundtrip` | C++ | Single-process create → publish → consume | `./build/native/roundtrip` |
+| `producer` | C++ | Multi-process producer with backpressure retry | `./build/native/producer [name] [count] [delay_ms]` |
+| `consumer` | C++ | Multi-process consumer with futex wait | `./build/native/consumer [name] [timeout_ms]` |
+| `stress` | C++ | Fill ring until full; verify `try_publish` backpressure | `./build/native/stress` |
+| `roundtrip.py` | Python | Same as C++ roundtrip | `python3 examples/python/roundtrip.py` |
+| `producer.py` | Python | Same as C++ producer | `python3 examples/python/producer.py [name] [count] [delay_ms]` |
+| `consumer.py` | Python | Same as C++ consumer | `python3 examples/python/consumer.py [name] [timeout_ms]` |
+| `stress.py` | Python | Same as C++ stress / backpressure | `python3 examples/python/stress.py` |
 
 **C++ producer / consumer (two terminals):** producer must create the ring first.
 
 ```bash
 # terminal 1 — start producer (creates shm)
-./cpp/build/producer smh_q_demo 10 200
+./build/native/producer smh_q_demo 10 200
 
 # terminal 2 — consumer attaches
-./cpp/build/consumer smh_q_demo 30000
+./build/native/consumer smh_q_demo 30000
 ```
 
 **Cross-language (C++ producer, Python consumer):**
 
 ```bash
-./cpp/build/producer smh_q_xlang 5 100 &
-python3 python/examples/consumer.py smh_q_xlang 10000
+./build/native/producer smh_q_xlang 5 100 &
+python3 examples/python/consumer.py smh_q_xlang 10000
 ```
 
-See also [cpp/examples/README.md](cpp/examples/README.md).
+See also [examples/native/README.md](examples/native/README.md).
 
 ## Backends
 
@@ -148,20 +148,20 @@ Plain `std::chrono` / `time.perf_counter` benchmarks — no external dependencie
 
 | Name | Language | What it measures | Command |
 |------|----------|------------------|---------|
-| `bench_throughput` | C++ | Threaded SPSC: msgs/s, MB/s, p50/p99 latency | `./cpp/build/bench_throughput [count] [payload_bytes]` |
-| `bench_sequential` | C++ | Single-thread publish-all then consume-all | `./cpp/build/bench_sequential [count] [payload_bytes]` |
-| `bench_futex` | C++ | Spin vs futex wakeup when producer is idle | `./cpp/build/bench_futex [count] [idle_us]` |
-| `bench_throughput.py` | Python | Threaded + sequential (same scenarios) | `python3 python/benchmarks/bench_throughput.py [count] [payload_bytes]` |
+| `bench_throughput` | C++ | Threaded SPSC: msgs/s, MB/s, p50/p99 latency | `./build/native/bench_throughput [count] [payload_bytes]` |
+| `bench_sequential` | C++ | Single-thread publish-all then consume-all | `./build/native/bench_sequential [count] [payload_bytes]` |
+| `bench_futex` | C++ | Spin vs futex wakeup when producer is idle | `./build/native/bench_futex [count] [idle_us]` |
+| `bench_throughput.py` | Python | Threaded + sequential (same scenarios) | `python3 benchmarks/python/bench_throughput.py [count] [payload_bytes]` |
 
 Default: 100k messages. Pass `payload_bytes=0` (Python) or omit (C++ defaults to 64) to sweep 64/256/1024 in Python.
 
 **Sample output:**
 
 ```
-$ ./cpp/build/bench_throughput 100000 64
+$ ./build/native/bench_throughput 100000 64
 threaded     payload=  64B count= 100000 elapsed=   29.80 ms  msgs/s=   3355723  MB/s=  204.82  p50=   236 ns  p99=   798 ns
 
-$ ./cpp/build/bench_sequential 100000 64
+$ ./build/native/bench_sequential 100000 64
 sequential   payload=  64B count= 100000 elapsed=   16.94 ms  msgs/s=   5902048  MB/s=  360.23
 ```
 
@@ -170,7 +170,7 @@ sequential   payload=  64B count= 100000 elapsed=   16.94 ms  msgs/s=   5902048 
 ```bash
 cd cpp && cmake -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build
 ./build/roundtrip
-python3 python/examples/roundtrip.py
+python3 examples/python/roundtrip.py
 ctest --test-dir build
 ```
 

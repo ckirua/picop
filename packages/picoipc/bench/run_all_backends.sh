@@ -11,22 +11,22 @@ export PYTHONPATH="${ROOT}/python:${PYTHONPATH:-}"
 
 BUILD_PY="${SMH_Q_BUILD_PYTHON:-ON}"
 if [[ "${SMH_Q_BUILD_CYTHON:-OFF}" == "ON" ]]; then
-  cmake -S cpp -B cpp/build -DCMAKE_BUILD_TYPE=Release -DSMH_Q_BUILD_PYTHON=OFF
-  cmake --build cpp/build -j"$(nproc)" --target smh_q_shared roundtrip stress producer consumer bench_sequential
+  cmake -S native -B build/native -DCMAKE_BUILD_TYPE=Release -DSMH_Q_BUILD_PYTHON=OFF
+  cmake --build build/native -j"$(nproc)" --target smh_q_shared roundtrip stress producer consumer bench_sequential
   python3 -m pip install -q cython 2>/dev/null || true
   if [[ -f pyproject.toml ]]; then mv pyproject.toml pyproject.toml.bak; fi
-  (cd python && python3 setup_cython.py build_ext --inplace) 2>/dev/null || true
+  (cd src && python3 setup_cython.py build_ext --inplace) 2>/dev/null || true
   if [[ -f pyproject.toml.bak ]]; then mv pyproject.toml.bak pyproject.toml; fi
 else
   PY_FLAG=OFF
   [[ "$BUILD_PY" == "ON" ]] && PY_FLAG=ON
-  cmake -S cpp -B cpp/build -DCMAKE_BUILD_TYPE=Release -DSMH_Q_BUILD_PYTHON="$PY_FLAG"
-  cmake --build cpp/build -j"$(nproc)"
+  cmake -S native -B build/native -DCMAKE_BUILD_TYPE=Release -DSMH_Q_BUILD_PYTHON="$PY_FLAG"
+  cmake --build build/native -j"$(nproc)"
   if [[ "$PY_FLAG" == "ON" ]]; then
-    for _so in cpp/build/_native*.so; do
+    for _so in build/native/_native*.so; do
       if [[ -f "$_so" ]]; then
-        cp -f "$_so" python/picoipc/_native.so
-        cp -f "$_so" "python/picoipc/$(basename "$_so")"
+        cp -f "$_so" src/picoipc/_native.so
+        cp -f "$_so" "src/picoipc/$(basename "$_so")"
       fi
     done
   fi

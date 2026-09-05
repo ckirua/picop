@@ -1,7 +1,7 @@
 # opt/ctypes — ctypes binding to libsmh_q.so
 
 ## Setup
-- `cpp/bindings/c_api.cpp` + `cpp/include/smh_q/c_api.h`
+- `native/bindings/c_api.cpp` + `native/include/smh_q/c_api.h`
 - `python/smh_q/_ctypes_ring.py` via ctypes
 - `SMH_Q_BACKEND=ctypes`
 

@@ -1,6 +1,6 @@
 # C++ examples and benchmarks
 
-Build from `cpp/`:
+Build from `native/`:
 
 ```bash
 cmake -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build

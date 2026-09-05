@@ -1,6 +1,6 @@
 # C++ / CMake build trees
-cpp/build/
-cpp/build-*/
+build/native/
+build/native-*/
 build-*/
 *.o
 *.a
@@ -63,9 +63,9 @@ artifacts/backend_compare/
 !artifacts/baseline.json
 
 # Cython / native extension build outputs
-python/picoipc/_cython_ring.c
-python/picoipc/*.so
-python/picoipc/_native*.so
+src/picoipc/_cython_ring.c
+src/picoipc/*.so
+src/picoipc/_native*.so
 
 # Logs
 *.log

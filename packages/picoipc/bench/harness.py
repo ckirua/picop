@@ -20,9 +20,9 @@ except ImportError:
     yaml = None  # type: ignore[assignment]
 
 ROOT = Path(__file__).resolve().parent.parent
-CPP_BUILD = ROOT / "cpp" / "build"
+CPP_BUILD = ROOT / "build" / "native"
 ARTIFACTS = ROOT / "artifacts"
-PYTHON_DIR = ROOT / "python"
+PYTHON_DIR = ROOT / "src"
 
 
 def _git_sha() -> str:
@@ -90,7 +90,7 @@ def correctness_cpp_stress() -> None:
 
 
 def correctness_py_roundtrip() -> None:
-    script = PYTHON_DIR / "examples" / "roundtrip.py"
+    script = ROOT / "examples" / "python" / "roundtrip.py"
     _run_cmd("py_roundtrip", [sys.executable, str(script)])
 
 

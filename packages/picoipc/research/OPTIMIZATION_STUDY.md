@@ -45,7 +45,7 @@ Record branch outcomes in `research/runs/<branch>.md` (setup, numbers, verdict).
 
 After a branch merges to `main`:
 
-1. Set the default backend in `python/picoipc/__init__.py` to the winner.
+1. Set the default backend in `src/picoipc/__init__.py` to the winner.
 2. Refresh `artifacts/baseline.json` from the new default.
 3. Add a row to `research/OPTIMIZATION_LOG.md`.
 

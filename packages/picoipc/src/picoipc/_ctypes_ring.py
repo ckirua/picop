@@ -17,7 +17,7 @@ def _find_lib() -> Path:
     for path in [here.parents[2] / "cpp" / "build" / "libsmh_q.so", Path("/usr/local/lib/libsmh_q.so")]:
         if path.is_file():
             return path
-    raise OSError("libsmh_q.so not found; cmake -S cpp -B cpp/build && cmake --build cpp/build")
+    raise OSError("libsmh_q.so not found; cmake -S native -B build/native && cmake --build build/native")
 
 _lib: ctypes.CDLL | None = None
 

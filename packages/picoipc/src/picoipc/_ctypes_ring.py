@@ -14,7 +14,7 @@ def _find_lib() -> Path:
     if env:
         return Path(env)
     here = Path(__file__).resolve()
-    for path in [here.parents[2] / "cpp" / "build" / "libsmh_q.so", Path("/usr/local/lib/libsmh_q.so")]:
+    for path in [here.parents[2] / "build" / "native" / "libsmh_q.so", Path("/usr/local/lib/libsmh_q.so")]:
         if path.is_file():
             return path
     raise OSError("libsmh_q.so not found; cmake -S native -B build/native && cmake --build build/native")

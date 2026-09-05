@@ -6,11 +6,13 @@ from cpython.exc cimport (
     PyErr_Clear,
     PyErr_ExceptionMatches,
     PyErr_Fetch,
+    PyErr_GetRaisedException,
     PyErr_NoMemory,
     PyErr_Occurred,
     PyErr_Restore,
     PyErr_SetNone,
     PyErr_SetObject,
+    PyErr_SetRaisedException,
     PyErr_SetString,
 )
 from cpython.object cimport PyObject
@@ -53,3 +55,13 @@ cdef inline void err_fetch(PyObject **ptype, PyObject **pvalue, PyObject **ptrac
 cdef inline void err_restore(PyObject *type, PyObject *value, PyObject *traceback) noexcept:
     # Steals the three refs into the thread error indicator.
     PyErr_Restore(type, value, traceback)
+
+
+cdef inline PyObject *err_get_raised() noexcept:
+    # New reference; preferred lifecycle API since Python 3.12.
+    return PyErr_GetRaisedException()
+
+
+cdef inline void err_set_raised(PyObject *exc) noexcept:
+    # Steals ``exc``; preferred lifecycle API since Python 3.12.
+    PyErr_SetRaisedException(exc)

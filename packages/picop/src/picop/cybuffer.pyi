@@ -28,4 +28,24 @@ def buf_eq(a: object, b: object) -> bool:
     C-contiguous buffers use ``memcmp``; otherwise memoryview richcompare.
     Format/size mismatch yields ``False``.
     """
+
+
+def buf_nbytes(obj: object) -> int:
+    """Return the total byte length of ``obj``'s exported buffer."""
+    ...
+
+
+def buf_itemsize(obj: object) -> int:
+    """Return the item size of ``obj``'s exported buffer."""
+    ...
+
+
+def buf_ndim(obj: object) -> int:
+    """Return the dimensionality of ``obj``'s exported buffer."""
+    ...
+
+
+def buf_readonly(obj: object) -> bool:
+    """Return whether ``obj`` exports a read-only buffer."""
+    ...
     ...

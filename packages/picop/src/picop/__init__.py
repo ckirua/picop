@@ -303,10 +303,19 @@ from .cymarshal import (
     marshal_dumps,
     marshal_loads,
 )
+from .cycall import (
+    call_noargs,
+    call_onearg,
+    call_twoargs,
+)
 from .cybuffer import (
     buf_check,
     buf_copy_data,
     buf_eq,
+    buf_nbytes,
+    buf_itemsize,
+    buf_ndim,
+    buf_readonly,
 )
 from .cybytearray import (
     bytearray_check,
@@ -379,6 +388,10 @@ from .cymemoryview import (
     memoryview_ne,
     memoryview_from_object,
     memoryview_get_contiguous,
+    memoryview_nbytes,
+    memoryview_itemsize,
+    memoryview_ndim,
+    memoryview_readonly,
 )
 from .cylong import (
     long_check,

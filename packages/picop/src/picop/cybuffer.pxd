@@ -30,6 +30,46 @@ cpdef inline int buf_copy_data(object dest, object src) except -1:
     return PyObject_CopyData(dest, src)
 
 
+cpdef inline Py_ssize_t buf_nbytes(object obj) except -1:
+    cdef Py_buffer view
+    if PyObject_GetBuffer(obj, &view, PyBUF_FULL_RO) < 0:
+        raise
+    try:
+        return view.len
+    finally:
+        PyBuffer_Release(&view)
+
+
+cpdef inline Py_ssize_t buf_itemsize(object obj) except -1:
+    cdef Py_buffer view
+    if PyObject_GetBuffer(obj, &view, PyBUF_FULL_RO) < 0:
+        raise
+    try:
+        return view.itemsize
+    finally:
+        PyBuffer_Release(&view)
+
+
+cpdef inline int buf_ndim(object obj) except -1:
+    cdef Py_buffer view
+    if PyObject_GetBuffer(obj, &view, PyBUF_FULL_RO) < 0:
+        raise
+    try:
+        return view.ndim
+    finally:
+        PyBuffer_Release(&view)
+
+
+cpdef inline bint buf_readonly(object obj) except *:
+    cdef Py_buffer view
+    if PyObject_GetBuffer(obj, &view, PyBUF_FULL_RO) < 0:
+        raise
+    try:
+        return view.readonly != 0
+    finally:
+        PyBuffer_Release(&view)
+
+
 cdef inline bint buceq(object a, object b):
     # Abstract buffer-protocol equality (not a concrete bytes/bytearray type).
     # Contiguous same-layout → memcmp; else memoryview richcompare fallback.

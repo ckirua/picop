@@ -41,4 +41,24 @@ def memoryview_get_contiguous(obj: object, buffertype: int = ..., order: str = "
     -----
     ``order`` is ``C``, ``F``, or ``A``.
     """
+
+
+def memoryview_nbytes(mview: memoryview) -> int:
+    """Return the total byte length of ``mview``."""
+    ...
+
+
+def memoryview_itemsize(mview: memoryview) -> int:
+    """Return the item size of ``mview``."""
+    ...
+
+
+def memoryview_ndim(mview: memoryview) -> int:
+    """Return the dimensionality of ``mview``."""
+    ...
+
+
+def memoryview_readonly(mview: memoryview) -> bool:
+    """Return whether ``mview`` is read-only."""
+    ...
     ...

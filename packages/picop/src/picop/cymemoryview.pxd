@@ -108,3 +108,19 @@ cdef inline object memoryview_get_base(memoryview mview) noexcept:
 cpdef inline memoryview memoryview_get_contiguous(object obj, int buffertype=PyBUF_READ, str order="C"):
     return mvget_contiguous(obj, buffertype, order)
 
+
+cpdef inline Py_ssize_t memoryview_nbytes(memoryview mview) noexcept:
+    return PyMemoryView_GET_BUFFER(mview).len
+
+
+cpdef inline Py_ssize_t memoryview_itemsize(memoryview mview) noexcept:
+    return PyMemoryView_GET_BUFFER(mview).itemsize
+
+
+cpdef inline int memoryview_ndim(memoryview mview) noexcept:
+    return PyMemoryView_GET_BUFFER(mview).ndim
+
+
+cpdef inline bint memoryview_readonly(memoryview mview) noexcept:
+    return PyMemoryView_GET_BUFFER(mview).readonly != 0
+

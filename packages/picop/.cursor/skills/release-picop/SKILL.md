@@ -1,9 +1,9 @@
 ---
 name: release-picop
 description: >-
-  Tag and publish the picop package (PyPI dist picop; GitHub repo cypy) via
-  scripts/release.sh, Trusted Publishing, and v* tags. Use when the user asks
-  to release, tag, publish to PyPI, bump version, or ship a picop/cypy release.
+  Tag and publish the picop package (PyPI dist picop) via
+  scripts/release.sh, Trusted Publishing, and picop-v* tags. Use when the user
+  asks to release, tag, publish to PyPI, bump version, or ship a picop release.
   @-mention this skill for release work; do not invent a release path.
 disable-model-invocation: true
 ---
@@ -23,7 +23,7 @@ User asks to **release**, **tag**, **publish** (PyPI), or **bump version** for p
 | PyPI / pip | **`picop`** |
 | Preferred import | **`picop`** (`from picop.hot import …`) |
 | Deprecated import | **`cypy`** until **3.0** |
-| GitHub repo | `ckirua/cypy` |
+| GitHub monorepo | `ckirua/picop` (`packages/picop`) |
 | Version source | `src/picop/__about__.py` (prefer this; legacy trees may still use `src/cypy/__about__.py`) |
 
 ## Preconditions
@@ -34,7 +34,7 @@ User asks to **release**, **tag**, **publish** (PyPI), or **bump version** for p
 
 ## Preferred path
 
-[`scripts/release.sh`](../../../scripts/release.sh) bumps `__about__`, updates `CHANGELOG.md` / install pins, commits, pushes `main`, annotated tag `vX.Y.Z`, creates the GitHub Release, and watches [`.github/workflows/publish.yml`](../../../.github/workflows/publish.yml).
+[`scripts/release.sh`](../../../scripts/release.sh) bumps `__about__`, updates `CHANGELOG.md` / install pins, commits, pushes `main`, creates an annotated `picop-vX.Y.Z` tag and GitHub Release, and watches the repository-root `publish.yml` workflow.
 
 ```bash
 scripts/release.sh --patch --title "short highlight"
@@ -46,11 +46,11 @@ Also: `--minor` / `--major`, `--notes-file`, `--no-push` (commit only). Prefer d
 
 ## Manual fallback
 
-Only if the script cannot run. See **Tag and GitHub Release** in [`docs/RELEASE.md`](../../../docs/RELEASE.md): bump version on main → `git tag -a vX.Y.Z` → `git push origin vX.Y.Z` → `gh release create …`. Pushing `v*` triggers publish.
+Only if the script cannot run. See **Tag and GitHub Release** in [`docs/RELEASE.md`](../../../docs/RELEASE.md): bump version on main → `git tag -a picop-vX.Y.Z` → `git push origin picop-vX.Y.Z` → `gh release create …`. Pushing `picop-v*` triggers publish.
 
 ## PyPI
 
-- **Trusted Publishing (OIDC)** already configured for project **`picop`** (workflow `publish.yml`, environment `pypi`)
+- **Trusted Publishing (OIDC)** uses workflow `publish.yml` and environment `pypi`
 - **sdist only** — plain `linux_*` wheels are rejected; manylinux is a later follow-up
 - Tag push publishes to PyPI; `workflow_dispatch` can target TestPyPI
 

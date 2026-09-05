@@ -17,7 +17,7 @@ How to read this index:
 
 ```bash
 pip install picop
-# or: pip install "git+https://github.com/ckirua/picop.git"
+# or: pip install "picop @ git+https://github.com/ckirua/picop.git#subdirectory=packages/picop"
 for f in examples/py*.py examples/wrap_ansi.py; do python "$f" || exit 1; done
 ```
 

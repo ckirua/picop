@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Tag + GitHub Release for cypy / picop. Pushing v* runs .github/workflows/publish.yml.
+# Tag + GitHub Release for picop. Pushing picop-v* runs .github/workflows/publish.yml.
 #
 # Usage:
 #   scripts/release.sh 1.44.17
@@ -91,7 +91,7 @@ fi
   || die "version must be PEP 440-ish X.Y.Z (got: $VERSION)"
 [[ "$VERSION" != "$OLD" ]] || die "version $VERSION is already current in $ABOUT"
 
-TAG="v${VERSION}"
+TAG="picop-v${VERSION}"
 TODAY="$(date -u +%Y-%m-%d)"
 [[ -n "$TITLE" ]] || TITLE="release ${VERSION}"
 
@@ -199,7 +199,7 @@ print(f'  updated {p}')
   done
 fi
 
-msg="Release v${VERSION}: ${TITLE}."
+msg="Release picop ${VERSION}: ${TITLE}."
 
 info "commit"
 run git add "$ABOUT" "$CHANGELOG" "${pin_files[@]}"
@@ -211,7 +211,7 @@ fi
 run git commit -m "$msg"
 
 if [[ "$NO_PUSH" -eq 1 ]]; then
-  info "done (no push). Tag locally with: git tag -a $TAG -m \"cypy $TAG\""
+  info "done (no push). Tag locally with: git tag -a $TAG -m \"picop $TAG\""
   exit 0
 fi
 
@@ -219,7 +219,7 @@ info "push main"
 run git push origin main
 
 info "tag + push $TAG"
-run git tag -a "$TAG" -m "cypy $TAG"
+run git tag -a "$TAG" -m "picop $TAG"
 run git push origin "$TAG"
 
 NOTES_TMP="$(mktemp)"
@@ -246,14 +246,14 @@ print(f'''## Highlights
 ## Install
 \`\`\`bash
 pip install \"picop=={ver}\"
-# or: pip install \"picop @ git+https://github.com/ckirua/picop.git@v{ver}\"
+# or: pip install \"picop @ git+https://github.com/ckirua/picop.git@picop-v{ver}#subdirectory=packages/picop\"
 \`\`\`
 ''')
 " >"$NOTES_TMP"
 fi
 
 info "GitHub release $TAG"
-run gh release create "$TAG" --title "cypy $TAG" --notes-file "$NOTES_TMP"
+run gh release create "$TAG" --title "picop ${VERSION}" --notes-file "$NOTES_TMP"
 
 info "watching publish workflow (Ctrl+C to detach)"
 if [[ "$DRY_RUN" -eq 1 ]]; then

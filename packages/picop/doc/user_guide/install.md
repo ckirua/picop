@@ -16,7 +16,7 @@ Build deps (`setuptools`, `wheel`, `Cython`, `picobuild`) are pulled via `pyproj
 ```bash
 pip install "picop @ git+https://github.com/ckirua/picop.git@v2.0.0"
 # or unpinned tip of main:
-# pip install "git+https://github.com/ckirua/picop.git"
+# pip install "picop @ git+https://github.com/ckirua/picop.git#subdirectory=packages/picop"
 ```
 
 ## Editable (contributors)

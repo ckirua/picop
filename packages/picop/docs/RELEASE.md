@@ -1,6 +1,6 @@
 # Release checklist
 
-Ship a tagged `picop` release from `main`. Version is sourced from [`src/picop/__about__.py`](../src/picop/__about__.py) (`pyproject.toml` dynamic version). GitHub repo remains `cypy`; PyPI / import package is **`picop`**. Soft `cypy` import alias until **3.0**.
+Ship a tagged `picop` release from `main`. Version is sourced from [`src/picop/__about__.py`](../src/picop/__about__.py) (`pyproject.toml` dynamic version). The package lives at `packages/picop` in the `ckirua/picop` monorepo. Soft `cypy` import alias until **3.0**.
 
 ## Compatibility (0.x → 1.0)
 
@@ -47,7 +47,7 @@ already `picop`.
 
 1. [x] Freeze Core public set (`picop.__all__` + `picop.hot`) and document cimport contracts in COVERAGE / module trackers.
 2. [x] Changelog: close “Provisional (non-Core)” — Protocols/Runtime under post-1.0 minor policy.
-3. [x] Tag `v1.0.0` (after merge to `main`).
+3. [x] Tag `v1.0.0` (new monorepo releases use package-prefixed tags).
 
 ### 2.0 import rename checklist
 
@@ -88,9 +88,9 @@ Manual equivalent:
 ```bash
 git checkout main && git pull
 # after version bump is on main:
-git tag -a "vX.Y.Z" -m "picop vX.Y.Z"
-git push origin "vX.Y.Z"
-gh release create "vX.Y.Z" --title "picop vX.Y.Z" --notes-file - <<'EOF'
+git tag -a "picop-vX.Y.Z" -m "picop X.Y.Z"
+git push origin "picop-vX.Y.Z"
+gh release create "picop-vX.Y.Z" --title "picop X.Y.Z" --notes-file - <<'EOF'
 ## Highlights
 - …
 
@@ -100,12 +100,12 @@ gh release create "vX.Y.Z" --title "picop vX.Y.Z" --notes-file - <<'EOF'
 ## Install
 ```bash
 pip install "picop==X.Y.Z"
-# or: pip install "picop @ git+https://github.com/ckirua/picop.git@vX.Y.Z"
+# or: pip install "picop @ git+https://github.com/ckirua/picop.git@picop-vX.Y.Z#subdirectory=packages/picop"
 ```
 EOF
 ```
 
-Pushing the tag runs [`.github/workflows/publish.yml`](../.github/workflows/publish.yml)
+Pushing the tag runs the repository-root [`.github/workflows/publish.yml`](../../../.github/workflows/publish.yml)
 (Trusted Publishing → PyPI project **`picop`**, **sdist only**). Preferred import is **`picop`**;
 deprecated **`cypy`** alias until **3.0**.
 Plain `linux_*` wheels are rejected by PyPI; add manylinux via cibuildwheel later if needed.
@@ -113,7 +113,7 @@ Plain `linux_*` wheels are rejected by PyPI; add manylinux via cibuildwheel late
 ### One-time PyPI Trusted Publisher
 
 1. https://pypi.org/manage/account/publishing/ → pending publisher for **`picop`**
-2. Owner `ckirua`, repo `cypy`, workflow `publish.yml`, environment `pypi`
+2. Owner `ckirua`, repo `picop`, workflow `publish.yml`, environment `pypi`
 3. Optional: same on TestPyPI with environment `testpypi`
 4. Create GitHub Environments `pypi` / `testpypi` (optional reviewers)
 

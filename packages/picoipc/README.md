@@ -42,8 +42,8 @@ Default magic: `0x534D4851` (`"SMHQ"`).
 picoipc/
   README.md  LICENSE
   native/include/smh_q/ring.hpp  native/src/ring.cpp  native/CMakeLists.txt
-  examples/native/{roundtrip,producer,consumer,stress}.cpp
-  benchmarks/native/{bench_throughput,bench_sequential,bench_futex}.cpp
+  examples/cpp/{roundtrip,producer,consumer,stress}.cpp
+  benchmarks/cpp/{bench_throughput,bench_sequential,bench_futex}.cpp
   pyproject.toml  src/picoipc/{__init__,ring}.py
   examples/python/{roundtrip,producer,consumer,stress}.py
   benchmarks/python/bench_throughput.py
@@ -52,9 +52,8 @@ picoipc/
 ## Build (C++)
 
 ```bash
-cd cpp
-cmake -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build
+cmake -S native -B build/native -DCMAKE_BUILD_TYPE=Release
+cmake --build build/native
 ```
 
 ## Bundled C++ API (`smh_q::Ring`)
@@ -116,7 +115,7 @@ Layout matches C++ — cross-language producer/consumer works.
 python3 examples/python/consumer.py smh_q_xlang 10000
 ```
 
-See also [examples/native/README.md](examples/native/README.md).
+See also [examples/cpp/README.md](examples/cpp/README.md).
 
 ## Backends
 
@@ -168,10 +167,10 @@ sequential   payload=  64B count= 100000 elapsed=   16.94 ms  msgs/s=   5902048 
 ## Quick start
 
 ```bash
-cd cpp && cmake -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build
-./build/roundtrip
+cmake -S native -B build/native -DCMAKE_BUILD_TYPE=Release && cmake --build build/native
+./build/native/roundtrip
 python3 examples/python/roundtrip.py
-ctest --test-dir build
+ctest --test-dir build/native
 ```
 
 ## Relation to upstream SPSC ring

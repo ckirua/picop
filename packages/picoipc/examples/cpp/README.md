@@ -1,9 +1,10 @@
 # C++ examples and benchmarks
 
-Build from `native/`:
+Build from the package root:
 
 ```bash
-cmake -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build
+cmake -S native -B build/native -DCMAKE_BUILD_TYPE=Release
+cmake --build build/native
 ```
 
 ## Examples
@@ -19,6 +20,6 @@ cmake -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build
 
 | Binary | Source | Description |
 |--------|--------|-------------|
-| `bench_throughput` | `../benchmarks/bench_throughput.cpp` | Threaded SPSC; args: `[count] [payload_bytes]` |
-| `bench_sequential` | `../benchmarks/bench_sequential.cpp` | Publish-all then consume-all; args: `[count] [payload_bytes]` |
-| `bench_futex` | `../benchmarks/bench_futex.cpp` | Spin vs futex consumer; args: `[count] [idle_us]` |
+| `bench_throughput` | `../../benchmarks/cpp/bench_throughput.cpp` | Threaded SPSC; args: `[count] [payload_bytes]` |
+| `bench_sequential` | `../../benchmarks/cpp/bench_sequential.cpp` | Publish-all then consume-all; args: `[count] [payload_bytes]` |
+| `bench_futex` | `../../benchmarks/cpp/bench_futex.cpp` | Spin vs futex consumer; args: `[count] [idle_us]` |

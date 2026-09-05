@@ -31,7 +31,7 @@ Env: SMH_Q_SHM_SPIN_ITERS=(unset) SMH_Q_SHM_WAIT_MS=(unset) (defaults 2000, 1)
 
 ## Files
 - `native/src/ring.cpp` — `getenv_int`, `shm_spin_iters`, `shm_wait_slice_ms`
-- `benchmarks/native/bench_futex.cpp` — print active env
+- `benchmarks/cpp/bench_futex.cpp` — print active env
 - `README.md` — relation-to-ull env tuning note
 
 ## Merge

@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [2.1.0] — 2026-09-06 — systems call and buffer helpers
 
 - Add `cycall` zero-, one-, and two-argument CPython call helpers, including a cimport-only vectorcall primitive.
 - Add public buffer and memoryview metadata inspection helpers.

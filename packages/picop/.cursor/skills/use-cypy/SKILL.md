@@ -26,8 +26,8 @@ description: >-
 
 ```bash
 pip install picop
-# pin: pip install "picop==2.0.0"
-# or from git: pip install "picop @ git+https://github.com/ckirua/cypy.git@v2.0.0"
+# pin: pip install "picop==2.1.0"
+# or from git: pip install "picop @ git+https://github.com/ckirua/cypy.git@v2.1.0"
 ```
 
 Requires **Python ≥ 3.14**.

@@ -14,7 +14,7 @@ PyPI distribution name and import package are both **`picop`**.
 
 ```bash
 pip install picop
-# pin: pip install "picop==2.0.0"
+# pin: pip install "picop==2.1.0"
 ```
 
 Build deps (`setuptools`, `wheel`, `Cython`, `picobuild`) are pulled via `pyproject.toml` `[build-system]`. Source installs need a C toolchain and OpenSSL headers (`libssl-dev` on Debian/Ubuntu).
@@ -22,7 +22,7 @@ Build deps (`setuptools`, `wheel`, `Cython`, `picobuild`) are pulled via `pyproj
 ### From git (users)
 
 ```bash
-pip install "picop @ git+https://github.com/ckirua/picop.git@v2.0.0"
+pip install "picop @ git+https://github.com/ckirua/picop.git@v2.1.0"
 # or unpinned tip of main:
 # pip install "picop @ git+https://github.com/ckirua/picop.git#subdirectory=packages/picop"
 ```
@@ -111,7 +111,7 @@ python examples/pydict.py
 
 ## Compatibility
 
-**1.0 policy:** **Core** (`picop.__all__` + `picop.hot`) and documented cimport contracts are frozen. Soft aliases were removed in **0.3**. Protocols / Runtime remain provisional under minors. See [`docs/RELEASE.md`](docs/RELEASE.md). Semantic twins like `dict_len`/`dict_size` stay dual (never identity-aliased). Prefer pin: `pip install "picop==2.0.0"`.
+**1.0 policy:** **Core** (`picop.__all__` + `picop.hot`) and documented cimport contracts are frozen. Soft aliases were removed in **0.3**. Protocols / Runtime remain provisional under minors. See [`docs/RELEASE.md`](docs/RELEASE.md). Semantic twins like `dict_len`/`dict_size` stay dual (never identity-aliased). Prefer pin: `pip install "picop==2.1.0"`.
 
 **2.0 soft rename:** import package is **`picop`**; deprecated **`cypy`** alias remains until **3.0** (then removed). Pip install name was already `picop`.
 

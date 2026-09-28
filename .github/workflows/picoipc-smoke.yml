@@ -27,7 +27,20 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential cmake python3-dev
+      - name: Install test dependencies
+        run: python -m pip install --upgrade pytest
+
       - name: Gate
         run: |
-          PICOIPC_BACKEND=pure RECORD_BASELINE=1 ./bench/run_gate.sh || true
+          # Required production build, CTest, pybind11 correctness, and pybind11 baseline comparison.
           ./bench/run_gate.sh
+
+          # Prove the staged default extension is actually selected, then run the full Python suite.
+          PYTHONPATH=src PICOIPC_BACKEND=pybind11 PICOIPC_EXPECTED_IMPL=pybind11 python -c "from picoipc import impl_name; assert impl_name() == 'pybind11'"
+          PYTHONPATH=src PICOIPC_BACKEND=pybind11 PICOIPC_EXPECTED_IMPL=pybind11 python -m pytest tests -q
+
+          # Require the portable reference implementation to satisfy the same Ring contract.
+          PYTHONPATH=src PICOIPC_BACKEND=pure PICOIPC_EXPECTED_IMPL=pure_python python -m pytest tests/test_ring.py -q
+
+          # Pure runs configured correctness and emits a distinct result, but has no invalid pybind11 performance comparison.
+          PYTHONPATH=src PICOIPC_BACKEND=pure python bench/harness.py --config bench/config_smoke.yaml --output artifacts/bench_pure.json

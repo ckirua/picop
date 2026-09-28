@@ -34,7 +34,7 @@ python3 -c "import sys; assert sys.version_info >= (3, 14)"
 echo "==> Running harness ($CONFIG)"
 SHA="$(git rev-parse --short HEAD 2>/dev/null || echo unknown)"
 CANDIDATE="artifacts/bench_${SHA}.json"
-python3 -m pip install -q pyyaml 2>/dev/null || true
+python3 -m pip install -q pyyaml
 export PYTHONPATH="$ROOT/src:${PYTHONPATH:-}"
 export PICOIPC_BACKEND="${PICOIPC_BACKEND:-pybind11}"
 python3 bench/harness.py --config "$CONFIG" --output "$CANDIDATE"

@@ -48,6 +48,12 @@ jobs:
         with:
           python-version: "3.14"
 
+
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends build-essential libssl-dev
+
       - name: Install build tools
         run: pip install --upgrade build twine
 
@@ -58,6 +64,17 @@ jobs:
 
       - name: Check metadata
         run: twine check dist/*
+
+      - name: Smoke built sdist
+        run: |
+          smoke_dir="$(mktemp -d)"
+          trap 'rm -rf "$smoke_dir"' EXIT
+          python -m venv "$smoke_dir/venv"
+          CPY_NATIVE=0 "$smoke_dir/venv/bin/python" -m pip install "$(pwd)"/dist/picop-*.tar.gz
+          "$smoke_dir/venv/bin/python" -c "from picop.hot import bytes_len, dict_get, str_len; assert bytes_len(b'ok') == 2; assert dict_get({'a': 1}, 'a') == 1; assert str_len('ok') == 2"
+          "$smoke_dir/venv/bin/python" -W default -c "import cypy; from cypy.hot import bytes_len; assert bytes_len(b'ok') == 2; assert cypy.__version__ == __import__('picop').__version__"
+          PYTHON="$smoke_dir/venv/bin/python" bash scripts/smoke_barrel_cimport.sh
+
 
       - name: Upload dist artifacts
         uses: actions/upload-artifact@v4

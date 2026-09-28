@@ -14,4 +14,9 @@ pip install ./packages/picop
 pip install ./packages/picoipc
 ```
 
+
+## Agent guide
+
+Repository-wide agent orientation and shared workflow rules: [`.agents/README.md`](.agents/README.md). Read it before the nearest package-local `AGENTS.md`; package-specific guidance remains authoritative for package changes.
+
 Changes should remain within one package unless they intentionally update shared repository automation.

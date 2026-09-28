@@ -2,6 +2,8 @@
 
 This repository contains independently installable packages under `packages/`.
 
+Repository-wide orientation, package map, validation anchors, and shared CI/release rules live in [`.agents/README.md`](.agents/README.md). Read it before the nearest package-local guidance; package-specific rules remain authoritative.
+
 - Read and follow the nearest package-local `AGENTS.md` before changing a package.
 - Keep package APIs, build metadata, tests, documentation, and release notes inside that package.
 - Keep shared GitHub workflows under the repository-root `.github/workflows/` directory and scope them by package path.

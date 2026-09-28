@@ -9,7 +9,7 @@ Charter for improving Python `picoipc` throughput via native bindings while keep
 | `opt/ctypes` | ctypes → `libsmh_q.so` | `ctypes` |
 | `opt/pybind11` | pybind11 extension | `pybind11` |
 | `opt/cython` | Cython wrapper | `cython` |
-| `main` (baseline) | pure Python ring | `pure` |
+| `main` (baseline) | pybind11 extension | `pybind11` |
 
 Branch naming: `opt/<method>` off `main`. Do not stack multiple binding approaches on one branch.
 
@@ -21,7 +21,7 @@ git checkout -b opt/ctypes
 ./bench/run_gate.sh
 ```
 
-`run_gate.sh` builds C++ (Release), runs `bench/harness.py` with `bench/config_smoke.yaml`, compares output to `artifacts/baseline.json`.
+`run_gate.sh` builds C++ (Release), runs `bench/harness.py` with `bench/config_smoke.yaml`, and compares the pybind11 output to `artifacts/baseline.json`.
 
 ### Smoke gate rules (`config_smoke.yaml`)
 
@@ -36,8 +36,9 @@ Optional deep profile: `bench/config_full.yaml` (not run on every PR).
 
 ### Artifacts
 
-- `artifacts/baseline.json` — committed on `main`; pure-Python reference numbers.
-- `artifacts/bench_<git_sha>.json` — per-run harness output (not committed on opt branches unless refreshing baseline after merge).
+- `artifacts/baseline.json` — committed pybind11 production baseline.
+- `artifacts/bench_<git_sha>.json` — per-run pybind11 harness output (not committed on opt branches unless intentionally promoting a new baseline).
+- `artifacts/bench_pure.json` — ignored pure-Python correctness-smoke output.
 
 Record branch outcomes in `research/runs/<branch>.md` (setup, numbers, verdict). Append promoted merges to `research/OPTIMIZATION_LOG.md`.
 
@@ -46,11 +47,14 @@ Record branch outcomes in `research/runs/<branch>.md` (setup, numbers, verdict).
 After a branch merges to `main`:
 
 1. Set the default backend in `src/picoipc/__init__.py` to the winner.
-2. Refresh `artifacts/baseline.json` from the new default.
+2. Intentionally refresh `artifacts/baseline.json` from the new default through the documented promotion workflow.
 3. Add a row to `research/OPTIMIZATION_LOG.md`.
 
-Do **not** merge if the gate fails, C++ cross-lang breaks, or deps are heavy without proportional gain (e.g. Cython vs pybind11).
+Do **not** merge if the gate fails, C++ cross-lang breaks, or deps are heavy without proportional gain (e.g. Cython vs pybind11). Never update a baseline through `RECORD_BASELINE` or ordinary CI.
 
 ## CI
 
-PRs run the repository-root `.github/workflows/picoipc-smoke.yml`: CMake build + `./bench/run_gate.sh` (~2 min).
+PRs run the repository-root `.github/workflows/picoipc-smoke.yml` with two required obligations:
+
+1. `./bench/run_gate.sh` builds the production pybind11 backend, runs CTest and configured correctness checks, then compares throughput against the committed pybind11 baseline.
+2. The explicit `PICOIPC_BACKEND=pure` harness run is a required correctness smoke with no throughput comparison.

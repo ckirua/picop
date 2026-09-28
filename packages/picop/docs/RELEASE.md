@@ -121,10 +121,21 @@ Manual dry-run: Actions → **publish** → Run workflow → `testpypi`.
 
 ## Artifacts / local PyPI check
 
+Validate the exact source archive in a clean environment before upload. This
+requires CPython 3.14, a C compiler toolchain, and OpenSSL development headers.
+
 ```bash
 pip install build twine
-CPY_NATIVE=0 python -m build
+CPY_NATIVE=0 python -m build --sdist
 twine check dist/*
+smoke_dir="$(mktemp -d)"
+python -m venv "$smoke_dir/venv"
+CPY_NATIVE=0 "$smoke_dir/venv/bin/python" -m pip install "$(pwd)"/dist/picop-*.tar.gz
+"$smoke_dir/venv/bin/python" -c "from picop.hot import bytes_len, dict_get, str_len; assert bytes_len(b'ok') == 2; assert dict_get({'a': 1}, 'a') == 1; assert str_len('ok') == 2"
+"$smoke_dir/venv/bin/python" -W default -c "import cypy; from cypy.hot import bytes_len; assert bytes_len(b'ok') == 2; assert cypy.__version__ == __import__('picop').__version__"
+PYTHON="$smoke_dir/venv/bin/python" bash scripts/smoke_barrel_cimport.sh
+rm -rf "$smoke_dir"
+
 # optional local upload (prefer CI Trusted Publishing):
 # twine upload --repository testpypi dist/*
 # twine upload dist/*

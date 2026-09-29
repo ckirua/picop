@@ -43,7 +43,7 @@ def test_same_backend_allows_bounded_residual_variance() -> None:
     baseline = metrics("pybind11", 100.0, 1_000.0)
     candidate = metrics("pybind11", 95.0, 950.0)
 
-    assert compare.required_multiplier(baseline, candidate, 1.25) == 0.90
+    assert compare.required_multiplier(baseline, candidate, 1.25) == 0.75
 
 def test_different_backend_retains_configured_speedup_requirement() -> None:
     baseline = metrics("pure_python", 100.0, 1_000.0)

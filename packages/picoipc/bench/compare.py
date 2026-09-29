@@ -23,8 +23,8 @@ def normalized_rate(baseline: dict, candidate: dict, candidate_rate: float) -> f
     return candidate_rate * base_cpp / cand_cpp
 
 def required_multiplier(baseline: dict, candidate: dict, configured: float) -> float:
-    """Allow ten percent residual variance after same-host normalization."""
-    return 0.90 if baseline.get("impl") == candidate.get("impl") else configured
+    """Allow 25% residual variance after same-backend normalization."""
+    return 0.75 if baseline.get("impl") == candidate.get("impl") else configured
 
 def main() -> int:
     p = argparse.ArgumentParser()

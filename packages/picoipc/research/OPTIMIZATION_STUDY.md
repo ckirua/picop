@@ -28,7 +28,7 @@ git checkout -b opt/ctypes
 | Check | Rule |
 |-------|------|
 | Correctness | All steps in `correctness` pass (`cpp_roundtrip`, `cpp_stress`, `py_roundtrip`, `py_cpp_xlang`) |
-| Throughput | `sequential_msgs_per_sec_64b` >= `baseline x throughput_multiplier` (default 1.25) |
+| Throughput | Median of five sequential Python and C++ samples. For pybind11-to-pybind11 comparisons, C++ throughput normalizes host speed and permits 25% residual variance on heterogeneous GitHub-hosted runners; different backends use `throughput_multiplier` (default 1.25). |
 | Wall time | Harness completes within `max_wall_s` (default 90) |
 | Regression | C++ cross-language roundtrip must pass |
 

@@ -11,6 +11,8 @@ import subprocess
 import sys
 import threading
 import time
+from statistics import median
+
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -306,6 +308,10 @@ def run_harness(config_path: Path, output: Path | None = None) -> dict:
     cpp_ref = bool(cfg.get("cpp_reference", True))
     max_wall_s = float(cfg.get("max_wall_s", 90))
     throughput_multiplier = float(cfg.get("throughput_multiplier", 1.25))
+    benchmark_samples = int(cfg.get("benchmark_samples", 1))
+    if benchmark_samples < 1:
+        raise ValueError("benchmark_samples must be >= 1")
+
 
     result: dict = {
         "impl": _backend_impl(),
@@ -313,6 +319,7 @@ def run_harness(config_path: Path, output: Path | None = None) -> dict:
         "python": sys.executable,
         "git_sha": _git_sha(),
         "timestamp": datetime.now(timezone.utc).isoformat(),
+        "benchmark_samples": benchmark_samples,
         "config": str(config_path.resolve().relative_to(ROOT)),
         "correctness": correctness,
         "correctness_ok": correctness_ok,
@@ -324,10 +331,16 @@ def run_harness(config_path: Path, output: Path | None = None) -> dict:
     primary_payload = payloads[0] if payloads else 64
 
     if "sequential" in modes:
-        rate = bench_sequential(count, primary_payload, warmup)
+        rate_samples = [
+            bench_sequential(count, primary_payload, warmup)
+            for _ in range(benchmark_samples)
+        ]
+        rate = median(rate_samples)
         result[f"sequential_msgs_per_sec_{primary_payload}b"] = rate
+        result[f"sequential_msgs_per_sec_{primary_payload}b_samples"] = rate_samples
         if primary_payload == 64:
             result["sequential_msgs_per_sec_64b"] = rate
+            result["sequential_msgs_per_sec_64b_samples"] = rate_samples
 
     if "threaded" in modes:
         thr_rate = bench_threaded(threaded_count, primary_payload, min(warmup, 200))
@@ -336,10 +349,16 @@ def run_harness(config_path: Path, output: Path | None = None) -> dict:
             result["threaded_msgs_per_sec_64b"] = thr_rate
 
     if cpp_ref:
-        cpp_rate = bench_cpp_sequential(count, primary_payload)
+        cpp_rate_samples = [
+            bench_cpp_sequential(count, primary_payload)
+            for _ in range(benchmark_samples)
+        ]
+        cpp_rate = median(cpp_rate_samples)
         result[f"cpp_sequential_msgs_per_sec_{primary_payload}b"] = cpp_rate
+        result[f"cpp_sequential_msgs_per_sec_{primary_payload}b_samples"] = cpp_rate_samples
         if primary_payload == 64:
             result["cpp_sequential_msgs_per_sec_64b"] = cpp_rate
+            result["cpp_sequential_msgs_per_sec_64b_samples"] = cpp_rate_samples
 
     result["wall_s"] = round(time.perf_counter() - t_start, 3)
 

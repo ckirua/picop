@@ -30,7 +30,7 @@ Run the narrowest command that exercises the change, then the package gate when 
 | `picop` | `python scripts/check_exports.py`; relevant examples; use `bash scripts/smoke_barrel_cimport.sh` for cimport/package-artifact changes. |
 | `picoipc` | `./bench/run_gate.sh` for the native correctness and production performance gate; run shared Ring tests with both `PICOIPC_BACKEND=pybind11` and `PICOIPC_BACKEND=pure` when changing portable Ring behavior. |
 
-`picoipc`'s production benchmark comparison uses the committed pybind11 baseline. Do not refresh that baseline from ordinary CI or use a pure-Python result for the production comparison.
+`picoipc`'s production benchmark comparison uses the committed pybind11 baseline and median five-sample measurements. Do not refresh that baseline from ordinary CI or use a pure-Python result for the production comparison.
 
 ## Shared CI and release
 

@@ -11,3 +11,4 @@ correctness:
   - py_cpp_xlang
 max_wall_s: 90
 throughput_multiplier: 1.25
+benchmark_samples: 5

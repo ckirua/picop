@@ -8,9 +8,9 @@ Repository-wide operating guide for coding agents and maintainers. Read this fil
 |---|---|---|
 | [`packages/picop/`](../packages/picop/) | CPython C-API helpers and C-backed UUID values for Cython | [`README.md`](../packages/picop/README.md), [`AGENTS.md`](../packages/picop/AGENTS.md), [`docs/`](../packages/picop/docs/) |
 | [`packages/picoipc/`](../packages/picoipc/) | Linux POSIX shared-memory SPSC ring and native bindings | [`README.md`](../packages/picoipc/README.md), [`AGENTS.md`](../packages/picoipc/AGENTS.md), [`research/`](../packages/picoipc/research/) |
-| [`.github/workflows/`](../.github/workflows/) | Shared path-scoped CI and picop publishing | [`picop-smoke.yml`](../.github/workflows/picop-smoke.yml), [`picoipc-smoke.yml`](../.github/workflows/picoipc-smoke.yml), [`publish.yml`](../.github/workflows/publish.yml) |
+| [`.github/workflows/`](../.github/workflows/) | Shared path-scoped CI and package publishing | [`picop-smoke.yml`](../.github/workflows/picop-smoke.yml), [`picoipc-smoke.yml`](../.github/workflows/picoipc-smoke.yml), [`publish.yml`](../.github/workflows/publish.yml), [`picoipc-publish.yml`](../.github/workflows/picoipc-publish.yml) |
 
-The repository root is not an installable Python distribution. Packages are independently installable and own their APIs, build metadata, tests, documentation, and release notes.
+The repository root is not an installable Python distribution. `picop` is the primary package; `picoipc` is a separate Linux-only package. They are independently installable and own their APIs, build metadata, tests, documentation, and release notes.
 
 ## Working rules
 
@@ -36,7 +36,9 @@ Run the narrowest command that exercises the change, then the package gate when 
 
 - Keep shared workflows in [`.github/workflows/`](../.github/workflows/) and scope triggers by package path.
 - [`publish.yml`](../.github/workflows/publish.yml) publishes **picop only**, as an sdist, after a `picop-v*` tag or an explicit dispatch. It validates the exact built sdist before artifact upload.
-- A picop release requires a clean, current `main`, green CI, an explicit user-confirmed version and title, and the process in [`packages/picop/docs/RELEASE.md`](../packages/picop/docs/RELEASE.md). Do not create tags or publish as part of ordinary maintenance work.
+- Releases are coordinated by policy, not by version: `picop` and `picoipc` versions and release timing remain independent. Annotated tags `picop-vX.Y.Z` and `picoipc-vX.Y.Z` release only their matching distribution. Release PRs must pass that package's gate; release tags come from a clean, current `main`, create a GitHub Release, and publish through PyPI Trusted Publishing.
+- `picoipc` version lives in `packages/picoipc/pyproject.toml`; `picoipc-v*` builds/tests its Linux sdist and publishes only `picoipc`. Configure its PyPI Trusted Publisher for `picoipc-publish.yml` with the `pypi` environment.
+- A picop release requires a clean, current `main`, green CI, an explicit user-confirmed version and title, and the process in [`packages/picop/docs/RELEASE.md`](../packages/picop/docs/RELEASE.md). Preserve `picop`'s API/version policy and existing `scripts/release.sh` flow. Do not create tags or publish as part of ordinary maintenance work.
 - `packages/picop/.cursor/skills/` contains the picop consumer, maintainer, and release skills. Refer to the relevant skill rather than duplicating a release process.
 
 ## Documentation ownership

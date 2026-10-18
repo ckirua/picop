@@ -15,6 +15,11 @@
 #endif
 
 _Static_assert(
+    UUID_RANDOM_BUFFER_SIZE >= UUID_SIZE,
+    "UUID_RANDOM_BUFFER_SIZE must hold at least one UUID"
+);
+
+_Static_assert(
     UUID_RANDOM_BUFFER_SIZE % UUID_SIZE == 0,
     "UUID_RANDOM_BUFFER_SIZE must be a multiple of 16"
 );
@@ -23,4 +28,6 @@ _Static_assert(
     "UUID_RANDOM_BUFFER_SIZE must fit RAND_bytes' int length"
 );
 
+/* Call once before generation; a nonzero result is a fork-hook error code. */
+int c_uuid_init(void);
 int c_uuid4(uint8_t uuid[UUID_SIZE]);

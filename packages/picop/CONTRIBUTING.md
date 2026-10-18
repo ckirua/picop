@@ -7,9 +7,9 @@ Thanks for contributing to **picop** (repo / copyright: **ckirua**; historical i
 Editable install (see root [`README.md`](README.md)):
 
 ```bash
-python3.14 -m venv .venv
+python3.15 -m venv .venv
 source .venv/bin/activate
-pip install setuptools wheel Cython picobuild
+pip install setuptools wheel 'Cython>=3.3.0' picobuild
 pip install -e . --no-build-isolation
 ```
 
@@ -33,6 +33,13 @@ python scripts/check_exports.py
 # tracker grades (when docs/modules/ Lifecycle lines change)
 python scripts/grade_trackers.py
 ```
+
+Run installed-artifact correctness on 3.14, 3.15, 3.14t and 3.15t with separate
+environments/builds. On t runtimes, first check `sys._is_gil_enabled()` before
+and after importing `picop` and `cypy` with `PYTHON_GIL` unset; both must remain
+false. Run a separate `python -X gil=0 -m pytest tests -q` concurrency suite.
+Do not reuse native binaries between ABIs. Rebuild downstream Cython consumers
+with `PYTHON=/path/to/python bash scripts/smoke_barrel_cimport.sh`.
 
 ## Pull requests
 

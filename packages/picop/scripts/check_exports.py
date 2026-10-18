@@ -20,7 +20,6 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-INIT_PY = ROOT / "src" / "picop" / "__init__.py"
 MODULES = ROOT / "docs" / "modules"
 
 CIMPORT_ONLY_SURFACE = re.compile(
@@ -40,7 +39,10 @@ def cimport_only_modules() -> list[str]:
 
 def init_imported_modules() -> set[str]:
     """Submodule names imported in ``__init__.py`` (``from .cyfoo import``)."""
-    tree = ast.parse(INIT_PY.read_text(encoding="utf-8"), filename=str(INIT_PY))
+    import picop
+
+    init_py = Path(picop.__file__).resolve()
+    tree = ast.parse(init_py.read_text(encoding="utf-8"), filename=str(init_py))
     mods: set[str] = set()
     for node in tree.body:
         if isinstance(node, ast.ImportFrom) and node.module:

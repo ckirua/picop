@@ -2,6 +2,8 @@
 # Typed ``bytearray`` helpers. Public docs live in ``cybytearray.pyi``.
 # C pointers / uninit construction: cdef.
 
+import cython
+
 from cpython.object cimport PyObject
 from libc.stddef cimport size_t
 from libc.string cimport memchr, memcmp
@@ -35,11 +37,14 @@ cdef inline bint bacheck_exact(object p) noexcept:
 
 
 cdef inline Py_ssize_t balen(bytearray ba) noexcept:
-    return PyByteArray_GET_SIZE(ba)
+    with cython.critical_section(ba):
+        return PyByteArray_GET_SIZE(ba)
+
 
 
 cdef inline Py_ssize_t basize(object ba) except -1:
-    return PyByteArray_Size(ba)
+    with cython.critical_section(ba):
+        return PyByteArray_Size(ba)
 
 
 cdef inline bytearray bafrom_object(object o):
@@ -73,15 +78,17 @@ cdef inline int baresize(bytearray ba, Py_ssize_t n) except -1:
 
 
 cdef inline bint baeq(bytearray a, bytearray b) noexcept:
-    # Identity / len short-circuit + memcmp on typed bytearray (mirror beq).
+    # Hold both exporters stable across their metadata and content reads.
+    cdef Py_ssize_t la
     if a is b:
         return True
-    cdef Py_ssize_t la = PyByteArray_GET_SIZE(a)
-    if la != PyByteArray_GET_SIZE(b):
-        return False
-    if la == 0:
-        return True
-    return memcmp(PyByteArray_AS_STRING(a), PyByteArray_AS_STRING(b), <size_t>la) == 0
+    with cython.critical_section(a, b):
+        la = PyByteArray_GET_SIZE(a)
+        if la != PyByteArray_GET_SIZE(b):
+            return False
+        if la == 0:
+            return True
+        return memcmp(PyByteArray_AS_STRING(a), PyByteArray_AS_STRING(b), <size_t>la) == 0
 
 
 cdef inline bint bane(bytearray a, bytearray b) noexcept:
@@ -89,20 +96,23 @@ cdef inline bint bane(bytearray a, bytearray b) noexcept:
 
 
 cdef inline bint bacontains(bytearray haystack, bytes needle) noexcept:
-    # memchr/memmem win on small buffers; CPython stringlib wins past ~256B.
-    cdef Py_ssize_t hlen = PyByteArray_GET_SIZE(haystack)
     cdef Py_ssize_t nlen = PyBytes_GET_SIZE(needle)
+    cdef Py_ssize_t hlen
+    cdef char *hp
+    cdef char *np = PyBytes_AS_STRING(needle)
     if nlen == 0:
         return True
-    if nlen > hlen:
-        return False
-    if hlen > 256:
-        return needle in haystack
-    cdef char *hp = PyByteArray_AS_STRING(haystack)
-    cdef char *np = PyBytes_AS_STRING(needle)
-    if nlen == 1:
-        return memchr(hp, <unsigned char>np[0], <size_t>hlen) is not NULL
-    return memmem(hp, <size_t>hlen, np, <size_t>nlen) is not NULL
+    with cython.critical_section(haystack):
+        hlen = PyByteArray_GET_SIZE(haystack)
+        if nlen > hlen:
+            return False
+        if hlen > 256:
+            return needle in haystack
+        hp = PyByteArray_AS_STRING(haystack)
+        if nlen == 1:
+            return memchr(hp, <unsigned char>np[0], <size_t>hlen) is not NULL
+        return memmem(hp, <size_t>hlen, np, <size_t>nlen) is not NULL
+
 
 # Wave 4 N1/N5 preferred names (0.3: soft letter/bare are cdef-only)
 

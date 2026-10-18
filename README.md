@@ -1,19 +1,15 @@
-# Pico packages
+# picop
 
-Monorepo for independently installable low-level Python packages.
+Fast CPython C-API helpers and C-backed UUID values for Cython.
+CPython 3.15 is primary; 3.14, 3.14t and 3.15t remain supported.
 
-| Package | Path | Purpose | Platform |
-|---|---|---|---|
-| `picop` | [`packages/picop`](packages/picop) | Fast CPython C-API helpers and C-backed UUID values for Cython | CPython 3.14+ |
-| `picoipc` | [`packages/picoipc`](packages/picoipc) | Shared-memory queues and local IPC primitives | Linux, Python 3.14+ |
-
-Each directory under `packages/` owns its build metadata, tests, documentation, and release lifecycle. Install a package from its directory rather than from the repository root:
+The package lives in [`packages/picop`](packages/picop), which owns its build
+metadata, tests, documentation and release lifecycle. The repository root is not
+an installable Python distribution.
 
 ```bash
 pip install ./packages/picop
-pip install ./packages/picoipc
 ```
-
 
 ## Agent guide
 

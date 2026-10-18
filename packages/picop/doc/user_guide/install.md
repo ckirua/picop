@@ -2,6 +2,10 @@
 
 PyPI distribution name and import package are both **`picop`**. Requires **Python ≥ 3.14**, a C toolchain for source builds, and OpenSSL headers (`libssl-dev` on Debian/Ubuntu) for UUID.
 
+Python **3.15 is primary**; 3.14, 3.14t and 3.15t are also supported. On t
+interpreters imports do not enable the GIL. Each ABI needs its own extension
+build, and downstream Cython extensions must rebuild for the UUID layout change.
+
 ## From PyPI
 
 ```bash
@@ -9,7 +13,7 @@ pip install picop
 # pin: pip install "picop==2.0.0"
 ```
 
-Build deps (`setuptools`, `wheel`, `Cython`, `picobuild`) are pulled via `pyproject.toml` `[build-system]`.
+Build deps (`setuptools`, `wheel`, `Cython>=3.3.0`, `picobuild`) are pulled via `pyproject.toml` `[build-system]`.
 
 ## From git
 
@@ -22,9 +26,9 @@ pip install "picop @ git+https://github.com/ckirua/picop.git@v2.0.0"
 ## Editable (contributors)
 
 ```bash
-python3.14 -m venv .venv
+python3.15 -m venv .venv
 source .venv/bin/activate
-pip install setuptools wheel Cython picobuild
+pip install setuptools wheel 'Cython>=3.3.0' picobuild
 pip install -e . --no-build-isolation
 ```
 

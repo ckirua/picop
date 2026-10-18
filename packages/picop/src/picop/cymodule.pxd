@@ -4,7 +4,6 @@
 # Prefer ``mod_add_object_ref`` over stealing ``mod_add_object``.
 
 from cpython.object cimport PyObject
-from cpython.ref cimport Py_INCREF
 
 
 cdef extern from "Python.h":
@@ -27,7 +26,7 @@ cdef extern from "Python.h":
     object PyImport_ReloadModule(object m)
     long PyImport_GetMagicNumber() noexcept
     PyObject *PyImport_GetModuleDict() except? NULL
-    PyObject *PyImport_AddModule(const char *name) except? NULL
+    object PyImport_AddModuleRef(const char *name)
 
 
 cpdef inline bint mod_check(object p) noexcept:
@@ -96,9 +95,7 @@ cdef inline object mod_get_dict(object module):
     cdef PyObject *p = PyModule_GetDict(module)
     if p is NULL:
         return None
-    cdef object obj = <object>p
-    Py_INCREF(obj)
-    return obj
+    return <object>p
 
 
 cdef inline int mod_add_object(object module, const char *name, object value) except -1:
@@ -111,21 +108,14 @@ cdef inline void *mod_get_state(object module) noexcept:
 
 
 cdef inline object mod_add_module(const char *name):
-    cdef PyObject *p = PyImport_AddModule(name)
-    if p is NULL:
-        return None
-    cdef object obj = <object>p
-    Py_INCREF(obj)
-    return obj
+    return PyImport_AddModuleRef(name)
 
 
 cdef inline object mod_modules_dict():
     cdef PyObject *p = PyImport_GetModuleDict()
     if p is NULL:
         return None
-    cdef object obj = <object>p
-    Py_INCREF(obj)
-    return obj
+    return <object>p
 # N2 preferred *_cstr (0.3: *_string cdef-only where soft)
 
 cpdef inline int mod_add_cstr(object module, const char *name, const char *value) except -1:

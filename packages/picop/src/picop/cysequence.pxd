@@ -3,6 +3,7 @@
 # Fast/ITEM macros and Fast_ITEMS pointer: cdef.
 
 from cpython.object cimport PyObject, PyObject_RichCompareBool, Py_EQ
+import cython
 
 
 cdef extern from "Python.h":
@@ -120,11 +121,16 @@ cdef inline object sqfast(object o, const char *msg):
 
 
 cdef inline object sqfast_get(object o, Py_ssize_t i) noexcept:
-    # Borrowed; o must be from sqfast / list / tuple; no bounds check.
+    # No bounds check; caller keeps the index valid. List-backed results
+    # are promoted while the list lock protects the slot.
+    if isinstance(o, list):
+        with cython.critical_section(o):
+            return <object>PySequence_Fast_GET_ITEM(o, i)
     return <object>PySequence_Fast_GET_ITEM(o, i)
 
-
 cdef inline PyObject **sqfast_items(object o) noexcept:
+    # Raw pointer escapes the call; caller must retain o and externally
+    # synchronize mutation for the pointer's entire use.
     return PySequence_Fast_ITEMS(o)
 
 
@@ -134,6 +140,9 @@ cdef inline object sqitem(object o, Py_ssize_t i):
 
 
 cdef inline Py_ssize_t sqfast_size(object o) noexcept:
+    if isinstance(o, list):
+        with cython.critical_section(o):
+            return PySequence_Fast_GET_SIZE(o)
     return PySequence_Fast_GET_SIZE(o)
 
 # Wave 4 N1/N5 preferred names (0.3: soft letter/bare are cdef-only)

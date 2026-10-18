@@ -1,5 +1,6 @@
+# cython: freethreading_compatible=True
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-"""GIL-held CPython call helpers."""
+"""CPython call helpers requiring an attached thread state."""
 
 from cpython.object cimport PyObject
 

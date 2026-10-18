@@ -1,19 +1,4 @@
 # Publish picop to PyPI (Trusted Publishing / OIDC).
-# Pushing picop-v* runs .github/workflows/publish.yml.
-# One-time setup (before the first tag publish):
-#   1. Create a PyPI account and claim the pending publisher for project "picop":
-#        https://pypi.org/manage/account/publishing/
-#      Owner: ckirua  ·  Repo: picop  ·  Workflow: publish.yml  ·  Environment: pypi
-#   2. (Optional) Same for TestPyPI with environment: testpypi
-#   3. Create matching GitHub Environments "pypi" / "testpypi" (optional protection rules).
-#
-# Trigger: annotated picop version tags (picop-vX.Y.Z) after the version bump is on main.
-# Manual: workflow_dispatch → choose testpypi or pypi.
-#
-# Artifacts: sdist only. PyPI rejects plain linux_x86_64 wheels; manylinux
-# wheels need cibuildwheel (follow-up). Users build from sdist (C toolchain +
-# OpenSSL headers).
-
 name: picop publish
 
 on:
@@ -22,86 +7,125 @@ on:
   workflow_dispatch:
     inputs:
       repository:
-        description: "Target index"
+        description: Target index
         required: true
         type: choice
-        options:
-          - testpypi
-          - pypi
+        options: [testpypi, pypi]
         default: testpypi
 
 permissions:
   contents: read
 
 jobs:
-  build:
-    name: Build sdist
+  build-sdist:
+    name: Build one Python 3.15 sdist
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: packages/picop
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Python 3.14
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
-          python-version: "3.14"
-
-
+          python-version: "3.15"
+          allow-prereleases: true
       - name: Install native build dependencies
         run: |
           sudo apt-get update
           sudo apt-get install --yes --no-install-recommends build-essential libssl-dev
-
-      - name: Install build tools
-        run: pip install --upgrade build twine
-
-      - name: Build sdist
+      - name: Build immutable sdist
         env:
           CPY_NATIVE: "0"
-        run: python -m build --sdist
-
-      - name: Check metadata
-        run: twine check dist/*
-
-      - name: Smoke built sdist
         run: |
-          smoke_dir="$(mktemp -d)"
-          trap 'rm -rf "$smoke_dir"' EXIT
-          python -m venv "$smoke_dir/venv"
-          CPY_NATIVE=0 "$smoke_dir/venv/bin/python" -m pip install "$(pwd)"/dist/picop-*.tar.gz
-          "$smoke_dir/venv/bin/python" -c "from picop.hot import bytes_len, dict_get, str_len; assert bytes_len(b'ok') == 2; assert dict_get({'a': 1}, 'a') == 1; assert str_len('ok') == 2"
-          "$smoke_dir/venv/bin/python" -W default -c "import cypy; from cypy.hot import bytes_len; assert bytes_len(b'ok') == 2; assert cypy.__version__ == __import__('picop').__version__"
-          PYTHON="$smoke_dir/venv/bin/python" bash scripts/smoke_barrel_cimport.sh
-
-
-      - name: Upload dist artifacts
-        uses: actions/upload-artifact@v4
+          python -m pip install --upgrade build twine
+          python -m build --sdist
+          python -m twine check dist/*
+          test "$(find dist -maxdepth 1 -name 'picop-*.tar.gz' | wc -l)" -eq 1
+      - uses: actions/upload-artifact@v4
         with:
-          name: python-package-distributions
-          path: packages/picop/dist/
+          name: picop-sdist
+          path: packages/picop/dist/*.tar.gz
+          if-no-files-found: error
+          retention-days: 7
+
+  validate-sdist:
+    needs: build-sdist
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.14", "3.15", "3.14t", "3.15t"]
+    defaults:
+      run:
+        working-directory: packages/picop
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          allow-prereleases: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: picop-sdist
+          path: packages/picop/artifact
+      - name: Install exact sdist in clean environment
+        env:
+          CPY_NATIVE: "0"
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends build-essential libssl-dev
+          python -m venv .venv-validation
+          PY="$PWD/.venv-validation/bin/python"
+          "$PY" -m pip install --upgrade pytest setuptools
+          "$PY" -m pip install artifact/*.tar.gz
+          mkdir -p "$RUNNER_TEMP/picop-validation"
+          cp -R tests scripts examples docs "$RUNNER_TEMP/picop-validation/"
+      - name: Validate installed artifact outside source tree
+        env:
+          CPY_NATIVE: "0"
+        run: |
+          cd "$RUNNER_TEMP/picop-validation"
+          PY="$GITHUB_WORKSPACE/packages/picop/.venv-validation/bin/python"
+          "$PY" -c 'import sys, sysconfig; print(sys.version, "Py_GIL_DISABLED=", sysconfig.get_config_var("Py_GIL_DISABLED"))'
+          if [[ "${{ matrix.python-version }}" == *t ]]; then
+            env -u PYTHON_GIL "$PY" -c 'import pathlib, sys; assert not sys._is_gil_enabled(); import picop; assert not sys._is_gil_enabled(); assert not pathlib.Path(picop.__file__).is_relative_to(pathlib.Path.cwd())'
+            env -u PYTHON_GIL "$PY" -c 'import sys; assert not sys._is_gil_enabled(); import cypy; assert not sys._is_gil_enabled()'
+            env -u PYTHON_GIL "$PY" - <<'PY'
+          import pkgutil, sys
+          assert not sys._is_gil_enabled()
+          import picop
+          for info in pkgutil.walk_packages(picop.__path__, picop.__name__ + '.'):
+              __import__(info.name)
+          assert not sys._is_gil_enabled(), 'GIL enabled after native module imports'
+          PY
+          else
+            "$PY" -c 'import pathlib, picop, cypy; assert not pathlib.Path(picop.__file__).is_relative_to(pathlib.Path.cwd())'
+          fi
+          "$PY" -m pytest tests -q
+          if [[ "${{ matrix.python-version }}" == *t ]]; then
+            "$PY" -X gil=0 -m pytest tests -q
+          fi
+          "$PY" "$GITHUB_WORKSPACE/packages/picop/scripts/check_exports.py"
+          for f in examples/py*.py examples/wrap_ansi.py; do "$PY" "$f"; done
+          PYTHON="$PY" bash scripts/smoke_barrel_cimport.sh
 
   publish:
     name: Publish to ${{ github.event_name == 'workflow_dispatch' && inputs.repository || 'pypi' }}
-    needs: build
+    needs: validate-sdist
     runs-on: ubuntu-latest
     environment: ${{ github.event_name == 'workflow_dispatch' && inputs.repository || 'pypi' }}
     permissions:
       id-token: write
     steps:
-      - name: Download dist artifacts
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
-          name: python-package-distributions
+          name: picop-sdist
           path: dist/
-
       - name: Publish to TestPyPI
         if: github.event_name == 'workflow_dispatch' && inputs.repository == 'testpypi'
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
-
       - name: Publish to PyPI
         if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.repository == 'pypi')
         uses: pypa/gh-action-pypi-publish@release/v1

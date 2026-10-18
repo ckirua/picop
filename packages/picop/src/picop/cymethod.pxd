@@ -4,7 +4,7 @@
 # ``PyMethod_Class`` ABI-missing on 3.14.
 
 from cpython.object cimport PyObject, PyObject_RichCompareBool, Py_EQ
-from cpython.ref cimport Py_INCREF
+import cython
 
 
 cdef extern from "Python.h":
@@ -19,9 +19,7 @@ cdef extern from "Python.h":
 cdef inline object _borrowed_to_owned(PyObject *p):
     if p is NULL:
         return None
-    cdef object obj = <object>p
-    Py_INCREF(obj)
-    return obj
+    return <object>p
 
 
 cpdef inline bint method_check(object o) noexcept:
@@ -47,21 +45,33 @@ cpdef inline object method_new(object func, object self):
 
 
 cdef inline object method_function(object meth):
-    return _borrowed_to_owned(PyMethod_Function(meth))
+    cdef object result
+    with cython.critical_section(meth):
+        result = _borrowed_to_owned(PyMethod_Function(meth))
+    return result
 
 
 cdef inline object method_self(object meth):
-    return _borrowed_to_owned(PyMethod_Self(meth))
+    cdef object result
+    with cython.critical_section(meth):
+        result = _borrowed_to_owned(PyMethod_Self(meth))
+    return result
 
 
 cdef inline object method_function_unchecked(object meth):
     # Unchecked macro — meth must be a method.
-    return _borrowed_to_owned(PyMethod_GET_FUNCTION(meth))
+    cdef object result
+    with cython.critical_section(meth):
+        result = _borrowed_to_owned(PyMethod_GET_FUNCTION(meth))
+    return result
 
 
 cdef inline object method_self_unchecked(object meth):
     # Unchecked macro — meth must be a method.
-    return _borrowed_to_owned(PyMethod_GET_SELF(meth))
+    cdef object result
+    with cython.critical_section(meth):
+        result = _borrowed_to_owned(PyMethod_GET_SELF(meth))
+    return result
 
 # N6: preferred method_get_* (0.3: method_function/method_self cdef-only)
 cpdef inline object method_get_function(object meth):

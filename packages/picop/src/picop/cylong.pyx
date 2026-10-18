@@ -1,3 +1,4 @@
+# cython: freethreading_compatible=True
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
 """
 Fast :class:`int` / long C-API helpers.

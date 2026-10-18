@@ -1,9 +1,9 @@
 # cyfunction.pxd
 # Function-object helpers. Public docs in ``cyfunction.pyi``.
-# Getters return owned refs (INCREF of borrowed C-API results).
+# Borrowed getters are promoted to owning Cython locals under the function lock.
 
 from cpython.object cimport PyObject
-from cpython.ref cimport Py_INCREF
+import cython
 
 
 cdef extern from "Python.h":
@@ -21,10 +21,8 @@ cdef extern from "Python.h":
 cdef inline object _borrowed_to_owned(PyObject *p):
     if p is NULL:
         return None
-    cdef object obj = <object>p
-    Py_INCREF(obj)
-    return obj
-
+    # Conversion from PyObject* to Cython object retains the borrowed value.
+    return <object>p
 
 cpdef inline bint func_check(object o) noexcept:
     return PyFunction_Check(o)
@@ -45,28 +43,54 @@ cpdef inline object func_new(object code, object globals):
 
 
 cpdef inline object func_get_code(object op):
-    return _borrowed_to_owned(PyFunction_GetCode(op))
+    cdef PyObject *p
+    cdef object result
+    with cython.critical_section(op):
+        p = PyFunction_GetCode(op)
+        result = _borrowed_to_owned(p)
+    return result
 
 
 cpdef inline object func_get_globals(object op):
-    return _borrowed_to_owned(PyFunction_GetGlobals(op))
+    cdef PyObject *p
+    cdef object result
+    with cython.critical_section(op):
+        p = PyFunction_GetGlobals(op)
+        result = _borrowed_to_owned(p)
+    return result
 
 
 cpdef inline object func_get_module(object op):
-    return _borrowed_to_owned(PyFunction_GetModule(op))
+    cdef PyObject *p
+    cdef object result
+    with cython.critical_section(op):
+        p = PyFunction_GetModule(op)
+        result = _borrowed_to_owned(p)
+    return result
 
 
 cpdef inline object func_get_defaults(object op):
-    return _borrowed_to_owned(PyFunction_GetDefaults(op))
-
+    cdef PyObject *p
+    cdef object result
+    with cython.critical_section(op):
+        p = PyFunction_GetDefaults(op)
+        result = _borrowed_to_owned(p)
+    return result
 
 cpdef inline int func_set_defaults(object op, object defaults) except -1:
-    return PyFunction_SetDefaults(op, defaults)
+    with cython.critical_section(op):
+        return PyFunction_SetDefaults(op, defaults)
 
 
 cpdef inline object func_get_closure(object op):
-    return _borrowed_to_owned(PyFunction_GetClosure(op))
+    cdef PyObject *p
+    cdef object result
+    with cython.critical_section(op):
+        p = PyFunction_GetClosure(op)
+        result = _borrowed_to_owned(p)
+    return result
 
 
 cpdef inline int func_set_closure(object op, object closure) except -1:
-    return PyFunction_SetClosure(op, closure)
+    with cython.critical_section(op):
+        return PyFunction_SetClosure(op, closure)

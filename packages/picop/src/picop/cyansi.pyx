@@ -1,14 +1,15 @@
+# cython: freethreading_compatible=True
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
 """
 ANSI SGR escape sequences for terminals.
 """
 
-from .cyansi cimport _RESET, bg8, bold, fg8, fg256, reset, wrap
+from .cyansi cimport _RESET, _cyansi_init_tables, bg8, bold, fg8, fg256, reset, wrap
 from .cyunicode cimport uintern
 
 include "cyansi.pxi"
 
-reset()
+_cyansi_init_tables()
 
 RESET = _RESET
 

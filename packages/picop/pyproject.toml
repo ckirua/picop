@@ -2,7 +2,7 @@
 requires = [
     "setuptools",
     "wheel",
-    "Cython",
+    "Cython>=3.3.0",
     "picobuild",
 ]
 build-backend = "setuptools.build_meta"
@@ -34,12 +34,13 @@ classifiers = [
     "Programming Language :: Cython",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
     "Programming Language :: Python :: Implementation :: CPython",
     "Topic :: Software Development :: Libraries",
     "Typing :: Typed",
 ]
 dependencies = [
-    "Cython",
+    "Cython>=3.3.0",
     "picobuild",
 ]
 

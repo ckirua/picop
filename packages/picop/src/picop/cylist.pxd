@@ -5,6 +5,7 @@
 from cpython.object cimport PyObject, PyObject_RichCompareBool, Py_EQ
 from cpython.ref cimport Py_INCREF
 from cpython.pyport cimport PY_SSIZE_T_MAX
+import cython
 
 
 cdef extern from "Python.h":
@@ -48,35 +49,40 @@ cdef inline list lnew(Py_ssize_t n):
 
 
 cdef inline object lget(list l, Py_ssize_t i) noexcept:
-    # No bounds check; borrowed GET_ITEM.
-    return <object>PyList_GET_ITEM(l, i)
+    # No bounds check; caller guarantees a valid index. Lock protects the
+    # borrowed slot through its promotion to an owned local.
+    cdef object result
+    with cython.critical_section(l):
+        result = <object>PyList_GET_ITEM(l, i)
+    return result
 
 
 cdef inline object lget_checked(list l, Py_ssize_t i):
-    # Bounds-checked borrowed GetItem (raises IndexError).
-    return <object>PyList_GetItem(l, i)
+    # Strong-reference API preserves IndexError while checking atomically.
+    return PyList_GetItemRef(l, i)
 
 
 cdef inline object lget_ref(list l, Py_ssize_t i):
-    # Strong-ref GetItemRef (raises IndexError).
     return PyList_GetItemRef(l, i)
 
 
 cdef inline Py_ssize_t llen(list l) noexcept:
-    return PyList_GET_SIZE(l)
+    with cython.critical_section(l):
+        return PyList_GET_SIZE(l)
 
 
 cdef inline bint leq(list a, list b):
-    # Identity / len short-circuit + richcompare (same semantics as ``==``).
     if a is b:
         return True
-    if PyList_GET_SIZE(a) != PyList_GET_SIZE(b):
-        return False
+    with cython.critical_section(a, b):
+        if PyList_GET_SIZE(a) != PyList_GET_SIZE(b):
+            return False
     return <bint>PyObject_RichCompareBool(a, b, Py_EQ)
 
 
 cdef inline Py_ssize_t lsize(object l) except -1:
-    return PyList_Size(l)
+    with cython.critical_section(l):
+        return PyList_Size(l)
 
 
 cdef inline int lappend(list l, object value) except -1:

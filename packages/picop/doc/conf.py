@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import ast
 import importlib.metadata
-import sys
 from pathlib import Path
 
 # -- Paths --------------------------------------------------------------------
@@ -13,7 +12,7 @@ DOC_ROOT = Path(__file__).resolve().parent
 REPO_ROOT = DOC_ROOT.parent
 PACKAGE_SRC = REPO_ROOT / "src" / "picop"
 
-sys.path.insert(0, str(REPO_ROOT / "src"))
+# Import the installed/editable build, never a source tree with another ABI's binaries.
 
 # -- Project ------------------------------------------------------------------
 

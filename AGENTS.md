@@ -1,11 +1,10 @@
 # Agent guidance
 
-This repository contains independently installable packages under `packages/`.
+This repository contains the `picop` package under `packages/picop/`.
 
 Repository-wide orientation, package map, validation anchors, and shared CI/release rules live in [`.agents/README.md`](.agents/README.md). Read it before the nearest package-local guidance; package-specific rules remain authoritative.
 
 - Read and follow the nearest package-local `AGENTS.md` before changing a package.
 - Keep package APIs, build metadata, tests, documentation, and release notes inside that package.
 - Keep shared GitHub workflows under the repository-root `.github/workflows/` directory and scope them by package path.
-- Do not introduce dependencies between packages unless the public product contract requires one.
 - Run package commands from the relevant package directory; the repository root is not an installable Python distribution.

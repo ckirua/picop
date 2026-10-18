@@ -2,7 +2,7 @@ name: picop docs
 
 on:
   push:
-    branches: [main]
+    branches: [main, python-3.15]
     paths:
       - "packages/picop/doc/**"
       - "packages/picop/src/picop/**"
@@ -32,10 +32,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python 3.14
-        uses: actions/setup-python@v5
+      - name: Set up Python 3.15
+        uses: actions/setup-python@v6
         with:
-          python-version: "3.14"
+          python-version: "3.15"
+          allow-prereleases: true
 
       - name: Install UUID native dependency
         run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends libssl-dev

@@ -56,7 +56,7 @@ Use [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md). Deep
 - Removals / semantic changes need a major.
 - Soft aliases removed in **0.3** — **do not revive** them.
 
-**3.0 migration (unreleased):** use `picop` for Python imports and Cython cimports. The `cypy` package and cimport shims have been removed; no compatibility shim remains. Rebuild downstream Cython extensions after changing imports.
+**3.0 release candidate:** use `picop` for Python imports and Cython cimports. The `cypy` package and cimport shims have been removed; no compatibility shim remains. Rebuild downstream Cython extensions after changing imports. `3.0.0rc1` is a prerelease.
 
 Protocols / Runtime remain provisional under post-1.0 minor policy. See [`docs/RELEASE.md`](docs/RELEASE.md) and [`COVERAGE.md`](COVERAGE.md).
 

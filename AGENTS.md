@@ -10,7 +10,7 @@ The repository root is the installable `picop` project. Run build, installation,
 
 For micro-opts, default to `from picop.hot import …`. Full public surface remains on `from picop import …` / `picop.cy*`. Soft letter/bare aliases were removed in **0.3** — never revive them.
 
-**3.0 migration (unreleased):** `cypy` Python imports and Cython cimport shims were removed. Use `picop` imports/cimports instead and rebuild downstream Cython extensions.
+**3.0 release candidate:** `cypy` Python imports and Cython cimport shims were removed. Use `picop` imports/cimports instead and rebuild downstream Cython extensions. `3.0.0rc1` is a prerelease, not stable 3.0.
 
 ## Keep surface consistent
 

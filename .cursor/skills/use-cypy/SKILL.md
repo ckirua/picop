@@ -12,7 +12,7 @@ description: >-
 
 `picop` is a curated **CPython C-API accelerator** for Cython (Python ≥ 3.14) — typed hot-path helpers, not a stdlib reimplementation.
 
-**3.0 migration (unreleased):** use `from picop…` / `from picop… cimport`. The `cypy` Python package and Cython cimport shims have been removed; this skill directory name remains `use-cypy`.
+**3.0 release candidate:** use `from picop…` / `from picop… cimport`. The `cypy` Python package and Cython cimport shims have been removed; this skill directory name remains `use-cypy`. `3.0.0rc1` is a prerelease.
 
 ## When to apply
 
@@ -25,9 +25,9 @@ description: >-
 ## Install (consumer project)
 
 ```bash
-pip install picop
-# pin: pip install "picop==2.1.0"
-# or from git: pip install "picop @ git+https://github.com/ckirua/cypy.git@v2.1.0"
+pip install --pre "picop==3.0.0rc1"
+# latest stable release instead: pip install picop
+# or from git: pip install "picop @ git+https://github.com/ckirua/picop.git@picop-v3.0.0rc1"
 ```
 
 Requires **Python ≥ 3.14**.

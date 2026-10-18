@@ -4,7 +4,7 @@ Fast CPython C-API helpers for Cython — typed hot-path wrappers plus C-backed 
 
 **Python 3.15 is primary**, with Python 3.14 backward compatibility and genuine GIL-disabled support on **3.14t and 3.15t**. Minimum Python remains 3.14. Map of what is covered: [`COVERAGE.md`](COVERAGE.md). Primary license: [`LICENSE`](LICENSE) (MIT); adapted UUID portions retain their notices in [`NOTICE`](NOTICE) and [`LICENSES/Apache-2.0.txt`](LICENSES/Apache-2.0.txt). Contributing: [`CONTRIBUTING.md`](CONTRIBUTING.md). Security: [`SECURITY.md`](SECURITY.md). Safety / footguns: [`docs/SAFETY.md`](docs/SAFETY.md).
 
-**3.0 migration (unreleased):** the `cypy` Python package and Cython cimport shims have been removed. This checkout is `3.0.0.dev0`, not a published release; version-pinned install examples below refer to 2.x.
+**3.0 release candidate:** `3.0.0rc1` removes the `cypy` Python package and Cython cimport shims. Use `picop` and rebuild downstream Cython extensions. This is a prerelease, not stable 3.0.
 
 ## Migrating from 2.x
 
@@ -32,8 +32,8 @@ PyPI distribution name and import package are both **`picop`**.
 ### From PyPI
 
 ```bash
-pip install picop
-# pin: pip install "picop==2.1.0"
+pip install --pre "picop==3.0.0rc1"
+# latest stable release instead: pip install picop
 ```
 
 Build deps (`setuptools`, `wheel`, `Cython>=3.3.0`, `picobuild`) are pulled via `pyproject.toml` `[build-system]`. Source installs need a C toolchain and OpenSSL headers (`libssl-dev` on Debian/Ubuntu). Compile extensions separately for each interpreter ABI; regular and free-threaded binaries are not interchangeable.
@@ -41,7 +41,7 @@ Build deps (`setuptools`, `wheel`, `Cython>=3.3.0`, `picobuild`) are pulled via 
 ### From git (users)
 
 ```bash
-pip install "picop @ git+https://github.com/ckirua/picop.git@v2.1.0"
+pip install "picop @ git+https://github.com/ckirua/picop.git@picop-v3.0.0rc1"
 # or unpinned tip of main:
 # pip install "picop @ git+https://github.com/ckirua/picop.git"
 ```
@@ -139,7 +139,7 @@ python examples/pydict.py
 
 ## Compatibility
 
-**1.0 policy:** **Core** (`picop.__all__` + `picop.hot`) and documented cimport contracts are frozen. Soft aliases were removed in **0.3**. Protocols / Runtime remain provisional under minors. See [`docs/RELEASE.md`](docs/RELEASE.md). Semantic twins like `dict_len`/`dict_size` stay dual (never identity-aliased). Use the editable instructions above to install this unreleased 3.0 development checkout.
+**1.0 policy:** **Core** (`picop.__all__` + `picop.hot`) and documented cimport contracts are frozen. Soft aliases were removed in **0.3**. Protocols / Runtime remain provisional under minors. See [`docs/RELEASE.md`](docs/RELEASE.md). Semantic twins like `dict_len`/`dict_size` stay dual (never identity-aliased). The 3.0 candidate is opt-in; unpinned stable installations remain on the latest stable release.
 
 Product tiers (Core / Protocols / Runtime): [`COVERAGE.md`](COVERAGE.md).
 

@@ -9,16 +9,19 @@ build, and downstream Cython extensions must rebuild for the UUID layout change.
 ## From PyPI
 
 ```bash
-pip install picop
-# pin: pip install "picop==2.0.0"
+pip install --pre "picop==3.0.0rc1"
+# latest stable release instead: pip install picop
 ```
+
+`3.0.0rc1` is a release candidate, not stable 3.0. The `cypy` import and cimport
+namespace has been removed; migrate callers to `picop`.
 
 Build deps (`setuptools`, `wheel`, `Cython>=3.3.0`, `picobuild`) are pulled via `pyproject.toml` `[build-system]`.
 
 ## From git
 
 ```bash
-pip install "picop @ git+https://github.com/ckirua/picop.git@v2.0.0"
+pip install "picop @ git+https://github.com/ckirua/picop.git@picop-v3.0.0rc1"
 # or unpinned tip of main:
 # pip install "picop @ git+https://github.com/ckirua/picop.git"
 ```

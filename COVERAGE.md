@@ -4,7 +4,7 @@ Product contract for what `picop` is, what it ships, and how to choose helpers.
 
 `picop` is **not** a reimplementation of the Python standard library, and it is **not** a full 1:1 port of Cython’s `Includes/cpython`. It is a curated **CPython C-API accelerator** for Cython on **Python ≥ 3.14**.
 
-**Import:** use `picop` for both Python and Cython. The `cypy` Python imports and Cython cimport shims were removed in 3.0; migrate imports and cimports to the corresponding `picop` path. This repository's 3.0 development version is not published.
+**Import:** use `picop` for both Python and Cython. The `cypy` Python imports and Cython cimport shims were removed in 3.0; migrate imports and cimports to the corresponding `picop` path. `3.0.0rc1` is a prerelease, not stable 3.0.
 
 Authoritative symbol lists: `src/picop/__init__.py` / `__init__.pxd` `__all__`, plus `picop.hot` for micro-opt starters. Per-module decisions: [`docs/modules/`](docs/modules/).
 Timed public-ops checklist: [`docs/OPS_INVENTORY.md`](docs/OPS_INVENTORY.md) (gate: `scripts/ops_inventory_coverage.py --strict`).

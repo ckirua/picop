@@ -23,7 +23,7 @@ User asks to **release**, **tag**, **publish** (PyPI), or **bump version** for p
 | PyPI / pip | **`picop`** |
 | Preferred import | **`picop`** (`from picop.hot import …`) |
 | Deprecated import | **`cypy`** until **3.0** |
-| GitHub repository | `ckirua/picop` (`packages/picop`) |
+| GitHub repository | `ckirua/picop` (installable project at repository root) |
 | Version source | `src/picop/__about__.py` (prefer this; legacy trees may still use `src/cypy/__about__.py`) |
 
 ## Preconditions

@@ -20,9 +20,6 @@ jobs:
   build-sdist:
     name: Build one Python 3.15 sdist
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/picop
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v6
@@ -44,7 +41,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: picop-sdist
-          path: packages/picop/dist/*.tar.gz
+          path: dist/*.tar.gz
           if-no-files-found: error
           retention-days: 7
 
@@ -55,9 +52,6 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.14", "3.15", "3.14t", "3.15t"]
-    defaults:
-      run:
-        working-directory: packages/picop
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v6
@@ -67,7 +61,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: picop-sdist
-          path: packages/picop/artifact
+          path: artifact
       - name: Install exact sdist in clean environment
         env:
           CPY_NATIVE: "0"
@@ -85,7 +79,7 @@ jobs:
           CPY_NATIVE: "0"
         run: |
           cd "$RUNNER_TEMP/picop-validation"
-          PY="$GITHUB_WORKSPACE/packages/picop/.venv-validation/bin/python"
+          PY="$GITHUB_WORKSPACE/.venv-validation/bin/python"
           "$PY" -c 'import sys, sysconfig; print(sys.version, "Py_GIL_DISABLED=", sysconfig.get_config_var("Py_GIL_DISABLED"))'
           if [[ "${{ matrix.python-version }}" == *t ]]; then
             env -u PYTHON_GIL "$PY" -c 'import pathlib, sys; assert not sys._is_gil_enabled(); import picop; assert not sys._is_gil_enabled(); assert not pathlib.Path(picop.__file__).is_relative_to(pathlib.Path.cwd())'
@@ -105,7 +99,7 @@ jobs:
           if [[ "${{ matrix.python-version }}" == *t ]]; then
             "$PY" -X gil=0 -m pytest tests -q
           fi
-          "$PY" "$GITHUB_WORKSPACE/packages/picop/scripts/check_exports.py"
+          "$PY" "$GITHUB_WORKSPACE/scripts/check_exports.py"
           for f in examples/py*.py examples/wrap_ansi.py; do "$PY" "$f"; done
           PYTHON="$PY" bash scripts/smoke_barrel_cimport.sh
 

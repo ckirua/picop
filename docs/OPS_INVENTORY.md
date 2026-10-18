@@ -22,9 +22,9 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 | Metric | Count |
 |--------|------:|
 | Public barrel helpers | 449 |
-| `tierA` | 308 |
+| `tierA` | 319 |
 | `tierB` | 119 |
-| `pending` | 11 |
+| `pending` | 0 |
 | `n/a` | 11 |
 
 ## Checklist
@@ -57,10 +57,10 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 | `buf_check` | tierB | Tier A+B compare labels present |
 | `buf_copy_data` | tierA | Tier A `session.compare` present |
 | `buf_eq` | tierB | Tier A+B compare labels present |
-| `buf_itemsize` | pending | No existing benchmark compare label |
-| `buf_nbytes` | pending | No existing benchmark compare label |
-| `buf_ndim` | pending | No existing benchmark compare label |
-| `buf_readonly` | pending | No existing benchmark compare label |
+| `buf_itemsize` | tierA | Tier A `session.compare` present |
+| `buf_nbytes` | tierA | Tier A `session.compare` present |
+| `buf_ndim` | tierA | Tier A `session.compare` present |
+| `buf_readonly` | tierA | Tier A `session.compare` present |
 | `bytearray_check` | tierB | Tier A+B compare labels present |
 | `bytearray_check_exact` | tierB | Tier A+B compare labels present |
 | `bytearray_concat` | tierA | Tier A `session.compare` present |
@@ -82,9 +82,9 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 | `bytes_ne` | tierB | Tier A+B compare labels present |
 | `bytes_size` | tierA | Tier A `session.compare` present |
 | `bytes_startswith` | tierB | Tier A+B compare labels present |
-| `call_noargs` | pending | No existing benchmark compare label |
-| `call_onearg` | pending | No existing benchmark compare label |
-| `call_twoargs` | pending | No existing benchmark compare label |
+| `call_noargs` | tierA | Tier A `session.compare` present |
+| `call_onearg` | tierA | Tier A `session.compare` present |
+| `call_twoargs` | tierA | Tier A `session.compare` present |
 | `calliter_check` | tierA | Tier A `session.compare` present |
 | `calliter_new` | tierA | Tier A `session.compare` present |
 | `capsule_check_exact` | tierB | Tier A+B compare labels present |
@@ -283,11 +283,11 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 | `memoryview_eq` | tierB | Tier A+B compare labels present |
 | `memoryview_from_object` | tierA | Tier A `session.compare` present |
 | `memoryview_get_contiguous` | tierA | Tier A `session.compare` present |
-| `memoryview_itemsize` | pending | No existing benchmark compare label |
-| `memoryview_nbytes` | pending | No existing benchmark compare label |
-| `memoryview_ndim` | pending | No existing benchmark compare label |
+| `memoryview_itemsize` | tierA | Tier A `session.compare` present |
+| `memoryview_nbytes` | tierA | Tier A `session.compare` present |
+| `memoryview_ndim` | tierA | Tier A `session.compare` present |
 | `memoryview_ne` | tierB | Tier A+B compare labels present |
-| `memoryview_readonly` | pending | No existing benchmark compare label |
+| `memoryview_readonly` | tierA | Tier A `session.compare` present |
 | `method_check` | tierB | Tier A+B compare labels present |
 | `method_eq` | tierB | Tier A+B compare labels present |
 | `method_get_function` | tierA | Tier A `session.compare` present |

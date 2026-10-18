@@ -33,6 +33,12 @@ def _parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("result", type=Path, help="JSON produced by bench.py")
     parser.add_argument(
+        "--baseline",
+        type=Path,
+        default=_BASELINE,
+        help="measured reference JSON (default: results/baseline.json)",
+    )
+    parser.add_argument(
         "--max-regression-pct",
         type=_percentage,
         default=_DEFAULT_MAX_REGRESSION_PCT,
@@ -130,7 +136,7 @@ def _decimal_text(value: Decimal, *, signed: bool = False) -> str:
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
-        baseline = _gated_baselines(_load_json(_BASELINE))
+        baseline = _gated_baselines(_load_json(args.baseline))
         result = _load_json(args.result)
         _validate_result(result, baseline)
     except ValueError as exc:

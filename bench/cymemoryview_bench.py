@@ -13,14 +13,23 @@ _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
 
-from picop import memoryview_check, memoryview_from_object, memoryview_get_contiguous
+from picop import (
+    memoryview_check,
+    memoryview_from_object,
+    memoryview_get_contiguous,
+    memoryview_itemsize,
+    memoryview_ndim,
+    memoryview_nbytes,
+    memoryview_readonly,
+)
 
 from _bench_util import BenchSession
 
 BA = bytearray(b"abcdefgh")
 B = b"abcdefgh"
 MV = memoryview(BA)
-
+WORDS = memoryview(bytearray(16)).cast("I")
+MULTIDIM = memoryview(bytearray(16)).cast("B", shape=(4, 4))
 
 def py_mvcheck(p: object) -> bool:
     return isinstance(p, memoryview)
@@ -65,6 +74,16 @@ def main() -> None:
         B,
         param="bytes C",
     )
+
+    session.section("memoryview metadata")
+    session.compare("memoryview_itemsize", memoryview_itemsize, lambda mv: mv.itemsize, MV, param="writable bytes")
+    session.compare("memoryview_itemsize", memoryview_itemsize, lambda mv: mv.itemsize, WORDS, param="writable uint")
+    session.compare("memoryview_nbytes", memoryview_nbytes, lambda mv: mv.nbytes, MV, param="writable bytes")
+    session.compare("memoryview_nbytes", memoryview_nbytes, lambda mv: mv.nbytes, WORDS, param="writable uint")
+    session.compare("memoryview_ndim", memoryview_ndim, lambda mv: mv.ndim, MV, param="1-D bytes")
+    session.compare("memoryview_ndim", memoryview_ndim, lambda mv: mv.ndim, MULTIDIM, param="2-D bytes")
+    session.compare("memoryview_readonly", memoryview_readonly, lambda mv: mv.readonly, MV, param="writable")
+    session.compare("memoryview_readonly", memoryview_readonly, lambda mv: mv.readonly, memoryview(B), param="readonly")
 
     session.summary()
 

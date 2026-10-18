@@ -2,7 +2,7 @@
 
 Release and validation commands below are run from the repository root unless noted.
 
-Ship a tagged `picop` release from `main`. Version is sourced from [`src/picop/__about__.py`](../src/picop/__about__.py) (`pyproject.toml` dynamic version). The repository root is the installable `picop` project. `3.0.0rc1` is a release candidate; 3.0 removes the former `cypy` Python import and Cython cimport shims.
+Ship a tagged `picop` release from `main`. Version is sourced from [`src/picop/__about__.py`](../src/picop/__about__.py) (`pyproject.toml` dynamic version). The repository root is the installable `picop` project. 3.0 removes the former `cypy` Python import and Cython cimport shims.
 
 ## Compatibility (0.x → 1.0)
 
@@ -86,6 +86,13 @@ scripts/release.sh --patch --dry-run
 For the first stable 3.0 release, select `3.0.0` explicitly after confirming the
 version and title. Bump flags increment the numeric base of `X.Y.Z.devN` just
 as they do for `X.Y.Z`; they do not promote a development version automatically.
+
+The helper performs its own version bump and uses `picop X.Y.Z` as the GitHub
+release title. If a release PR already merged and validated that exact version,
+or the confirmed GitHub title differs, use the manual equivalent below rather
+than bypassing checks or introducing a second metadata commit. Confirm the
+full title, verify green CI on the exact `main` commit, and use
+`gh release create <tag> --verify-tag --title "<confirmed full title>" --notes-file <notes-file>`.
 
 Manual equivalent:
 
@@ -171,3 +178,33 @@ python -c "from picop.hot import bytes_len; assert bytes_len(b'ok') == 2"
 ```
 
 Portable builds are the default (`-O3` only). Contributors may set `CPY_NATIVE=1` for local tuned benches — do **not** require it for release artifacts.
+
+## 3.0 consumer validation evidence
+
+The 3.0 promotion used the genuine
+[`ckirua/swissquote`](https://github.com/ckirua/swissquote/tree/05f08958b7eebfaec2ade4754997f1eb090d00d5)
+Python client at `05f08958b7eebfaec2ade4754997f1eb090d00d5`, not picop's own
+example extension. Its existing SBE market-data decoder directly cimports
+`picop.cybytes.bas_string` / `blen` and `picop.cylist.lappend`. The project
+already depends on `picop>=2.0.0`; no dependency or migration was manufactured.
+
+Against the published `picop==3.0.0rc1`, independent source copies and clean
+environments rebuilt the decoder for each ABI. All **13 existing offline
+tests** passed on **3.14, 3.15, 3.14t and 3.15t**; forced `-X gil=0` runs also
+passed all 13 tests on both t runtimes. A separate program decoded **1,000
+golden SBE frames into 9,000 rows** per ABI, checked named SDK rows and rejected
+a short frame without altering the destination. No live feed, credentials,
+ClickHouse instance or C++ service was exercised.
+
+**Threading boundary:** importing picop on both t runtimes left the GIL
+disabled. Importing Swissquote's decoder then enabled it and emitted CPython's
+warning because that extension does not declare free-threading compatibility.
+Passing its forced-no-GIL tests does **not** establish a supported no-GIL
+contract for Swissquote. Fixing or declaring that consumer's threading support
+is separate work; do not suppress the warning or attribute it to picop.
+
+Targeted RC source review found no confirmed release blocker. Comparing the
+actual RC1 and local stable source archives found **162 package files**, with
+only `src/picop/__about__.py` changed; no native fix required an RC2. This
+record is pinned release evidence, not a new cross-repository CI dependency.
+

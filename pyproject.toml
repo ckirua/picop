@@ -8,7 +8,7 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-# PyPI distribution name (preferred import package is ``picop``; ``cypy`` is a deprecated soft alias).
+# PyPI distribution and Python/Cython import package are both ``picop``.
 name = "picop"
 description = "Fast CPython C-API helpers and C-backed UUID values for Cython"
 readme = "README.md"

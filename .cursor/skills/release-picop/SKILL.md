@@ -59,7 +59,7 @@ Only if the script cannot run. See **Tag and GitHub Release** in [`docs/RELEASE.
 Full policy: [`docs/RELEASE.md`](../../../docs/RELEASE.md).
 
 - **Core** (`picop.__all__` + `picop.hot`) frozen at **1.0** — additive minors OK; removals / breaking need a **major**
-- 3.0 development version is unreleased; do not describe it as published
+- `3.0.0rc1` is a release candidate, not stable 3.0; mark candidate GitHub releases as prereleases and never make them latest
 - Do not reopen Strategy A for 1.x
 
 ## Agent safety

@@ -2,7 +2,7 @@
 
 Release and validation commands below are run from the repository root unless noted.
 
-Ship a tagged `picop` release from `main`. Version is sourced from [`src/picop/__about__.py`](../src/picop/__about__.py) (`pyproject.toml` dynamic version). The repository root is the installable `picop` project. The 3.0 development version is unreleased; 3.0 removes the former `cypy` Python import and Cython cimport shims.
+Ship a tagged `picop` release from `main`. Version is sourced from [`src/picop/__about__.py`](../src/picop/__about__.py) (`pyproject.toml` dynamic version). The repository root is the installable `picop` project. `3.0.0rc1` is a release candidate; 3.0 removes the former `cypy` Python import and Cython cimport shims.
 
 ## Compatibility (0.x → 1.0)
 
@@ -60,7 +60,7 @@ Protocols / Runtime remain **provisional** under post-1.0 minor policy (see
 | Step | Check |
 |------|-------|
 | 1 | On latest `main`; working tree clean |
-| 2 | If any `docs/modules/` Lifecycle lines changed: `python scripts/grade_trackers.py` → **53/53 A** |
+| 2 | If any `docs/modules/` Lifecycle lines changed: `python scripts/grade_trackers.py` → all trackers grade A |
 | 3 | Local smoke: `pip install -e . --no-build-isolation` then `from picop.hot import bytes_len, dict_get, str_len` |
 | 4 | Examples: `for f in examples/py*.py examples/wrap_ansi.py; do python "$f"; done` |
 | 5 | Export/compat: `python scripts/check_exports.py` |
@@ -109,6 +109,14 @@ pip install "picop==X.Y.Z"
 EOF
 ```
 
+For release candidates, use the documented manual path: the current helper
+does not set GitHub prerelease/latest flags. After the confirmed version and
+notes are on green `main`, create the annotated tag as above and use
+`gh release create picop-v3.0.0rc1 --prerelease --latest=false --title "picop 3.0 RC1 — picop-only imports" --notes-file <notes-file>`.
+Do not publish a candidate as a stable/latest GitHub release. To promote a
+candidate to stable later, select the confirmed stable version explicitly.
+
+
 Pushing the tag runs the repository-root [`.github/workflows/publish.yml`](../.github/workflows/publish.yml)
 (Trusted Publishing → PyPI project **`picop`**, **sdist only**). Python imports and
 Cython cimports use **`picop`**; the former `cypy` namespace was removed in 3.0.
@@ -150,7 +158,7 @@ rm -rf "$smoke_dir"
 Repeat the installation and downstream consumer checks for all four runtimes.
 On t runtimes, with `PYTHON_GIL` unset and no `-X gil` override, assert that
 `sys._is_gil_enabled()` is false before and after importing the full `picop`
-package, each native module, and `cypy`. Separately run the full behavior suite
+package and each native module. Verify that importing `cypy` is rejected. Separately run the full behavior suite
 with `python -X gil=0 -m pytest tests -q`. A focused UUID-only import is not
 evidence that the full package remains GIL-disabled.
 

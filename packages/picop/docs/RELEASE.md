@@ -1,6 +1,6 @@
 # Release checklist
 
-Ship a tagged `picop` release from `main`. Version is sourced from [`src/picop/__about__.py`](../src/picop/__about__.py) (`pyproject.toml` dynamic version). The package lives at `packages/picop` in the `ckirua/picop` monorepo. Soft `cypy` import alias until **3.0**.
+Ship a tagged `picop` release from `main`. Version is sourced from [`src/picop/__about__.py`](../src/picop/__about__.py) (`pyproject.toml` dynamic version). The package lives at `packages/picop` in the `ckirua/picop` repository. Soft `cypy` import alias until **3.0**.
 
 ## Compatibility (0.x → 1.0)
 
@@ -47,7 +47,7 @@ already `picop`.
 
 1. [x] Freeze Core public set (`picop.__all__` + `picop.hot`) and document cimport contracts in COVERAGE / module trackers.
 2. [x] Changelog: close “Provisional (non-Core)” — Protocols/Runtime under post-1.0 minor policy.
-3. [x] Tag `v1.0.0` (new monorepo releases use package-prefixed tags).
+3. [x] Tag `v1.0.0` (current releases use `picop-vX.Y.Z` tags).
 
 ### 2.0 import rename checklist
 

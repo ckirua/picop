@@ -2,15 +2,15 @@ name: picop docs
 
 on:
   push:
-    branches: [main, python-3.15]
+    branches: [main]
     paths:
-      - "packages/picop/doc/**"
-      - "packages/picop/src/picop/**"
-      - "packages/picop/docs/PIPELINE.md"
-      - "packages/picop/scripts/check_pyi_docstrings.py"
-      - "packages/picop/pyproject.toml"
-      - "packages/picop/setup.py"
-      - "packages/picop/CHANGELOG.md"
+      - "doc/**"
+      - "src/picop/**"
+      - "docs/PIPELINE.md"
+      - "scripts/check_pyi_docstrings.py"
+      - "pyproject.toml"
+      - "setup.py"
+      - "CHANGELOG.md"
       - ".github/workflows/picop-docs.yml"
   workflow_dispatch:
 
@@ -26,9 +26,6 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/picop
     steps:
       - uses: actions/checkout@v4
 
@@ -55,7 +52,7 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: packages/picop/doc/_build/html
+          path: doc/_build/html
 
   deploy:
     needs: build

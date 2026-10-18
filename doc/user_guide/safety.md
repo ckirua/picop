@@ -45,4 +45,4 @@ Runnable demo in the repository: `examples/py_cstr_bytes.py`.
 
 ## Reporting vulnerabilities
 
-See the repository [`SECURITY.md`](https://github.com/ckirua/picop/blob/main/packages/picop/SECURITY.md).
+See the repository [`SECURITY.md`](https://github.com/ckirua/picop/blob/main/SECURITY.md).

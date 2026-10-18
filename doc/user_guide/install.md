@@ -20,7 +20,7 @@ Build deps (`setuptools`, `wheel`, `Cython>=3.3.0`, `picobuild`) are pulled via 
 ```bash
 pip install "picop @ git+https://github.com/ckirua/picop.git@v2.0.0"
 # or unpinned tip of main:
-# pip install "picop @ git+https://github.com/ckirua/picop.git#subdirectory=packages/picop"
+# pip install "picop @ git+https://github.com/ckirua/picop.git"
 ```
 
 ## Editable (contributors)

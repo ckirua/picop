@@ -9,6 +9,7 @@
 - Speed up UUID integer construction using the public `PyLongWriter` API on compatible layouts and remove redundant Cython factory reference transfers, preserving eager stdlib slots and genuine no-GIL behavior.
 - Reject undersized UUID entropy buffers at build time and fail import if fork-child entropy invalidation cannot be registered.
 - Validate one immutable release sdist independently on 3.14, 3.15, 3.14t and 3.15t before publishing. Keep `cypy` forwarding until the separately scheduled 3.0 removal.
+- Move the standalone project from `packages/picop/` to the repository root. Build, install, test, documentation and release commands now run from the root; CI and release paths follow the new layout. Python imports and Cython cimports are unchanged.
 
 ## [2.1.0] — 2026-09-06 — systems call and buffer helpers
 

@@ -2,11 +2,9 @@ name: picop smoke
 
 on:
   push:
-    branches: [main, python-3.15]
-    paths: ["packages/picop/**", ".github/workflows/picop-smoke.yml"]
+    branches: ["**"]
   pull_request:
-    branches: [main, python-3.15]
-    paths: ["packages/picop/**", ".github/workflows/picop-smoke.yml"]
+    branches: [main]
 
 permissions:
   contents: read
@@ -14,9 +12,6 @@ permissions:
 jobs:
   build-sdist:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/picop
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v6
@@ -35,7 +30,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: picop-smoke-sdist
-          path: packages/picop/dist/*.tar.gz
+          path: dist/*.tar.gz
           if-no-files-found: error
           retention-days: 2
 
@@ -46,9 +41,6 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.14", "3.15", "3.14t", "3.15t"]
-    defaults:
-      run:
-        working-directory: packages/picop
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v6
@@ -58,7 +50,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: picop-smoke-sdist
-          path: packages/picop/artifact
+          path: artifact
       - name: Install native dependencies and exact sdist
         env:
           CPY_NATIVE: "0"
@@ -97,6 +89,6 @@ jobs:
           if [[ "${{ matrix.python-version }}" == *t ]]; then
             python -X gil=0 -m pytest tests -q
           fi
-          python "$GITHUB_WORKSPACE/packages/picop/scripts/check_exports.py"
+          python "$GITHUB_WORKSPACE/scripts/check_exports.py"
           for f in examples/py*.py examples/wrap_ansi.py; do python "$f"; done
           PYTHON="$(command -v python)" bash scripts/smoke_barrel_cimport.sh

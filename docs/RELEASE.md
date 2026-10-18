@@ -1,6 +1,8 @@
 # Release checklist
 
-Ship a tagged `picop` release from `main`. Version is sourced from [`src/picop/__about__.py`](../src/picop/__about__.py) (`pyproject.toml` dynamic version). The package lives at `packages/picop` in the `ckirua/picop` repository. Soft `cypy` import alias until **3.0**.
+Release and validation commands below are run from the repository root unless noted.
+
+Ship a tagged `picop` release from `main`. Version is sourced from [`src/picop/__about__.py`](../src/picop/__about__.py) (`pyproject.toml` dynamic version). The repository root is the installable `picop` project. Soft `cypy` import alias until **3.0**.
 
 ## Compatibility (0.x → 1.0)
 
@@ -100,12 +102,12 @@ gh release create "picop-vX.Y.Z" --title "picop X.Y.Z" --notes-file - <<'EOF'
 ## Install
 ```bash
 pip install "picop==X.Y.Z"
-# or: pip install "picop @ git+https://github.com/ckirua/picop.git@picop-vX.Y.Z#subdirectory=packages/picop"
+# or: pip install "picop @ git+https://github.com/ckirua/picop.git@picop-vX.Y.Z"
 ```
 EOF
 ```
 
-Pushing the tag runs the repository-root [`.github/workflows/publish.yml`](../../../.github/workflows/publish.yml)
+Pushing the tag runs the repository-root [`.github/workflows/publish.yml`](../.github/workflows/publish.yml)
 (Trusted Publishing → PyPI project **`picop`**, **sdist only**). Preferred import is **`picop`**;
 deprecated **`cypy`** alias until **3.0**.
 Plain `linux_*` wheels are rejected by PyPI; add manylinux via cibuildwheel later if needed.

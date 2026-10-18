@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.function` |
-| Sources | `src/cypy/cyfunction.pxd`, `.pyx`, `.pyi` |
+| Sources | `src/picop/cyfunction.pxd`, `.pyx`, `.pyi` |
 | Surface | public |
 | Tracker lifecycle | decided (tier A + depth) |
 | Format | v2 |

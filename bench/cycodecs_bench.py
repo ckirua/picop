@@ -4,7 +4,7 @@ import sys, codecs
 from pathlib import Path
 _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path: sys.path.insert(0, str(_BENCH_ROOT))
-from cypy import codec_decode, codec_encode, codec_known
+from picop import codec_decode, codec_encode, codec_known
 from _bench_util import BenchSession
 
 def main():

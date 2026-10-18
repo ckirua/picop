@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.marshal` |
-| Sources | `src/cypy/cymarshal.pxd`, `.pyx`, `.pyi` |
+| Sources | `src/picop/cymarshal.pxd`, `.pyx`, `.pyi` |
 | Surface | public |
 | Tracker lifecycle | decided |
 | Format | v2 |

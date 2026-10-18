@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | custom (terminal SGR) — not CPython |
-| Sources | `src/cypy/cyansi.pxd`, `cyansi.pyx`, `cyansi.pxi`, `cyansi.pyi` |
+| Sources | `src/picop/cyansi.pxd`, `cyansi.pyx`, `cyansi.pxi`, `cyansi.pyi` |
 | Surface | public |
 | Tracker lifecycle | decided (tier A + depth) |
 | Format | v2 |

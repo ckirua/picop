@@ -59,7 +59,7 @@ def obj_call(callable_object: object, args: object, kw: object = None) -> object
 
     Notes
     -----
-    ``args`` must be a tuple.
+    ``args`` must be a tuple; ``kw`` must be a dict or ``None`` (no keywords).
     """
     ...
 

@@ -1,4 +1,4 @@
-"""Shared timing helpers for cypy benchmark scripts."""
+"""Shared timing helpers for picop benchmark scripts."""
 
 from __future__ import annotations
 
@@ -217,9 +217,9 @@ def _fmt_verdict(ratio: float) -> str:
     if ratio <= 0.0:
         return "—"
     if ratio < 0.95:
-        return f"cypy +{(1.0 - ratio) * 100:.0f}% (≥5% gate)"
+        return f"picop +{(1.0 - ratio) * 100:.0f}% (≥5% gate)"
     if ratio < 0.98:
-        return f"cypy +{(1.0 - ratio) * 100:.0f}%"
+        return f"picop +{(1.0 - ratio) * 100:.0f}%"
     if ratio > 1.02:
         return f"baseline +{(ratio - 1.0) * 100:.0f}%"
     return "~tie"
@@ -238,7 +238,7 @@ class BenchSession:
     def header(self) -> None:
         print(self.title)
         print(f"{self.n:,} iterations × {self.runs} runs  (warmup {self.warmup})")
-        print("ratio = mean(cypy) / mean(baseline)  (< 1.0 → cypy wins); p99 shown for tails")
+        print("ratio = mean(picop) / mean(baseline)  (< 1.0 → picop wins); p99 shown for tails")
         print("gate: mean ratio ≤ 0.95 (≥5% win) or ≤ 1.02 with API-clarity keep")
         print()
 
@@ -296,7 +296,7 @@ class BenchSession:
 
         print(self._current.title)
         table = TextTable(
-            ("case", "cypy mean±σ", "cypy p99", "base mean±σ", "base p99", "ratio", "p99×", "verdict"),
+            ("case", "picop mean±σ", "picop p99", "base mean±σ", "base p99", "ratio", "p99×", "verdict"),
             aligns=("left", "right", "right", "right", "right", "right", "right", "left"),
         )
         for row in self._current.rows:
@@ -327,7 +327,7 @@ class BenchSession:
 
         print("─" * 72)
         print(
-            f"summary: {wins}/{len(self._rows)} cypy faster  ·  "
+            f"summary: {wins}/{len(self._rows)} picop faster  ·  "
             f"{gate_wins}/{len(self._rows)} pass ≥5% gate  ·  "
             f"mean ratio {mean_ratio:.2f}x  ·  median {median_ratio:.2f}x"
         )
@@ -339,7 +339,7 @@ class BenchSession:
         print()
 
         overview = TextTable(
-            ("operation", "case", "cypy mean±σ", "p99", "ratio", "p99×", "verdict"),
+            ("operation", "case", "picop mean±σ", "p99", "ratio", "p99×", "verdict"),
             aligns=("left", "left", "right", "right", "right", "right", "left"),
         )
         for row in self._rows:

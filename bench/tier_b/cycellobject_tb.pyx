@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cycellobject cimport cell_check
+from picop.cycellobject cimport cell_check
 include "_sink.pxi"
 
 cpdef bint baseline_cell_check(object p, Py_ssize_t n):

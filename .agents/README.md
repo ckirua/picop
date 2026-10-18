@@ -7,7 +7,6 @@ Repository operating guide for coding agents and maintainers. Read this file fir
 | Area | Purpose | Entry points |
 |---|---|---|
 | [`src/picop/`](../src/picop/) | CPython C-API helpers and C-backed UUID values for Cython | [`README.md`](../README.md), [`AGENTS.md`](../AGENTS.md), [`docs/`](../docs/) |
-| [`src/cypy/`](../src/cypy/) | Deprecated import and cimport compatibility package | [`README.md`](../README.md#compatibility) |
 | [`.github/workflows/`](../.github/workflows/) | picop CI, documentation and publishing | [`picop-smoke.yml`](../.github/workflows/picop-smoke.yml), [`publish.yml`](../.github/workflows/publish.yml) |
 
 The repository root is the installable `picop` project. It owns the build metadata, tests, documentation and release notes. Run package commands here, including `pip install .`, `pip install -e .`, and `python -m build`.
@@ -19,7 +18,7 @@ The repository root is the installable `picop` project. It owns the build metada
 3. Keep Python/Cython sources in `src/`, tests in `tests/`, and repository automation in `.github/workflows/`.
 4. Run build, installation, test and release commands from the repository root.
 5. Keep public-surface changes complete: callers, exports, stubs, tests, examples, package documentation, and release notes must agree.
-6. Preserve the package contracts: picop Core is frozen and `cypy` remains a deprecated shim until 3.0.
+6. Preserve package contracts: picop Core is frozen; Python imports and Cython cimports use `picop`. The former `cypy` package and cimport shims are removed in 3.0.
 
 ## Package validation
 

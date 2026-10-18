@@ -4,13 +4,13 @@ Rules for coding agents working in this repo or consuming the package.
 
 Repository orientation, validation anchors, and CI/release rules live in [`.agents/README.md`](.agents/README.md). Read that guide before changing the package.
 
-The repository root is the installable `picop` project. Run build, installation, test, and release commands from this directory. Package sources live in `src/picop/`; the deprecated compatibility package remains in `src/cypy/`. Keep workflows in `.github/workflows/`.
+The repository root is the installable `picop` project. Run build, installation, test, and release commands from this directory. Package sources live in `src/picop/`. Keep workflows in `.github/workflows/`.
 
 ## Prefer `picop.hot`
 
 For micro-opts, default to `from picop.hot import …`. Full public surface remains on `from picop import …` / `picop.cy*`. Soft letter/bare aliases were removed in **0.3** — never revive them.
 
-**Soft rename (2.0 → 3.0):** `cypy` is a deprecated import alias (`DeprecationWarning`); prefer `picop`. The `cypy` package and cimport shims are removed in **3.0**. Skill folder name stays `use-cypy`.
+**3.0 migration (unreleased):** `cypy` Python imports and Cython cimport shims were removed. Use `picop` imports/cimports instead and rebuild downstream Cython extensions.
 
 ## Keep surface consistent
 

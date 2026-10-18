@@ -12,7 +12,7 @@ description: >-
 
 `picop` is a curated **CPython C-API accelerator** for Cython (Python ≥ 3.14) — typed hot-path helpers, not a stdlib reimplementation.
 
-**Soft rename (2.0):** prefer `from picop…` / `from picop… cimport`. Deprecated import alias `cypy` emits `DeprecationWarning` and is **removed in 3.0**. Skill folder name remains `use-cypy`.
+**3.0 migration (unreleased):** use `from picop…` / `from picop… cimport`. The `cypy` Python package and Cython cimport shims have been removed; this skill directory name remains `use-cypy`.
 
 ## When to apply
 
@@ -60,7 +60,7 @@ from picop.hot import dict_get, dict_len, list_len, list_get, list_append, bytes
 1. **`from picop.hot import …`** — default for micro-opts (DX-01)
 2. **`from picop.cydict import dict_get`** / **`from picop import dict_get`** — full public surface
 3. **`from picop.cydict cimport dict_get`** — Cython hot paths
-4. **`from cypy…`** / **`from cypy… cimport`** — deprecated soft alias until **3.0** (prefer migrate to `picop`)
+4. **`from picop… cimport`** — package barrel or direct module paths; no `cypy` cimport shim is available.
 
 Discourage `from picop import *`. Prefer a **PyPI pin** (`pip install "picop==…"`) or a **release tag** over unpinned `git+…`.
 
@@ -122,7 +122,7 @@ Before rewriting a call site:
 7. Ownership: need `_ref` / `_checked`?
 8. Nearby tests / example pattern?
 9. If symbol missing → **stop** (do not invent)
-10. Prefer `picop` over deprecated `cypy` imports
+10. Prefer `picop` over legacy `cypy` imports
 
 ## Usually skip (str coerce)
 

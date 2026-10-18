@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.codecs` |
-| Sources | `src/cypy/cycodecs.pxd`, `.pyx`, `.pyi` |
+| Sources | `src/picop/cycodecs.pxd`, `.pyx`, `.pyi` |
 | Surface | public |
 | Tracker lifecycle | decided (tier A + depth) |
 | Format | v2 |

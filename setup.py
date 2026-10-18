@@ -50,7 +50,6 @@ if __name__ == "__main__":
         package_dir={"": "src"},
         package_data={
             "picop": ["py.typed", "**/*.pxd", "**/*.pxi", "**/*.h", "**/*.pyi"],
-            "cypy": ["**/*.pxd", "**/*.pxi", "**/*.pyi"],
         },
         ext_modules=cythonized_extensions,
     )

@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cygenobject cimport gen_check
+from picop.cygenobject cimport gen_check
 from types import GeneratorType
 include "_sink.pxi"
 

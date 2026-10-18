@@ -6,7 +6,7 @@
 |-------|--------|
 | Status | present / absent |
 | Maps to | `cpython.{x}` / custom / `Python.h` |
-| Sources | `src/cypy/cy{name}.*` or — |
+| Sources | `src/picop/cy{name}.*` or — |
 | Surface | public / cimport / none |
 | Tracker lifecycle | stub / indexed / implementing / measuring / decided |
 | Format | v2 |

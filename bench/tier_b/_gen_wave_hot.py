@@ -10,7 +10,7 @@ MODULES: dict[str, dict[str, str]] = {}
 
 MODULES["cybytes"] = {
     "pyx": r'''# cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cybytes cimport bytes_contains, bytes_eq, bytes_len, bytes_check, bytes_check_exact
+from picop.cybytes cimport bytes_contains, bytes_eq, bytes_len, bytes_check, bytes_check_exact
 include "_sink.pxi"
 
 cpdef bint baseline_bcontains(bytes haystack, bytes needle, Py_ssize_t n):
@@ -120,7 +120,7 @@ def main() -> None:
 
 MODULES["cydict"] = {
     "pyx": r'''# cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cydict cimport dict_get, dict_contains, dict_len, dict_check
+from picop.cydict cimport dict_get, dict_contains, dict_len, dict_check
 include "_sink.pxi"
 
 cpdef object baseline_dget(dict d, str key, Py_ssize_t n):
@@ -211,7 +211,7 @@ def main() -> None:
 
 MODULES["cylist"] = {
     "pyx": r'''# cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cylist cimport list_get, list_get_checked, list_len, list_check
+from picop.cylist cimport list_get, list_get_checked, list_len, list_check
 include "_sink.pxi"
 
 cpdef object baseline_lget(list l, Py_ssize_t i, Py_ssize_t n):
@@ -294,7 +294,7 @@ def main() -> None:
 
 MODULES["cyset"] = {
     "pyx": r'''# cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cyset cimport set_contains, set_len, set_check
+from picop.cyset cimport set_contains, set_len, set_check
 include "_sink.pxi"
 
 cpdef bint baseline_scontains(object s, object value, Py_ssize_t n):
@@ -368,7 +368,7 @@ def main() -> None:
 
 MODULES["cystr"] = {
     "pyx": r'''# cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cystr cimport str_contains, str_eq, str_len, str_check_exact
+from picop.cystr cimport str_contains, str_eq, str_len, str_check_exact
 include "_sink.pxi"
 
 cpdef bint baseline_contains(str haystack, str needle, Py_ssize_t n):
@@ -460,7 +460,7 @@ def main() -> None:
 
 MODULES["cyunicode"] = {
     "pyx": r'''# cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cyunicode cimport uutf8_bytes, uintern
+from picop.cyunicode cimport uutf8_bytes, uintern
 from cpython.object cimport PyObject
 include "_sink.pxi"
 
@@ -526,7 +526,7 @@ def main() -> None:
 
 MODULES["cyansi"] = {
     "pyx": r'''# cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cyansi cimport ansi_fg8, ansi_bg8, ansi_bold
+from picop.cyansi cimport ansi_fg8, ansi_bg8, ansi_bold
 include "_sink.pxi"
 
 cpdef str baseline_fg8(int code, Py_ssize_t n):
@@ -615,7 +615,7 @@ def main() -> None:
 
 MODULES["cygc"] = {
     "pyx": r'''# cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cygc cimport gc_is_enabled
+from picop.cygc cimport gc_is_enabled
 include "_sink.pxi"
 
 cdef extern from "Python.h":
@@ -657,7 +657,7 @@ def main() -> None:
 
 MODULES["cybytearray"] = {
     "pyx": r'''# cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cybytearray cimport bytearray_len, bytearray_check, bytearray_check_exact
+from picop.cybytearray cimport bytearray_len, bytearray_check, bytearray_check_exact
 include "_sink.pxi"
 
 cpdef Py_ssize_t baseline_balen(bytearray ba, Py_ssize_t n):
@@ -732,7 +732,7 @@ def main() -> None:
 MODULES["cyarray"] = {
     "pyx": r'''# cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
 from cpython.array cimport array
-from cypy.cyarray cimport array_len, array_check
+from picop.cyarray cimport array_len, array_check
 include "_sink.pxi"
 
 cpdef Py_ssize_t baseline_aylen(array a, Py_ssize_t n):
@@ -805,7 +805,7 @@ from bench.tier_b._tb_util import N, ensure_ext, markdown_table, tier_b_session
 
 def main() -> None:
     for name, spec in MODULES.items():
-        (HERE / f"{name}_tb.pyx").write_text(spec["pyx"].lstrip() + "\n", encoding="utf-8")
+        (HERE / f"{name}_tb.pyx").write_text(spec["pyx"].lstrip().rstrip("\n") + "\n", encoding="utf-8")
         (HERE / f"{name}.py").write_text(
             HDR.format(name=name)
             + spec["body"].lstrip()

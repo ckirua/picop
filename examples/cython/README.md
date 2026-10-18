@@ -9,7 +9,7 @@ from picop.cyerr cimport *              # submodule — see each .pxd
 # cygetargs / cyceval / cypystate / cypylifecycle / cypyport / cyversion
 ```
 
-(`cypy` still works as a deprecated alias until 3.0.)
+Use `picop` for all Cython cimports. The `cypy` shims were removed in 3.0; rebuild downstream extensions after migrating imports.
 
 Out-of-tree barrel smoke: [`../cimport_ext/`](../cimport_ext/).
 

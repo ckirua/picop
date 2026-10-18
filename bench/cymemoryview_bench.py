@@ -1,4 +1,4 @@
-"""Compare public :mod:`cypy` cymemoryview helpers vs plain Python (tier A).
+"""Compare public :mod:`picop` cymemoryview helpers vs plain Python (tier A).
 
 Depth: check hit/miss, from_object shapes, contiguous C/F.
 Run: python bench/cymemoryview_bench.py
@@ -13,7 +13,7 @@ _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
 
-from cypy import memoryview_check, memoryview_from_object, memoryview_get_contiguous
+from picop import memoryview_check, memoryview_from_object, memoryview_get_contiguous
 
 from _bench_util import BenchSession
 

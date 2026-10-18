@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cyfunction cimport func_check
+from picop.cyfunction cimport func_check
 from types import FunctionType
 include "_sink.pxi"
 

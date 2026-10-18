@@ -1,4 +1,4 @@
-# cypy benchmarks
+# picop benchmarks
 
 ## Layout
 
@@ -25,6 +25,12 @@ Env (Tier A defaults): `CPY_BENCH_N` (80000), `CPY_BENCH_RUNS` (5), `CPY_BENCH_W
 Heavier Tier A: `CPY_BENCH_N=500000 CPY_BENCH_RUNS=11`.  
 Tier B inner-loop count: `CPY_TIERB_N` (default **2_000_000**; falls back to `CPY_BENCH_N` when set).
 
+**3.0 namespace:** runnable harnesses import and cimport `picop`. Historical
+`cypy` benchmark-function names, result labels, and the UUID JSON suite ID
+`cypy.uuid` remain measurement-format identifiers, not import compatibility.
+Smoke-sized loop overrides verify executability only; they are not performance
+acceptance evidence and must not refresh measured baselines.
+
 ## Tiers
 
 | Tier | Baseline | Subject | Use for |
@@ -32,13 +38,13 @@ Tier B inner-loop count: `CPY_TIERB_N` (default **2_000_000**; falls back to `CP
 | **A** | Plain Python (`t[i]`, `len`, `in`, `dict.get`, …) | Public `cpdef` via `bench/cy*_bench.py` | APPROVED / reject / demote public |
 | **B** | Same op in a typed Cython `cdef` loop (no Python attr lookup in the hot loop) | Same public helper inside a matching `cdef` loop | Informational vs Cython emit; **does not reopen** the Tier A gate |
 
-**Tier B harness:** `bench/tier_b/{name}_tb.pyx` + `python -m bench.tier_b.{name}`. Both sides run an N-iteration loop in Cython; Python times one full-loop call per sample. Ratio = **cypy_loop / cython_baseline_loop**. Anti-DCE/LICM: `_sink.pxi` opaque identity + volatile sink. Build artifacts (`*.so`, `*.c`) are gitignored — compile locally before merge when adding results.
+**Tier B harness:** `bench/tier_b/{name}_tb.pyx` + `python -m bench.tier_b.{name}`. Both sides run an N-iteration loop in Cython; Python times one full-loop call per sample. Ratio = **picop_loop / cython_baseline_loop**. Anti-DCE/LICM: `_sink.pxi` opaque identity + volatile sink. Build artifacts (`*.so`, `*.c`) are gitignored — compile locally before merge when adding results.
 
 **Tier B n/a:** cimport-only / surface-none modules, or unfair I/O (document one rationale line in the tracker).
 
 Decision gate (see [`docs/README.md`](../docs/README.md)) — **Tier A only**:
 
-- **Primary metric:** mean wall time; **ratio = cypy / baseline**
+- **Primary metric:** mean wall time; **ratio = picop / baseline**
 - **APPROVED (perf):** primary scenario **ratio ≤ 0.95**
 - **APPROVED (API):** ratio ≤ 1.02 with API-clarity note
 - **Evidence:** paste the timed table + experiment conclusions into **`docs/modules/NNN_cy{name}.md`** (not separate RESULTS/NOTES files)

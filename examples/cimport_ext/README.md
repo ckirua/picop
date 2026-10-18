@@ -2,7 +2,7 @@
 
 Regression check that **`from picop cimport …`** (package barrel via `__init__.pxd`) and submodule paths both cythonize against an **installed** `picop` (editable or wheel).
 
-(`cypy` still works as a deprecated alias until 3.0.)
+Use `picop` for the barrel and direct cimports. The `cypy` cimport shims were removed in 3.0; downstream extensions must rebuild against the current `.pxd` files.
 
 ## Prerequisites
 

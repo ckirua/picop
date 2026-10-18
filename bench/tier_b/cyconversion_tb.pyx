@@ -1,6 +1,6 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
 from libc.stdlib cimport atof
-from cypy.cyconversion cimport conv_cstr_to_double, conv_stricmp
+from picop.cyconversion cimport conv_cstr_to_double, conv_stricmp
 include "_sink.pxi"
 
 cpdef double baseline_conv_string_to_double(bytes s, Py_ssize_t n):

@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.method` |
-| Sources | `src/cypy/cymethod.pxd`, `.pyx`, `.pyi` |
+| Sources | `src/picop/cymethod.pxd`, `.pyx`, `.pyi` |
 | Surface | public + cimport |
 | Tracker lifecycle | decided (tier A + depth) |
 | Format | v2 |

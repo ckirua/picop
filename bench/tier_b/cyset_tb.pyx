@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cyset cimport set_contains, set_len, set_check
+from picop.cyset cimport set_contains, set_len, set_check
 include "_sink.pxi"
 
 cpdef bint baseline_scontains(object s, object value, Py_ssize_t n):
@@ -49,4 +49,3 @@ cpdef bint cypy_scheck(object p, Py_ssize_t n):
         r = set_check(tb_obj(p, k))
         tb_sink_bint(r)
     return r
-

@@ -64,12 +64,13 @@ current_version() {
 bump_version() {
   local cur="$1" kind="$2"
   python3 -c "
+import re
 import sys
 cur, kind = sys.argv[1], sys.argv[2]
-parts = [int(x) for x in cur.split('.')]
-if len(parts) != 3:
-    raise SystemExit(f'expected X.Y.Z, got {cur!r}')
-major, minor, patch = parts
+version = re.fullmatch(r'(\d+)\.(\d+)\.(\d+)(?:\.dev\d+)?', cur)
+if version is None:
+    raise SystemExit(f'expected X.Y.Z or X.Y.Z.devN, got {cur!r}')
+major, minor, patch = map(int, version.groups())
 if kind == 'major':
     major, minor, patch = major + 1, 0, 0
 elif kind == 'minor':

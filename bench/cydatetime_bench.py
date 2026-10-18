@@ -5,7 +5,7 @@ from datetime import date, datetime, time, timedelta
 from pathlib import Path
 _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path: sys.path.insert(0, str(_BENCH_ROOT))
-from cypy import (
+from picop import (
     dt_date_check, dt_datetime_check, dt_date_year, dt_date_new, dt_timedelta_check, dt_timedelta_new,
 )
 from _bench_util import BenchSession

@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.complex` |
-| Sources | `src/cypy/cycomplex.pxd`, `.pyx`, `.pyi` |
+| Sources | `src/picop/cycomplex.pxd`, `.pyx`, `.pyi` |
 | Surface | public + cimport |
 | Tracker lifecycle | decided (tier A + depth) |
 | Format | v2 |

@@ -8,9 +8,9 @@ description: >-
   need major policy, not casual PRs.
 ---
 
-# Index one cypy module (v2)
+# Index one picop module (v2)
 
-**Audience:** maintainers after the **1.0 Core freeze**. Consumers should use `use-cypy`. New modules or Core removals need major policy — not casual PRs.
+**Audience:** maintainers after the **1.0 Core freeze**. Consumers should use `use-cypy` guidance for picop call sites. The skill directory name and historical `cy*` helper names remain unchanged.
 ## When
 
 User asks to index / remake / upgrade a `docs/modules/NNN_cy*.md` tracker, or a named Order under `docs/modules/` (see [`docs/modules/README.md`](../../docs/modules/README.md); phase status lives in [`docs/README.md`](../../docs/README.md)).

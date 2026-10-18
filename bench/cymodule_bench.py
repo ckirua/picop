@@ -1,4 +1,4 @@
-"""Compare public :mod:`cypy` cymodule helpers vs plain Python (tier A).
+"""Compare public :mod:`picop` cymodule helpers vs plain Python (tier A).
 
 Run: python bench/cymodule_bench.py
 """
@@ -15,7 +15,7 @@ _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
 
-from cypy import (
+from picop import (
     mod_check,
     mod_check_exact,
     mod_get_name,

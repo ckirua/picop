@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.iterator` |
-| Sources | `src/cypy/cyiterator.pxd`, `.pyx`, `.pyi` |
+| Sources | `src/picop/cyiterator.pxd`, `.pyx`, `.pyi` |
 | Surface | public |
 | Tracker lifecycle | decided (tier A + depth) |
 | Format | v2 |

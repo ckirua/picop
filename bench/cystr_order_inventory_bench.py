@@ -12,7 +12,7 @@ _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
 
-from cypy import str_check, str_cmp, str_ge, str_gt, str_is, str_le, str_lt
+from picop import str_check, str_cmp, str_ge, str_gt, str_is, str_le, str_lt
 
 from _bench_util import BenchSession
 

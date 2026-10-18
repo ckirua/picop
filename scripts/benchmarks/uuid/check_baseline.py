@@ -29,7 +29,7 @@ def _percentage(value: str) -> Decimal:
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Compare measured UUID medians with absolute cypy baselines."
+        description="Compare measured UUID medians with absolute picop baselines."
     )
     parser.add_argument("result", type=Path, help="JSON produced by bench.py")
     parser.add_argument(

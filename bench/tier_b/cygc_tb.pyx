@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cygc cimport gc_is_enabled
+from picop.cygc cimport gc_is_enabled
 include "_sink.pxi"
 
 cdef extern from "Python.h":
@@ -22,4 +22,3 @@ cpdef bint cypy_gc_is_enabled(Py_ssize_t n):
         r = gc_is_enabled()
         tb_sink_bint(r)
     return r
-

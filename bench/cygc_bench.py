@@ -1,4 +1,4 @@
-"""Compare public :mod:`cypy` cygc helpers vs ``gc`` module (tier A).
+"""Compare public :mod:`picop` cygc helpers vs ``gc`` module (tier A).
 
 Depth: is_enabled hot path; enable/disable round-trip; collect is smoke-only
 (full GC must not run in the N=80k loop).
@@ -16,7 +16,7 @@ _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
 
-from cypy import gc_collect, gc_disable, gc_enable, gc_is_enabled
+from picop import gc_collect, gc_disable, gc_enable, gc_is_enabled
 
 from _bench_util import BenchSession
 

@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.mapping` |
-| Sources | `src/cypy/cymapping.pxd`, `.pyx`, `.pyi` |
+| Sources | `src/picop/cymapping.pxd`, `.pyx`, `.pyi` |
 | Surface | public |
 | Tracker lifecycle | decided |
 | Format | v2 |

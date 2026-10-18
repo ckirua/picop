@@ -1,4 +1,4 @@
-"""Compare public :mod:`cypy` cytuple helpers vs plain Python (tier A).
+"""Compare public :mod:`picop` cytuple helpers vs plain Python (tier A).
 
 Run from repo root::
 
@@ -18,7 +18,7 @@ _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
 
-from cypy import (
+from picop import (
     tuple_check,
     tuple_check_exact,
     tuple_get,

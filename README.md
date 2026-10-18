@@ -4,7 +4,25 @@ Fast CPython C-API helpers for Cython — typed hot-path wrappers plus C-backed 
 
 **Python 3.15 is primary**, with Python 3.14 backward compatibility and genuine GIL-disabled support on **3.14t and 3.15t**. Minimum Python remains 3.14. Map of what is covered: [`COVERAGE.md`](COVERAGE.md). Primary license: [`LICENSE`](LICENSE) (MIT); adapted UUID portions retain their notices in [`NOTICE`](NOTICE) and [`LICENSES/Apache-2.0.txt`](LICENSES/Apache-2.0.txt). Contributing: [`CONTRIBUTING.md`](CONTRIBUTING.md). Security: [`SECURITY.md`](SECURITY.md). Safety / footguns: [`docs/SAFETY.md`](docs/SAFETY.md).
 
-**Import rename (2.0):** prefer `import picop` / `from picop…`. The `cypy` import package is a **deprecated soft alias** (emits `DeprecationWarning`) and will be **removed in 3.0**. PyPI name was already `picop`.
+**3.0 migration (unreleased):** the `cypy` Python package and Cython cimport shims have been removed. This checkout is `3.0.0.dev0`, not a published release; version-pinned install examples below refer to 2.x.
+
+## Migrating from 2.x
+
+Replace the `cypy` prefix with `picop` in Python imports and Cython cimports:
+
+```python
+from picop.hot import bytes_len
+from picop.uuid import UUID
+```
+
+```cython
+from picop cimport UUID
+from picop.uuid._uuid cimport UUID as DirectUUID, uuid_from_buf
+```
+
+Rebuild downstream Cython extensions against 3.0. Existing `picop` helper names
+and signatures are unchanged; no `cypy` compatibility package or cimport shim
+is shipped.
 
 ## Install
 Commands below are run from the repository root unless noted; the repository root is the installable project.
@@ -76,7 +94,7 @@ Also supported: `from picop.cydict import dict_get` / `from picop import dict_ge
 
 Cython: both **`from picop cimport …`** (package barrel) and **`from picop.cybytes cimport …`** (submodule) work after install. Out-of-tree regression: [`examples/cimport_ext/`](examples/cimport_ext/) / `bash scripts/smoke_barrel_cimport.sh`.
 
-Full public surface remains on `from picop import …` / `picop.cy*`. Deprecated: `from cypy…` / `from cypy… cimport` (soft alias until **3.0**).
+Use only `picop` for Python imports and Cython cimports; there is no `cypy` compatibility shim in 3.0.
 
 **Footgun:** C-string helpers take **`bytes`**, not `str`. Prefer `*_cstr` (`map_getitem_cstr`) — see `examples/py_cstr_bytes.py`. Broader trusted-caller notes (unchecked OOB, borrowed pointers, `marshal_loads`): [`docs/SAFETY.md`](docs/SAFETY.md).
 
@@ -107,9 +125,7 @@ If the fork hook cannot be registered, import fails rather than allowing parent
 and child to reuse buffered entropy. Custom `UUID_RANDOM_BUFFER_SIZE` builds
 must use a positive multiple of 16 that fits OpenSSL's integer length limit.
 
-Downstream Cython extensions **must rebuild** for this migration. Documented
-typed factories remain available, including direct, barrel and `cypy` cimports;
-the old private UUID instance fields and their binary layout are not retained.
+Downstream Cython extensions **must rebuild** for this migration and for the UUID layout change. Use `from picop.uuid cimport …` or `from picop cimport …` for UUID typed factories; direct and barrel imports are supported. The old private UUID instance fields and binary layout are not retained.
 
 ## Examples
 
@@ -123,9 +139,7 @@ python examples/pydict.py
 
 ## Compatibility
 
-**1.0 policy:** **Core** (`picop.__all__` + `picop.hot`) and documented cimport contracts are frozen. Soft aliases were removed in **0.3**. Protocols / Runtime remain provisional under minors. See [`docs/RELEASE.md`](docs/RELEASE.md). Semantic twins like `dict_len`/`dict_size` stay dual (never identity-aliased). Prefer pin: `pip install "picop==2.1.0"`.
-
-**2.0 soft rename:** import package is **`picop`**; deprecated **`cypy`** alias remains until **3.0** (then removed). Pip install name was already `picop`.
+**1.0 policy:** **Core** (`picop.__all__` + `picop.hot`) and documented cimport contracts are frozen. Soft aliases were removed in **0.3**. Protocols / Runtime remain provisional under minors. See [`docs/RELEASE.md`](docs/RELEASE.md). Semantic twins like `dict_len`/`dict_size` stay dual (never identity-aliased). Use the editable instructions above to install this unreleased 3.0 development checkout.
 
 Product tiers (Core / Protocols / Runtime): [`COVERAGE.md`](COVERAGE.md).
 

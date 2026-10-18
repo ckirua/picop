@@ -27,7 +27,7 @@ pick_python() {
   fi
   for candidate in "${candidates[@]}"; do
     [[ -n "$candidate" && -x "$candidate" ]] || continue
-    if "$candidate" -c "import cypy, Cython" >/dev/null 2>&1; then
+    if "$candidate" -c "import picop, Cython" >/dev/null 2>&1; then
       echo "$candidate"
       return 0
     fi
@@ -36,7 +36,7 @@ pick_python() {
 }
 
 if ! PYTHON="$(pick_python)"; then
-  echo "error: need python with cypy + Cython (activate .venv)" >&2
+  echo "error: need python with picop + Cython (activate .venv)" >&2
   exit 1
 fi
 

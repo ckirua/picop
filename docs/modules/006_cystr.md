@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | custom high-level `str` surface over `cpython.unicode` (UTF-8/intern → [`007_cyunicode.md`](007_cyunicode.md)) |
-| Sources | `src/cypy/cystr.pxd`, `cystr.pyx`, `cystr.pyi` |
+| Sources | `src/picop/cystr.pxd`, `cystr.pyx`, `cystr.pyi` |
 | Surface | public + cimport |
 | Tracker lifecycle | decided (tier A + depth) |
 | Format | v2 |

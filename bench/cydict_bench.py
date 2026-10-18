@@ -1,4 +1,4 @@
-"""Compare public :mod:`cypy` cydict helpers vs plain Python (tier A).
+"""Compare public :mod:`picop` cydict helpers vs plain Python (tier A).
 
 Includes depth cases: miss, stored None, size shapes.
 Run: python bench/cydict_bench.py
@@ -14,7 +14,7 @@ _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
 
-from cypy import (
+from picop import (
     dict_check,
     dict_check_exact,
     dict_clear,

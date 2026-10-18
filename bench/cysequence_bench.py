@@ -1,4 +1,4 @@
-"""Compare public :mod:`cypy` cysequence helpers vs plain Python (tier A).
+"""Compare public :mod:`picop` cysequence helpers vs plain Python (tier A).
 
 Depth: check/size, get/str_contains, str_concat/repeat, list/tuple convert.
 Run: python bench/cysequence_bench.py
@@ -13,7 +13,7 @@ _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
 
-from cypy import (
+from picop import (
     seq_check,
     seq_concat,
     seq_contains,

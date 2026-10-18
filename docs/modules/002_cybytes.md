@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.bytes` (`Cython/Includes/cpython/bytes.pxd`) |
-| Sources | `src/cypy/cybytes.pxd`, `cybytes.pyx`, `cybytes.pyi` |
+| Sources | `src/picop/cybytes.pxd`, `cybytes.pyx`, `cybytes.pyi` |
 | Surface | public + cimport |
 | Tracker lifecycle | decided (tier A + depth) |
 | Format | v2 |

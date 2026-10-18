@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cyansi cimport ansi_fg8, ansi_bg8, ansi_bold
+from picop.cyansi cimport ansi_fg8, ansi_bg8, ansi_bold
 include "_sink.pxi"
 
 cpdef str baseline_fg8(int code, Py_ssize_t n):
@@ -64,4 +64,3 @@ cpdef str cypy_bold(bint on, Py_ssize_t n):
         r = ansi_bold(on)
         tb_sink_obj(r)
     return r
-

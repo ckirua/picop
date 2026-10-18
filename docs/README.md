@@ -24,7 +24,7 @@ Phases 1–6 and the **1.0 Core freeze** are done. Per-module evidence lives in 
 | 6 | Usage examples for all Orders |
 | API | Soft window `0.2` → hard trim `0.3` → Core freeze `1.0` |
 
-Ship / remaster via [`PIPELINE.md`](PIPELINE.md) + [`TEMPLATE.md`](TEMPLATE.md). Product map: [`../COVERAGE.md`](../COVERAGE.md). Archive-only: [`future/MONKEY.md`](future/MONKEY.md) — do not restore into `src/cypy`.
+Ship / remaster via [`PIPELINE.md`](PIPELINE.md) + [`TEMPLATE.md`](TEMPLATE.md). Product map: [`../COVERAGE.md`](../COVERAGE.md). Archive-only: [`future/MONKEY.md`](future/MONKEY.md) — do not restore into `src/picop`.
 
 ## Doc map
 
@@ -47,7 +47,7 @@ Bench harnesses: [`bench/BENCH.md`](../bench/BENCH.md). Coverage map: [`COVERAGE
 
 | Layer | Values | Meaning |
 |-------|--------|---------|
-| Module presence | `present` / `absent` | Has `src/cypy/cy*` or not |
+| Module presence | `present` / `absent` | Has `src/picop/cy*` or not |
 | Tracker lifecycle | `stub` → `indexed` → `implementing` → `measuring` → `decided` | Process stage |
 | Export | `public` / `cimport` / `cdef` / `—` | How a **cypy** symbol is exposed |
 | Inventory layer | `cypy` / `C-API` / `used-by` | Helper vs raw symbol vs consumed |

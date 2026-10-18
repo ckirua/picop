@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.dict` (`Cython/Includes/cpython/dict.pxd`) + 3.13+ `PyDict_Pop*` / `ContainsString` |
-| Sources | `src/cypy/cydict.pxd`, `cydict.pyx`, `cydict.pyi` |
+| Sources | `src/picop/cydict.pxd`, `cydict.pyx`, `cydict.pyi` |
 | Surface | public + cimport |
 | Tracker lifecycle | decided (tier A + depth) |
 | Format | v2 |

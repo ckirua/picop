@@ -1,4 +1,4 @@
-"""Compare public :mod:`cypy` cycomplex helpers vs plain Python (tier A).
+"""Compare public :mod:`picop` cycomplex helpers vs plain Python (tier A).
 
 Run: python bench/cycomplex_bench.py
 """
@@ -12,7 +12,7 @@ _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
 
-from cypy import (
+from picop import (
     complex_check,
     complex_check_exact,
     complex_from_doubles,

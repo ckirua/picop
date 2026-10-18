@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.contextvars` |
-| Sources | `src/cypy/cycontextvars.pxd`, `.pyx`, `.pyi` |
+| Sources | `src/picop/cycontextvars.pxd`, `.pyx`, `.pyi` |
 | Surface | public |
 | Tracker lifecycle | decided |
 | Format | v2 |

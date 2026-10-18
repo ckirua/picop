@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cylist cimport list_get, list_get_checked, list_len, list_check
+from picop.cylist cimport list_get, list_get_checked, list_len, list_check
 include "_sink.pxi"
 
 cpdef object baseline_lget(list l, Py_ssize_t i, Py_ssize_t n):
@@ -57,4 +57,3 @@ cpdef bint cypy_lcheck(object p, Py_ssize_t n):
         r = list_check(tb_obj(p, k))
         tb_sink_bint(r)
     return r
-

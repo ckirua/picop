@@ -29,7 +29,7 @@ Specialized C-API names stay specialized (`set_any_check`, `weakref_check`,
 | `*_size(object)` | Untyped / subtypes | Checked C-API (`Py*_Size`) |
 
 **Never** identity-alias `*_len` to `*_size` — they are **semantic twins**
-([`SEMANTIC_TWINS`](../src/cypy/compat.py)). Prefer `dict_len` on typed `dict`;
+([`SEMANTIC_TWINS`](../src/picop/compat.py)). Prefer `dict_len` on typed `dict`;
 use `dict_size` when the object may be a subtype.
 
 `obj_len` / `obj_size` are both checked length bridges (protocol/object tier);
@@ -37,5 +37,5 @@ prefer typed `*_len` when the concrete type is known.
 
 ## Soft aliases (Strategy B)
 
-See [`COMPAT_MAP`](../src/cypy/compat.py): soft → preferred. Soft root names were
+See [`COMPAT_MAP`](../src/picop/compat.py): soft → preferred. Soft root names were
 **removed in 0.3**; package `__getattr__` raises with `soft_alias_removal_hint`.

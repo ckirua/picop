@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.tuple` (`Cython/Includes/cpython/tuple.pxd`) |
-| Sources | `src/cypy/cytuple.pxd`, `cytuple.pyx`, `cytuple.pyi` |
+| Sources | `src/picop/cytuple.pxd`, `cytuple.pyx`, `cytuple.pyi` |
 | Surface | public + cimport |
 | Tracker lifecycle | decided (tier A; construction demoted to cdef) |
 | Format | v2 |

@@ -2,7 +2,7 @@
 
 Copy-paste for the usual micro-opt path. Full demos: `pyhot.py`, `pydict.py`, `pylist.py`, `pybytes.py`, `pystr.py`, `pytuple.py`, `pyset.py`, `wrap_ansi.py`.
 
-(`cypy` still works as a deprecated alias until 3.0.)
+Use `picop` for all Python imports and Cython cimports; the `cypy` package and cimport shims were removed in 3.0.
 
 ## Python
 

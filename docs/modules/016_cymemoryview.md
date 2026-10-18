@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.memoryview` |
-| Sources | `src/cypy/cymemoryview.pxd`, `.pyx`, `.pyi` |
+| Sources | `src/picop/cymemoryview.pxd`, `.pyx`, `.pyi` |
 | Surface | public + cimport |
 | Tracker lifecycle | decided (tier A + depth) |
 | Format | v2 |

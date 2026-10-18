@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.time` |
-| Sources | `src/cypy/cytime.pxd`, `.pyx`, `.pyi` |
+| Sources | `src/picop/cytime.pxd`, `.pyx`, `.pyi` |
 | Surface | public + cimport |
 | Tracker lifecycle | decided |
 | Format | v2 |

@@ -4,7 +4,7 @@ Product contract for what `picop` is, what it ships, and how to choose helpers.
 
 `picop` is **not** a reimplementation of the Python standard library, and it is **not** a full 1:1 port of Cython’s `Includes/cpython`. It is a curated **CPython C-API accelerator** for Cython on **Python ≥ 3.14**.
 
-**Import (2.0):** prefer `picop`. Deprecated soft alias `cypy` (`DeprecationWarning`) until **3.0**, then removed. Pip name is already `picop`.
+**Import:** use `picop` for both Python and Cython. The `cypy` Python imports and Cython cimport shims were removed in 3.0; migrate imports and cimports to the corresponding `picop` path. This repository's 3.0 development version is not published.
 
 Authoritative symbol lists: `src/picop/__init__.py` / `__init__.pxd` `__all__`, plus `picop.hot` for micro-opt starters. Per-module decisions: [`docs/modules/`](docs/modules/).
 Timed public-ops checklist: [`docs/OPS_INVENTORY.md`](docs/OPS_INVENTORY.md) (gate: `scripts/ops_inventory_coverage.py --strict`).
@@ -54,7 +54,7 @@ As of **`1.0.0`**:
 | Core names that are also `cpdef`/`cdef` | **Yes** | Same symbol, same semantics as public Core |
 | `cdef`-only helpers (builders, unique-ref fill, C-string keys, borrow pointers, …) | **Documented cimport** | Keep for Cython; never promote to pure-Python without a minor; demote/remove → major after advertise |
 | Soft letter/bare/`*_string` (post-0.3) | Implementation only | Not a public or cimport *product* contract; prefer word-prefix / `*_cstr` |
-| Deprecated `cypy` import / cimport (2.0 soft window) | Soft alias | Prefer `picop`; **removed in 3.0** |
+| `picop` Python imports / Cython cimports | Supported surface | `cypy` compatibility imports and cimport shims are removed in 3.0 |
 
 **Authoritative lists:** `src/picop/__init__.py` / `hot.py` `__all__`, `src/picop/__init__.pxd` + `cy*.pxd`, tracker inventories.
 
@@ -87,7 +87,7 @@ As of **`1.0.0`**:
 | `import picop` / `from picop import …` | Full public barrel; Core discovery via `__all__` (frozen at 1.0) |
 | `from picop.cydict import dict_get` | Module-scoped public |
 | `cimport picop` / `from picop.cydict cimport …` | **Full Cython SDK** (wider than Python; includes cimport-only) |
-| `from cypy…` / `from cypy… cimport` | **Deprecated** soft alias (2.0); emits `DeprecationWarning`; **removed in 3.0** |
+| `from picop…` / `from picop… cimport` | Supported import and full Cython SDK |
 
 Discourage `from picop import *`.
 
@@ -158,7 +158,7 @@ Full table: [`docs/NAMING.md`](docs/NAMING.md). Removed soft aliases (0.3+): [`p
 - Restoring builtin monkey-patches ([`docs/future/MONKEY.md`](docs/future/MONKEY.md))
 - Treating Protocol/Runtime losers as Core micro-opt defaults
 
-Historical note: an older tree lived as `cycel.core.cpy`. **`cytime` ships in picop as Runtime** (not deferred to `cycel.time`). Broader clock/RFC utilities may still live in sibling packages. Pre-2.0 import name was `cypy` (soft alias until 3.0).
+Historical note: an older tree lived as `cycel.core.cpy`. **`cytime` ships in picop as Runtime** (not deferred to `cycel.time`). Broader clock/RFC utilities may still live in sibling packages. The pre-2.0 import name was `cypy`.
 
 ---
 

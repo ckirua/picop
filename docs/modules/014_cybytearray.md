@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.bytearray` (`Cython/Includes/cpython/bytearray.pxd`) |
-| Sources | `src/cypy/cybytearray.pxd`, `cybytearray.pyx`, `cybytearray.pyi` |
+| Sources | `src/picop/cybytearray.pxd`, `cybytearray.pyx`, `cybytearray.pyi` |
 | Surface | public + cimport |
 | Tracker lifecycle | decided (tier A + depth) |
 | Format | v2 |

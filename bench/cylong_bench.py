@@ -1,4 +1,4 @@
-"""Compare public :mod:`cypy` cylong helpers vs plain Python (tier A).
+"""Compare public :mod:`picop` cylong helpers vs plain Python (tier A).
 
 Depth: check exact vs bool, from/as roundtrips, overflow tuple.
 Run: python bench/cylong_bench.py
@@ -13,7 +13,7 @@ _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
 
-from cypy import (
+from picop import (
     long_as_double,
     long_as_long,
     long_as_long_overflow,

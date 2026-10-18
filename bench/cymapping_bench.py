@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path: sys.path.insert(0, str(_BENCH_ROOT))
-from cypy import map_check, map_has_key, map_len, map_keys, map_getitem_cstr
+from picop import map_check, map_has_key, map_len, map_keys, map_getitem_cstr
 from _bench_util import BenchSession
 
 def main():

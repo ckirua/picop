@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run cypy benchmarks and save combined output under results/.
+# Run picop benchmarks and save combined output under results/.
 #
 # Usage (from repo root):
 #   ./bench/small.sh
@@ -33,7 +33,7 @@ pick_python() {
   fi
   for candidate in "${candidates[@]}"; do
     [[ -n "$candidate" && -x "$candidate" ]] || continue
-    if "$candidate" -c "import cypy" >/dev/null 2>&1; then
+    if "$candidate" -c "import picop" >/dev/null 2>&1; then
       echo "$candidate"
       return 0
     fi
@@ -42,7 +42,7 @@ pick_python() {
 }
 
 if ! PYTHON="$(pick_python)"; then
-  echo "error: no python with cypy installed (activate .venv or set PYTHON=...)" >&2
+  echo "error: no python with picop installed (activate .venv or set PYTHON=...)" >&2
   exit 1
 fi
 
@@ -56,14 +56,14 @@ if command -v git >/dev/null 2>&1 && git -C "$ROOT" rev-parse --is-inside-work-t
 fi
 
 run_all() {
-  echo "cypy benchmarks (tier A = vs plain Python unless noted)"
+  echo "picop benchmarks (tier A = vs plain Python unless noted)"
   echo "timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
   echo "python: $($PYTHON --version 2>&1)"
   if [[ -n "$git_rev" ]]; then
     echo "git: $git_rev"
   fi
   echo "config: n=${CPY_BENCH_N:-80000} runs=${CPY_BENCH_RUNS:-5} warmup=${CPY_BENCH_WARMUP:-0}"
-  echo "  ratio < 1.0 → cypy wins  |  ≥5% gate → ratio ≤ 0.95"
+  echo "  ratio < 1.0 → picop wins  |  ≥5% gate → ratio ≤ 0.95"
   echo "========================================"
   echo
 

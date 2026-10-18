@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.weakref` |
-| Sources | `src/cypy/cyweakref.pxd`, `.pyx`, `.pyi` |
+| Sources | `src/picop/cyweakref.pxd`, `.pyx`, `.pyi` |
 | Surface | public + cimport |
 | Tracker lifecycle | decided |
 | Format | v2 |

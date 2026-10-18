@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cybytes cimport bytes_contains, bytes_eq, bytes_len, bytes_check, bytes_check_exact
+from picop.cybytes cimport bytes_contains, bytes_eq, bytes_len, bytes_check, bytes_check_exact
 include "_sink.pxi"
 
 cpdef bint baseline_bcontains(bytes haystack, bytes needle, Py_ssize_t n):

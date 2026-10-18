@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cytype cimport type_check
+from picop.cytype cimport type_check
 include "_sink.pxi"
 
 cpdef bint baseline_type_check(object p, Py_ssize_t n):

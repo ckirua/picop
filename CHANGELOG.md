@@ -8,8 +8,10 @@
 - Replace UUID's fabricated MRO with a real final native `uuid.UUID` subtype. Eagerly initialize its stdlib integer slot, preserve typed factories and Python value behavior, reject reinitialization, and remove private lazy caches/layout fields. Downstream Cython extensions must rebuild; no old private binary layout is preserved.
 - Speed up UUID integer construction using the public `PyLongWriter` API on compatible layouts and remove redundant Cython factory reference transfers, preserving eager stdlib slots and genuine no-GIL behavior.
 - Reject undersized UUID entropy buffers at build time and fail import if fork-child entropy invalidation cannot be registered.
-- Validate one immutable release sdist independently on 3.14, 3.15, 3.14t and 3.15t before publishing. Keep `cypy` forwarding until the separately scheduled 3.0 removal.
-- Move the standalone project from `packages/picop/` to the repository root. Build, install, test, documentation and release commands now run from the root; CI and release paths follow the new layout. Python imports and Cython cimports are unchanged.
+- Remove the `cypy` Python package and Cython cimport shims. Migrate Python imports and cimports (including UUID direct/barrel cimports) to `picop`; rebuild downstream Cython extensions. No compatibility shim is provided. This 3.0 development version is unreleased.
+- Move the standalone project from `packages/picop/` to the repository root. Build, install, test, documentation and release commands now run from the root; CI and release paths follow the new layout. Python imports and Cython cimports use `picop`.
+- Fix `obj_call`'s default no-keyword path so `None` is not passed as a C keyword dictionary; preserve callback results and exceptions without adding an empty-dict allocation.
+- Migrate benchmark runners, generated Cython harnesses and inventory tooling to `picop`; repair stale string-helper names and the file benchmark's exhausted input fixture. Existing measured baselines and result schemas are unchanged.
 
 ## [2.1.0] — 2026-09-06 — systems call and buffer helpers
 

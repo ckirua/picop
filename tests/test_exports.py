@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import runpy
+import subprocess
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -12,3 +14,26 @@ CHECK_EXPORTS = ROOT / "scripts" / "check_exports.py"
 def test_check_exports_exits_zero() -> None:
     ns = runpy.run_path(str(CHECK_EXPORTS), run_name="__picop_check_exports__")
     assert ns["main"]() == 0
+
+
+def test_removed_cypy_namespace_cannot_be_imported() -> None:
+    subprocess.run(
+        [
+            sys.executable,
+            "-I",
+            "-c",
+            """
+import importlib
+
+try:
+    importlib.import_module("cypy")
+except ModuleNotFoundError as exc:
+    assert exc.name == "cypy"
+else:
+    raise AssertionError("picop 3.0 must not provide the removed cypy namespace")
+""",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )

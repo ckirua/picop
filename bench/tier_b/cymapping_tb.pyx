@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cymapping cimport map_check
+from picop.cymapping cimport map_check
 include "_sink.pxi"
 
 cpdef bint baseline_map_check(object p, Py_ssize_t n):

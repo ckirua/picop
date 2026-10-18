@@ -1,4 +1,4 @@
-"""Compare public :mod:`cypy` cybytes helpers vs plain Python (tier A).
+"""Compare public :mod:`picop` cybytes helpers vs plain Python (tier A).
 
 Includes scale cases for depth (small win / large hybrid).
 Run: python bench/cybytes_bench.py
@@ -13,7 +13,7 @@ _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
 
-from cypy import (
+from picop import (
     bytes_bytearray_eq,
     bytes_check,
     bytes_check_exact,

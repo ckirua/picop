@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cymarshal cimport marshal_dumps
+from picop.cymarshal cimport marshal_dumps
 include "_sink.pxi"
 
 cpdef object baseline_marshal_dumps(object value, Py_ssize_t n):

@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cyiterobject cimport seqiter_check
+from picop.cyiterobject cimport seqiter_check
 include "_sink.pxi"
 
 cpdef bint baseline_seqiter_check(object p, Py_ssize_t n):

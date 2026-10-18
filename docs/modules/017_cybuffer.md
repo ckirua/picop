@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.buffer` |
-| Sources | `src/cypy/cybuffer.pxd`, `.pyx`, `.pyi` |
+| Sources | `src/picop/cybuffer.pxd`, `.pyx`, `.pyi` |
 | Surface | public + cimport |
 | Tracker lifecycle | decided (tier A + depth) |
 | Format | v2 |

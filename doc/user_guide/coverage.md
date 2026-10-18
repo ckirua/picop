@@ -4,7 +4,7 @@ Product contract for what `picop` is, what it ships, and how to choose helpers.
 
 `picop` is **not** a reimplementation of the Python standard library, and it is **not** a full 1:1 port of Cython’s `Includes/cpython`. It is a curated **CPython C-API accelerator** for Cython, primarily on **Python 3.15**, retaining 3.14 and free-threaded 3.14t/3.15t compatibility.
 
-Prefer `picop`. Deprecated soft alias `cypy` (`DeprecationWarning`) until **3.0**, then removed.
+Use `picop` for Python imports and Cython cimports. The former `cypy` imports and cimport shims were removed in 3.0; migrate to matching `picop` module paths.
 
 ## Product tiers
 
@@ -43,7 +43,7 @@ As of **`1.0.0`**:
 | Full public barrel beyond `__all__` | Protocols/Runtime **provisional** | Still importable; may evolve under minors |
 | `cimport picop` / `from picop.cy* cimport …` | **Documented SDK** | Wider than Python; cimport-only helpers stay out of this Python API reference |
 | Soft letter/bare/`*_string` (post-0.3) | Implementation only | Prefer word-prefix / `*_cstr` |
-| Deprecated `cypy` import / cimport | Soft alias | Prefer `picop`; **removed in 3.0** |
+| `picop` imports / cimports | Supported | Former `cypy` Python imports and Cython cimport shims were removed in 3.0 |
 
 ### Protocols (typed unknown)
 
@@ -66,7 +66,7 @@ Public Runtime helpers include datetime, codecs, marshal, file, weakref, capsule
 | `import picop` / `from picop import …` | Full public barrel; Core discovery via `__all__` |
 | `from picop.cydict import dict_get` | Module-scoped public |
 | `cimport picop` / `from picop.cydict cimport …` | **Full Cython SDK** (wider than Python) |
-| `from cypy…` | **Deprecated** soft alias until **3.0** |
+| `from picop…` / `from picop… cimport` | Supported Python and Cython SDK |
 
 Discourage `from picop import *`.
 

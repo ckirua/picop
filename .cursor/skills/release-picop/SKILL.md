@@ -10,7 +10,7 @@ disable-model-invocation: true
 
 # Release picop
 
-**Audience:** maintainers shipping a tagged **`picop`** release. Consumers use `use-cypy`. Policy and checklists live in [`docs/RELEASE.md`](../../../docs/RELEASE.md).
+**Audience:** maintainers shipping a tagged **`picop`** release. Consumers use `use-cypy` guidance for picop; policy and checklists live in [`docs/RELEASE.md`](../../../docs/RELEASE.md).
 
 ## When
 
@@ -22,9 +22,9 @@ User asks to **release**, **tag**, **publish** (PyPI), or **bump version** for p
 |------|------|
 | PyPI / pip | **`picop`** |
 | Preferred import | **`picop`** (`from picop.hot import …`) |
-| Deprecated import | **`cypy`** until **3.0** |
+| Python and Cython imports | **`picop` only** (former cypy compatibility removed in 3.0) |
 | GitHub repository | `ckirua/picop` (installable project at repository root) |
-| Version source | `src/picop/__about__.py` (prefer this; legacy trees may still use `src/cypy/__about__.py`) |
+| Version source | `src/picop/__about__.py` |
 
 ## Preconditions
 
@@ -59,7 +59,7 @@ Only if the script cannot run. See **Tag and GitHub Release** in [`docs/RELEASE.
 Full policy: [`docs/RELEASE.md`](../../../docs/RELEASE.md).
 
 - **Core** (`picop.__all__` + `picop.hot`) frozen at **1.0** — additive minors OK; removals / breaking need a **major**
-- Soft import rename: prefer **`picop`** in **2.x**; remove **`cypy`** in **3.0**
+- 3.0 development version is unreleased; do not describe it as published
 - Do not reopen Strategy A for 1.x
 
 ## Agent safety

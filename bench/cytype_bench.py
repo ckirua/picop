@@ -1,4 +1,4 @@
-"""Compare public :mod:`cypy` cytype helpers vs plain Python (tier A).
+"""Compare public :mod:`picop` cytype helpers vs plain Python (tier A).
 
 Run: python bench/cytype_bench.py
 """
@@ -12,7 +12,7 @@ _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
 
-from cypy import type_check, type_check_exact, type_is_subtype
+from picop import type_check, type_check_exact, type_is_subtype
 
 from _bench_util import BenchSession
 

@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cymemoryview cimport memoryview_check
+from picop.cymemoryview cimport memoryview_check
 include "_sink.pxi"
 
 cpdef bint baseline_mvcheck(object p, Py_ssize_t n):

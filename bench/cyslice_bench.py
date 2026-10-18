@@ -1,4 +1,4 @@
-"""Compare public :mod:`cypy` cyslice helpers vs plain Python (tier A).
+"""Compare public :mod:`picop` cyslice helpers vs plain Python (tier A).
 
 Depth: check, new, indices_ex shapes, unpack.
 Run: python bench/cyslice_bench.py
@@ -13,7 +13,7 @@ _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
 
-from cypy import slice_check, slice_indices_ex, slice_new, slice_unpack
+from picop import slice_check, slice_indices_ex, slice_new, slice_unpack
 
 from _bench_util import BenchSession
 

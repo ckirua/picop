@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `Python.h` GC (`PyGC_*`) — no Cython `cpython.gc` |
-| Sources | `src/cypy/cygc.pxd`, `cygc.pyx`, `cygc.pyi` |
+| Sources | `src/picop/cygc.pxd`, `cygc.pyx`, `cygc.pyi` |
 | Surface | public + cimport |
 | Tracker lifecycle | decided (tier A + depth) |
 | Format | v2 |

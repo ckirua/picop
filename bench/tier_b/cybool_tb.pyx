@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cybool cimport bool_check
+from picop.cybool cimport bool_check
 include "_sink.pxi"
 
 cpdef bint baseline_bool_check(object p, Py_ssize_t n):

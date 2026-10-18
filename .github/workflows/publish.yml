@@ -83,7 +83,6 @@ jobs:
           "$PY" -c 'import sys, sysconfig; print(sys.version, "Py_GIL_DISABLED=", sysconfig.get_config_var("Py_GIL_DISABLED"))'
           if [[ "${{ matrix.python-version }}" == *t ]]; then
             env -u PYTHON_GIL "$PY" -c 'import pathlib, sys; assert not sys._is_gil_enabled(); import picop; assert not sys._is_gil_enabled(); assert not pathlib.Path(picop.__file__).is_relative_to(pathlib.Path.cwd())'
-            env -u PYTHON_GIL "$PY" -c 'import sys; assert not sys._is_gil_enabled(); import cypy; assert not sys._is_gil_enabled()'
             env -u PYTHON_GIL "$PY" - <<'PY'
           import pkgutil, sys
           assert not sys._is_gil_enabled()
@@ -93,7 +92,7 @@ jobs:
           assert not sys._is_gil_enabled(), 'GIL enabled after native module imports'
           PY
           else
-            "$PY" -c 'import pathlib, picop, cypy; assert not pathlib.Path(picop.__file__).is_relative_to(pathlib.Path.cwd())'
+            "$PY" -c 'import pathlib, picop; assert not pathlib.Path(picop.__file__).is_relative_to(pathlib.Path.cwd())'
           fi
           "$PY" -m pytest tests -q
           if [[ "${{ matrix.python-version }}" == *t ]]; then

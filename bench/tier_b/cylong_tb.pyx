@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cylong cimport long_check
+from picop.cylong cimport long_check
 include "_sink.pxi"
 
 cpdef bint baseline_long_check(object p, Py_ssize_t n):

@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.pycapsule` |
-| Sources | `src/cypy/cypycapsule.pxd`, `.pyx`, `.pyi` |
+| Sources | `src/picop/cypycapsule.pxd`, `.pyx`, `.pyi` |
 | Surface | public + cimport |
 | Tracker lifecycle | decided |
 | Format | v2 |

@@ -2,7 +2,7 @@
 
 Read only when the high-value table in `SKILL.md` is not enough. Prefer examples under `examples/py*.py`.
 
-Default imports: `from picop.hot import …` / `from picop… cimport …`. Soft alias `cypy` is deprecated (removed in **3.0**).
+Default imports: `from picop.hot import …` / `from picop… cimport …`. The former `cypy` namespace and cimport shims were removed in **3.0**.
 
 ## Core containers / strings (public)
 

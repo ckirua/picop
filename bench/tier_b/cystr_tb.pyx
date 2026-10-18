@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cystr cimport str_contains, str_eq, str_len, str_check_exact
+from picop.cystr cimport str_contains, str_eq, str_len, str_check_exact
 include "_sink.pxi"
 
 cpdef bint baseline_contains(str haystack, str needle, Py_ssize_t n):
@@ -65,4 +65,3 @@ cpdef bint cypy_is_str(object p, Py_ssize_t n):
         r = str_check_exact(tb_obj(p, k))
         tb_sink_bint(r)
     return r
-

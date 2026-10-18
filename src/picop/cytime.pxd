@@ -1,6 +1,6 @@
 # cytime.pxd
 # High-resolution clocks. Public docs in ``cytime.pyi``.
-# Prefer this module over deferring to cycel.time for cypy surface.
+# Prefer this module over deferring to cycel.time for the picop surface.
 
 cdef extern from "Python.h":
     ctypedef long long PyTime_t

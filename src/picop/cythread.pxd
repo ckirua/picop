@@ -40,7 +40,7 @@ cdef inline void thread_release(PyThread_type_lock lock) nogil:
 
 cdef inline long thread_get_ident():
     # Not nogil: Cython's ``PyThread_get_thread_ident`` is GIL-marked; a nogil
-    # wrapper broke package-barrel ``from cypy cimport`` via ``__init__.pxd``.
+    # wrapper broke package-barrel cimports via ``__init__.pxd``.
     return PyThread_get_thread_ident()
 
 

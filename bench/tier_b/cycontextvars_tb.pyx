@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cycontextvars cimport ctx_check_exact
+from picop.cycontextvars cimport ctx_check_exact
 from contextvars import Context
 include "_sink.pxi"
 

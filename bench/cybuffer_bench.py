@@ -1,4 +1,4 @@
-"""Compare public :mod:`cypy` cybuffer helpers vs plain Python (tier A).
+"""Compare public :mod:`picop` cybuffer helpers vs plain Python (tier A).
 
 Depth: check hit/miss across types; copy_data bytearray↔bytearray.
 Run: python bench/cybuffer_bench.py
@@ -13,7 +13,7 @@ _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
 
-from cypy import buf_check, buf_copy_data
+from picop import buf_check, buf_copy_data
 
 from _bench_util import BenchSession
 

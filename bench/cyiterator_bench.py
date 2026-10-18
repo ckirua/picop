@@ -1,4 +1,4 @@
-"""Compare public :mod:`cypy` cyiterator helpers vs plain Python (tier A)."""
+"""Compare public :mod:`picop` cyiterator helpers vs plain Python (tier A)."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
 
-from cypy import iter_check, iter_next
+from picop import iter_check, iter_next
 
 from _bench_util import BenchSession
 

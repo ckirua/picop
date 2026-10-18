@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present (cimport) |
 | Maps to | `cpython.ref` |
-| Sources | `src/cypy/cyref.pxd` |
+| Sources | `src/picop/cyref.pxd` |
 | Surface | cimport only |
 | Tracker lifecycle | decided |
 | Format | v2 |

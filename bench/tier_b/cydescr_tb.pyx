@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cydescr cimport descr_is_data
+from picop.cydescr cimport descr_is_data
 include "_sink.pxi"
 
 cpdef bint baseline_descr_is_data(object p, Py_ssize_t n):

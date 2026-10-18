@@ -1,4 +1,4 @@
-"""Compare public :mod:`cypy` cylist helpers vs plain Python (tier A).
+"""Compare public :mod:`picop` cylist helpers vs plain Python (tier A).
 
 Depth: index shapes, empty vs small, slice, sort/reverse, AsTuple.
 Run: python bench/cylist_bench.py
@@ -13,7 +13,7 @@ _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
 
-from cypy import (
+from picop import (
     list_as_tuple,
     list_append,
     list_check,

@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cystr cimport str_cmp, str_lt, str_le, str_gt, str_ge, str_check, str_is
+from picop.cystr cimport str_cmp, str_lt, str_le, str_gt, str_ge, str_check, str_is
 include "_sink.pxi"
 
 cpdef int baseline_str_cmp(str a, str b, Py_ssize_t n):

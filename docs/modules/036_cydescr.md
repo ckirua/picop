@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.descr` |
-| Sources | `src/cypy/cydescr.pxd`, `.pyx`, `.pyi` |
+| Sources | `src/picop/cydescr.pxd`, `.pyx`, `.pyi` |
 | Surface | public |
 | Tracker lifecycle | decided (tier A + depth) |
 | Format | v2 |

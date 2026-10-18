@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path: sys.path.insert(0, str(_BENCH_ROOT))
-from cypy import conv_cstr_to_double, conv_stricmp
+from picop import conv_cstr_to_double, conv_stricmp
 from _bench_util import BenchSession
 
 def main():

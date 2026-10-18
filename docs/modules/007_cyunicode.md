@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.unicode` (UTF-8 / intern slice; high-level str → [`006_cystr.md`](006_cystr.md)) |
-| Sources | `src/cypy/cyunicode.pxd`, `cyunicode.pyx`, `cyunicode.pyi` |
+| Sources | `src/picop/cyunicode.pxd`, `cyunicode.pyx`, `cyunicode.pyi` |
 | Surface | public + cimport |
 | Tracker lifecycle | decided (tier A + depth) |
 | Format | v2 |

@@ -1,4 +1,4 @@
-"""Compare public :mod:`cypy` cynumber helpers vs plain Python (tier A).
+"""Compare public :mod:`picop` cynumber helpers vs plain Python (tier A).
 
 Run: python bench/cynumber_bench.py
 """
@@ -13,7 +13,7 @@ _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
 
-from cypy import (
+from picop import (
     num_abs,
     num_add,
     num_and,

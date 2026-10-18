@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cymodule cimport mod_check
+from picop.cymodule cimport mod_check
 from types import ModuleType
 include "_sink.pxi"
 

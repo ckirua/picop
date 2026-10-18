@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cynumber cimport num_check
+from picop.cynumber cimport num_check
 include "_sink.pxi"
 
 cpdef bint baseline_num_check(object p, Py_ssize_t n):

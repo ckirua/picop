@@ -1,4 +1,4 @@
-"""Compare public :mod:`cypy` cyansi helpers vs plain Python (tier A).
+"""Compare public :mod:`picop` cyansi helpers vs plain Python (tier A).
 
 Depth: table hit vs miss codes, strip with/without CSI, ansi_wrap.
 Run: python bench/cyansi_bench.py
@@ -14,7 +14,7 @@ _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
 
-from cypy import ansi_bg8, ansi_bold, ansi_fg8, ansi_fg256, ansi_reset, ansi_strip, ansi_wrap
+from picop import ansi_bg8, ansi_bold, ansi_fg8, ansi_fg256, ansi_reset, ansi_strip, ansi_wrap
 
 from _bench_util import BenchSession
 

@@ -1,4 +1,4 @@
-"""Compare public :mod:`cypy` cyarray helpers vs plain Python (tier A).
+"""Compare public :mod:`picop` cyarray helpers vs plain Python (tier A).
 
 Depth: len, check, copy/clone, extend, zero, resize shapes.
 Run: python bench/cyarray_bench.py
@@ -14,7 +14,7 @@ _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
 
-from cypy import (
+from picop import (
     array_check,
     array_check_exact,
     array_clone,

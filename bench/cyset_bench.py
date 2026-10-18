@@ -1,4 +1,4 @@
-"""Compare public :mod:`cypy` cyset helpers vs plain Python (tier A).
+"""Compare public :mod:`picop` cyset helpers vs plain Python (tier A).
 
 Depth: hit/miss str_contains, small vs mid size, frozenset checks, update shapes.
 Run: python bench/cyset_bench.py
@@ -13,7 +13,7 @@ _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
 
-from cypy import (
+from picop import (
     set_add,
     set_any_check,
     set_any_check_exact,

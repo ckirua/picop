@@ -14,7 +14,7 @@ _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
 
-from cypy import (
+from picop import (
     array_ne,
     bytearray_contains,
     bytearray_ne,

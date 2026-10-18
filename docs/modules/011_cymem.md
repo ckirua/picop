@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.mem` |
-| Sources | `src/cypy/cymem.pxd` |
+| Sources | `src/picop/cymem.pxd` |
 | Surface | cimport only |
 | Tracker lifecycle | decided (try-all + cheap aliases) |
 | Format | v2 |

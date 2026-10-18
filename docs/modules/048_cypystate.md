@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present (cimport) |
 | Maps to | `cpython.pystate` |
-| Sources | `src/cypy/cypystate.pxd` |
+| Sources | `src/picop/cypystate.pxd` |
 | Surface | cimport only |
 | Tracker lifecycle | decided |
 | Format | v2 |
@@ -66,7 +66,7 @@ GIL ensure/release and thread-state dict for Cython. Interpreter New/Delete/Swap
 | GIL | `gil_ensure`/`gil_release` must be paired; opaque handle — mismatch → deadlock or crash |
 | Borrowed / ownership | `GetDict` returns borrowed; any wrapper must INCREF before exposing |
 | ABI / safety | Interpreter New/Clear/Delete and ThreadState Swap REJECTED — Cython Includes warn DO NOT USE |
-| Prefer | Keep ensure/release for cdef extension code; never Swap from cypy public surface |
+| Prefer | Keep ensure/release for cdef extension code; never Swap from the picop public surface |
 
 ## Done when
 

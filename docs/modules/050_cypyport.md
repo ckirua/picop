@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present (cimport) |
 | Maps to | `cpython.pyport` |
-| Sources | `src/cypy/cypyport.pxd` |
+| Sources | `src/picop/cypyport.pxd` |
 | Surface | cimport only |
 | Tracker lifecycle | decided |
 | Format | v2 |

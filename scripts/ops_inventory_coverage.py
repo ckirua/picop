@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Public-ops inventory coverage gate.
 
-Public set = names imported from ``cy*`` in ``src/cypy/__init__.py``.
+Public set = names imported from ``cy*`` in ``src/picop/__init__.py``.
 Compares = first-arg labels of ``session.compare`` / ``session.compare_mutate``
 in ``bench/**/*.py``.
 
@@ -34,7 +34,7 @@ from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-INIT_PY = ROOT / "src" / "cypy" / "__init__.py"
+INIT_PY = ROOT / "src" / "picop" / "__init__.py"
 BENCH = ROOT / "bench"
 INVENTORY = ROOT / "docs" / "OPS_INVENTORY.md"
 
@@ -128,7 +128,7 @@ def write_seed(public: list[str], tier_a: set[str], tier_b: set[str]) -> None:
             "# Public ops inventory",
             "",
             "Checklist for every public barrel helper imported from `cy*` in",
-            "[`src/cypy/__init__.py`](../src/cypy/__init__.py).",
+            "[`src/picop/__init__.py`](../src/picop/__init__.py).",
             "",
             "Status vocabulary:",
             "",

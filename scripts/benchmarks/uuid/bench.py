@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run reproducible microbenchmarks for :mod:`cypy.uuid`."""
+"""Run reproducible microbenchmarks for :mod:`picop.uuid`."""
 
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ from uuid import UUID as StdlibUUID
 
 import pyperf
 
-from cypy.uuid import UUID, uuid4, uuid4_bytes
+from picop.uuid import UUID, uuid4, uuid4_bytes
 
 _CANONICAL = "123e4567-e89b-42d3-a456-426614174000"
 _RAW = bytes.fromhex("123e4567e89b42d3a456426614174000")

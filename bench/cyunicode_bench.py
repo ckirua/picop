@@ -1,4 +1,4 @@
-"""Compare public :mod:`cypy` cyunicode helpers vs plain Python (tier A).
+"""Compare public :mod:`picop` cyunicode helpers vs plain Python (tier A).
 
 Depth: short/long ASCII, non-ASCII UTF-8, already-interned vs fresh.
 Run: python bench/cyunicode_bench.py
@@ -13,7 +13,7 @@ _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
 
-from cypy import uintern, uutf8_bytes
+from picop import uintern, uutf8_bytes
 
 from _bench_util import BenchSession
 

@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cycomplex cimport complex_check
+from picop.cycomplex cimport complex_check
 include "_sink.pxi"
 
 cpdef bint baseline_complex_check(object p, Py_ssize_t n):

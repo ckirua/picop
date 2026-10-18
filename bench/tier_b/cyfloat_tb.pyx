@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cyfloat cimport float_check
+from picop.cyfloat cimport float_check
 include "_sink.pxi"
 
 cpdef bint baseline_float_check(object p, Py_ssize_t n):

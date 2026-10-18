@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cyobject cimport obj_type, obj_len
+from picop.cyobject cimport obj_type, obj_len
 include "_sink.pxi"
 
 cpdef object baseline_obj_type(object p, Py_ssize_t n):

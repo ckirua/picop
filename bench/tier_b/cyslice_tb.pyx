@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cyslice cimport slice_check
+from picop.cyslice cimport slice_check
 include "_sink.pxi"
 
 cpdef bint baseline_slcheck(object p, Py_ssize_t n):

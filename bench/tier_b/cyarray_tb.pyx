@@ -1,6 +1,6 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
 from cpython.array cimport array
-from cypy.cyarray cimport array_len, array_check
+from picop.cyarray cimport array_len, array_check
 include "_sink.pxi"
 
 cpdef Py_ssize_t baseline_aylen(array a, Py_ssize_t n):
@@ -34,4 +34,3 @@ cpdef bint cypy_aycheck(object p, Py_ssize_t n):
         r = array_check(tb_obj(p, k))
         tb_sink_bint(r)
     return r
-

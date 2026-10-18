@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cysequence cimport seq_get, seq_len
+from picop.cysequence cimport seq_get, seq_len
 include "_sink.pxi"
 
 cpdef object baseline_sqget(list l, Py_ssize_t i, Py_ssize_t n):

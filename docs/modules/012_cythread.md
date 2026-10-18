@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.pythread` + `PyEval_SaveThread` / `RestoreThread` |
-| Sources | `src/cypy/cythread.pxd` |
+| Sources | `src/picop/cythread.pxd` |
 | Surface | cimport only |
 | Tracker lifecycle | decided (lock/GIL slice try-all) |
 | Format | v2 |

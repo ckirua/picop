@@ -7,8 +7,8 @@ from picop.cybytes cimport bytes_len
 from picop.cybytes cimport bytes_concat, bytes_concat_and_del, bytes_resize
 from picop.cylist cimport list_get, list_get_checked
 from picop.cydict cimport dict_get, dict_get_with_error
+from picop.cyobject cimport obj_call
 from picop.uuid._uuid cimport UUID as DirectUUID, uuid_from_buf
-from cypy cimport UUID as ShimUUID, bytes_eq as shim_bytes_eq
 from picop.cymemoryview cimport memoryview_get_base, memoryview_from_memory
 
 import gc
@@ -24,6 +24,7 @@ cpdef bint check_barrel():
         bytes_eq(b"ab", b"ab")
         and list_len([1, 2, 3]) == 3
         and str_eq("x", "x")
+        and obj_call(str, (42,)) == "42"
     )
 
 
@@ -75,15 +76,15 @@ cpdef bint check_containers():
     return True
 
 
-cpdef bint check_direct_and_shim_uuid():
+cpdef bint check_direct_uuid():
     cdef unsigned char raw[16]
     cdef int i
     for i in range(16):
         raw[i] = i
+    cdef bytes expected = bytes(range(16))
     cdef DirectUUID direct = uuid_from_buf(raw)
-    cdef ShimUUID shim = ShimUUID(bytes(range(16)))
-    cdef UUID barrel = UUID(bytes(range(16)))
-    return direct == shim == barrel and shim_bytes_eq(direct.bytes, bytes(range(16)))
+    cdef UUID barrel = UUID(expected)
+    return direct == barrel and bytes_eq(direct.bytes, expected)
 
 
 cpdef bint check_memoryview_ownership():

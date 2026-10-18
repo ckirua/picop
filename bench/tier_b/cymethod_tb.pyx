@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cymethod cimport method_check
+from picop.cymethod cimport method_check
 from types import MethodType
 include "_sink.pxi"
 

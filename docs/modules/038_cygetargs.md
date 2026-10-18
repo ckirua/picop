@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present (cimport) |
 | Maps to | `cpython.getargs` |
-| Sources | `src/cypy/cygetargs.pxd` |
+| Sources | `src/picop/cygetargs.pxd` |
 | Surface | cimport only |
 | Tracker lifecycle | decided |
 | Format | v2 |

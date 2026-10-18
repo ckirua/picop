@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# Smoke: out-of-tree extension with barrel cimport against installed picop
-# (and deprecated cypy shim).
+# Smoke: out-of-tree extension with barrel and direct cimports against installed picop.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -25,8 +24,8 @@ assert demo.check_submodule() == 2
 assert demo.check_uuid()
 assert demo.check_ownership()
 assert demo.check_containers()
-assert demo.check_direct_and_shim_uuid()
+assert demo.check_direct_uuid()
 assert demo.check_memoryview_ownership()
 assert not free or not sys._is_gil_enabled()
-print("barrel/direct/shim cimport behavior ok; GIL enabled:", sys._is_gil_enabled())
+print("barrel/direct cimport behavior ok; GIL enabled:", sys._is_gil_enabled())
 PY

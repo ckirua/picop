@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cydatetime cimport dt_date_check
+from picop.cydatetime cimport dt_date_check
 from cpython.datetime cimport import_datetime, date
 include "_sink.pxi"
 

@@ -7,9 +7,9 @@ description: >-
   policy, not casual PRs. Never merge without user confirmation.
 ---
 
-# Add or promote a cypy helper
+# Add or promote a picop helper
 
-**Audience:** maintainers after the **1.0 Core freeze**. Consumers should use `use-cypy`. New modules or Core removals need major policy — not casual PRs.
+**Audience:** maintainers after the **1.0 Core freeze**. Consumers should use `use-cypy` guidance for picop call sites. The skill directory name and historical `cy*` helper names remain unchanged.
 ## When
 
 User asks to implement a tracker TODO, promote a candidate, or add a `cy*` helper.
@@ -27,9 +27,8 @@ Follow [`docs/PIPELINE.md`](../../docs/PIPELINE.md):
 ## Implement steps
 
 1. Read the module tracker (`docs/modules/NNN_cy{name}.md`) and `.cursor/rules/cypy-trackers.mdc`.
-2. Implement in `src/cypy/cy{name}.pxd` (and `.pyx` if needed): typed args, no runtime type checks unless required.
+2. Implement in `src/picop/cy{name}.pxd` (and `.pyx` if needed): typed args, no runtime type checks unless required.
 3. **Docs:** public **PEP 257 one-liners** in `cy{name}.pyi`. Complete **depth** probes per [`docs/PIPELINE.md`](../../docs/PIPELINE.md) before APPROVED.
-4. Export: public → `__init__.py` + `__all__` + `.pyi`; cimport-only → `cdef` + `__init__.pxd`.
 5. Update tracker with Bench results **and** Experiment conclusions (why/scale/safety/ABI).
 6. Examples smoke if public.
 7. Prefer measuring + depth before final APPROVED.

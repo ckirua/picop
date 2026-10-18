@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | custom (C11 `stdatomic` + `cyatomic_shim.h`) |
-| Sources | `src/cypy/cyatomic.pxd`, `cyatomic_shim.h` |
+| Sources | `src/picop/cyatomic.pxd`, `cyatomic_shim.h` |
 | Surface | cimport only |
 | Tracker lifecycle | decided |
 | Format | v2 |

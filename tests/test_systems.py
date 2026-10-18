@@ -10,6 +10,7 @@ from picop import (
     call_noargs,
     call_onearg,
     call_twoargs,
+    obj_call,
     memoryview_itemsize,
     memoryview_nbytes,
     memoryview_ndim,
@@ -23,6 +24,23 @@ def test_call_helpers_preserve_results_and_exceptions() -> None:
     assert call_twoargs(lambda left, right: left + right, 2, 5) == 7
     with pytest.raises(ValueError):
         call_noargs(lambda: (_ for _ in ()).throw(ValueError("bad")))
+
+
+def test_obj_call_optional_keywords_and_exception_identity() -> None:
+    def target(value: int, *, offset: int = 0) -> int:
+        return value + offset
+
+    assert obj_call(target, (4,)) == 4
+    assert obj_call(target, (4,), {"offset": 3}) == 7
+
+    failure = LookupError("callback failed")
+
+    def fail() -> None:
+        raise failure
+
+    with pytest.raises(LookupError) as caught:
+        obj_call(fail, ())
+    assert caught.value is failure
 
 
 def test_buffer_inspection_matches_memoryview_metadata() -> None:

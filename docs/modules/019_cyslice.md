@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.slice` |
-| Sources | `src/cypy/cyslice.pxd`, `.pyx`, `.pyi` |
+| Sources | `src/picop/cyslice.pxd`, `.pyx`, `.pyi` |
 | Surface | public + cimport |
 | Tracker lifecycle | decided (tier A + depth) |
 | Format | v2 |

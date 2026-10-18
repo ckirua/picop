@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.conversion` |
-| Sources | `src/cypy/cyconversion.pxd`, `.pyx`, `.pyi` |
+| Sources | `src/picop/cyconversion.pxd`, `.pyx`, `.pyi` |
 | Surface | public + cimport |
 | Tracker lifecycle | decided |
 | Format | v2 |

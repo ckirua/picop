@@ -132,6 +132,8 @@ cpdef inline bint obj_callable(object o) noexcept:
 
 
 cpdef inline object obj_call(object callable_object, object args, object kw=None):
+    if kw is None:
+        return PyObject_CallObject(callable_object, args)
     return PyObject_Call(callable_object, args, kw)
 
 

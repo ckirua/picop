@@ -13,7 +13,7 @@ How to read this index:
 
 **Barrel cimport (out-of-tree):** [`cimport_ext/`](cimport_ext/) — `from picop cimport …` against an installed package (`bash scripts/smoke_barrel_cimport.sh`).
 
-(`cypy` still works as a deprecated alias until 3.0.)
+3.0 removes the `cypy` Python import package and Cython cimport shims. Use `picop` paths instead.
 
 ```bash
 pip install picop

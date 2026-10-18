@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.module` |
-| Sources | `src/cypy/cymodule.pxd`, `.pyx`, `.pyi` |
+| Sources | `src/picop/cymodule.pxd`, `.pyx`, `.pyi` |
 | Surface | public + cimport |
 | Tracker lifecycle | decided (tier A + depth) |
 | Format | v2 |

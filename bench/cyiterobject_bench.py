@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path: sys.path.insert(0, str(_BENCH_ROOT))
-from cypy import seqiter_check, seqiter_new, calliter_check, calliter_new
+from picop import seqiter_check, seqiter_new, calliter_check, calliter_new
 from _bench_util import BenchSession
 
 def main():

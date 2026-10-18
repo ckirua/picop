@@ -63,7 +63,7 @@ def build(modules: list[str] | None = None) -> list[str]:
             Extension(
                 name=f"{name}_tb",
                 sources=[str(HERE / f"{name}_tb.pyx")],
-                include_dirs=[str(SRC), str(SRC / "cypy")],
+                include_dirs=[str(SRC), str(SRC / "picop")],
                 extra_compile_args=[
                     "-O3",
                     "-march=native",
@@ -90,7 +90,7 @@ def build(modules: list[str] | None = None) -> list[str]:
             self.build_lib = str(HERE)
             self.build_temp = str(HERE / "_build_temp")
 
-    dist = Distribution({"name": "cypy_tier_b", "ext_modules": ext_modules})
+    dist = Distribution({"name": "picop_tier_b", "ext_modules": ext_modules})
     dist.package_dir = {"": str(HERE)}
     cmd = _InplaceBuild(dist)
     cmd.ensure_finalized()

@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present (cimport) |
 | Maps to | `cpython.longintrepr` |
-| Sources | `src/cypy/cylongintrepr.pxd` |
+| Sources | `src/picop/cylongintrepr.pxd` |
 | Surface | cimport only |
 | Tracker lifecycle | decided |
 | Format | v2 |

@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.genobject` |
-| Sources | `src/cypy/cygenobject.pxd`, `.pyx`, `.pyi` |
+| Sources | `src/picop/cygenobject.pxd`, `.pyx`, `.pyi` |
 | Surface | public + cimport |
 | Tracker lifecycle | decided (tier A + depth) |
 | Format | v2 |

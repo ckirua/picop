@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `collections.deque` (custom; no public C-API) |
-| Sources | `src/cypy/cydeque.pxd`, `.pyx`, `.pyi` |
+| Sources | `src/picop/cydeque.pxd`, `.pyx`, `.pyi` |
 | Surface | public + cimport |
 | Tracker lifecycle | decided |
 | Format | v2 |

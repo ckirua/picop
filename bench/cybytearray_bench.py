@@ -1,4 +1,4 @@
-"""Compare public :mod:`cypy` cybytearray helpers vs plain Python (tier A).
+"""Compare public :mod:`picop` cybytearray helpers vs plain Python (tier A).
 
 Depth: len shapes, check hit/miss, from_object, str_concat sizes, resize.
 Run: python bench/cybytearray_bench.py
@@ -13,7 +13,7 @@ _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
 
-from cypy import (
+from picop import (
     bytearray_check,
     bytearray_check_exact,
     bytearray_concat,

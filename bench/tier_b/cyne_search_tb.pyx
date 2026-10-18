@@ -1,9 +1,9 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
 from cpython.array cimport array
-from cypy.cybytes cimport bytes_ne, bytes_startswith, bytes_endswith
-from cypy.cybytearray cimport bytearray_ne, bytearray_contains
-from cypy.cyarray cimport array_ne
-from cypy.cymemoryview cimport memoryview_ne
+from picop.cybytes cimport bytes_ne, bytes_startswith, bytes_endswith
+from picop.cybytearray cimport bytearray_ne, bytearray_contains
+from picop.cyarray cimport array_ne
+from picop.cymemoryview cimport memoryview_ne
 include "_sink.pxi"
 
 cpdef bint baseline_bytes_ne(bytes a, bytes b, Py_ssize_t n):

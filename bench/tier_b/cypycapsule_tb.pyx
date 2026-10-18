@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cypycapsule cimport capsule_check_exact
+from picop.cypycapsule cimport capsule_check_exact
 include "_sink.pxi"
 
 cpdef bint baseline_capsule_check_exact(object p, Py_ssize_t n):

@@ -4,7 +4,7 @@ import sys, weakref
 from pathlib import Path
 _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path: sys.path.insert(0, str(_BENCH_ROOT))
-from cypy import weakref_check, weakref_get_object, weakref_new_ref
+from picop import weakref_check, weakref_get_object, weakref_new_ref
 from _bench_util import BenchSession
 
 class Box: pass

@@ -2,7 +2,7 @@
 
 Release and validation commands below are run from the repository root unless noted.
 
-Ship a tagged `picop` release from `main`. Version is sourced from [`src/picop/__about__.py`](../src/picop/__about__.py) (`pyproject.toml` dynamic version). The repository root is the installable `picop` project. Soft `cypy` import alias until **3.0**.
+Ship a tagged `picop` release from `main`. Version is sourced from [`src/picop/__about__.py`](../src/picop/__about__.py) (`pyproject.toml` dynamic version). The repository root is the installable `picop` project. The 3.0 development version is unreleased; 3.0 removes the former `cypy` Python import and Cython cimport shims.
 
 ## Compatibility (0.x → 1.0)
 
@@ -28,9 +28,7 @@ Export gate: [`scripts/check_exports.py`](../scripts/check_exports.py).
 Protocols / Runtime remain **provisional** under post-1.0 minor policy (see
 [`CHANGELOG.md`](../CHANGELOG.md) / [`COVERAGE.md`](../COVERAGE.md)).
 
-**2.0 soft import rename:** preferred import is **`picop`**. Deprecated **`cypy`** shim
-(`DeprecationWarning` + cimport mirrors) until **3.0**, then removed. Pip name was
-already `picop`.
+**2.0 historical import rename:** preferred import became **`picop`**. The `cypy` compatibility package and cimport mirrors were removed in 3.0; migrate both Python and Cython callers to `picop`. Pip distribution name was already `picop`.
 
 **Alternative (not default):** Strategy A — single breaking `0.2` with **no** aliases (only if maintainers confirm near-zero external pins). Do not mix A and B halfway. **Chosen path was Strategy B** (soft then hard); do not reopen A for 1.x.
 
@@ -53,9 +51,9 @@ already `picop`.
 
 ### 2.0 import rename checklist
 
-1. [x] Tree under `src/picop/`; soft `src/cypy/` shim + `DeprecationWarning`.
-2. [x] Cython cimport shims for `cypy` → `picop`.
-3. [ ] **3.0:** remove `cypy` Python package and cimport shims; require `picop` only.
+1. [x] Tree under `src/picop/`; historical soft `src/cypy/` shim + `DeprecationWarning`.
+2. [x] Historical Cython cimport shims for `cypy` → `picop`.
+3. [x] **3.0:** remove `cypy` Python package and cimport shims; require `picop` only. Rebuild downstream Cython extensions.
 
 ## Before tagging
 
@@ -85,6 +83,10 @@ scripts/release.sh 2.0.0 --title "short highlight"
 scripts/release.sh --patch --dry-run
 ```
 
+For the first stable 3.0 release, select `3.0.0` explicitly after confirming the
+version and title. Bump flags increment the numeric base of `X.Y.Z.devN` just
+as they do for `X.Y.Z`; they do not promote a development version automatically.
+
 Manual equivalent:
 
 ```bash
@@ -108,8 +110,8 @@ EOF
 ```
 
 Pushing the tag runs the repository-root [`.github/workflows/publish.yml`](../.github/workflows/publish.yml)
-(Trusted Publishing → PyPI project **`picop`**, **sdist only**). Preferred import is **`picop`**;
-deprecated **`cypy`** alias until **3.0**.
+(Trusted Publishing → PyPI project **`picop`**, **sdist only**). Python imports and
+Cython cimports use **`picop`**; the former `cypy` namespace was removed in 3.0.
 Plain `linux_*` wheels are rejected by PyPI; add manylinux via cibuildwheel later if needed.
 
 ### One-time PyPI Trusted Publisher
@@ -138,7 +140,6 @@ smoke_dir="$(mktemp -d)"
 python -m venv "$smoke_dir/venv"
 CPY_NATIVE=0 "$smoke_dir/venv/bin/python" -m pip install "$(pwd)"/dist/picop-*.tar.gz
 "$smoke_dir/venv/bin/python" -c "from picop.hot import bytes_len, dict_get, str_len; assert bytes_len(b'ok') == 2; assert dict_get({'a': 1}, 'a') == 1; assert str_len('ok') == 2"
-"$smoke_dir/venv/bin/python" -W default -c "import cypy; from cypy.hot import bytes_len; assert bytes_len(b'ok') == 2; assert cypy.__version__ == __import__('picop').__version__"
 PYTHON="$smoke_dir/venv/bin/python" bash scripts/smoke_barrel_cimport.sh
 rm -rf "$smoke_dir"
 # optional local upload (prefer CI Trusted Publishing):

@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cyiterator cimport iter_check
+from picop.cyiterator cimport iter_check
 include "_sink.pxi"
 
 cpdef bint baseline_iter_check(object p, Py_ssize_t n):

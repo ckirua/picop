@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.array` (`Cython/Includes/cpython/array.pxd`) — Cython helpers over `array.array` |
-| Sources | `src/cypy/cyarray.pxd`, `cyarray.pyx`, `cyarray.pyi` |
+| Sources | `src/picop/cyarray.pxd`, `cyarray.pyx`, `cyarray.pyi` |
 | Surface | public + cimport |
 | Tracker lifecycle | decided (tier A + depth) |
 | Format | v2 |

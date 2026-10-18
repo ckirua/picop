@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cycodecs cimport codec_known
+from picop.cycodecs cimport codec_known
 include "_sink.pxi"
 
 cpdef bint baseline_codec_known(bytes encoding, Py_ssize_t n):

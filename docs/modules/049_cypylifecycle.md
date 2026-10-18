@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present (cimport) |
 | Maps to | `cpython.pylifecycle` |
-| Sources | `src/cypy/cypylifecycle.pxd` |
+| Sources | `src/picop/cypylifecycle.pxd` |
 | Surface | cimport only |
 | Tracker lifecycle | decided |
 | Format | v2 |

@@ -1,4 +1,4 @@
-"""Compare public :mod:`cypy` cyfunction helpers vs plain Python (tier A).
+"""Compare public :mod:`picop` cyfunction helpers vs plain Python (tier A).
 
 Run: python bench/cyfunction_bench.py
 """
@@ -13,7 +13,7 @@ _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
 
-from cypy import func_check, func_get_code, func_get_defaults, func_get_globals
+from picop import func_check, func_get_code, func_get_defaults, func_get_globals
 
 from _bench_util import BenchSession
 

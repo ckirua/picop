@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.type` |
-| Sources | `src/cypy/cytype.pxd`, `.pyx`, `.pyi` |
+| Sources | `src/picop/cytype.pxd`, `.pyx`, `.pyi` |
 | Surface | public + cimport |
 | Tracker lifecycle | decided (tier A + depth) |
 | Format | v2 |

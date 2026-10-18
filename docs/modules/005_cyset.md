@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.set` (`Cython/Includes/cpython/set.pxd`) + `setobject.h` macros |
-| Sources | `src/cypy/cyset.pxd`, `cyset.pyx`, `cyset.pyi` |
+| Sources | `src/picop/cyset.pxd`, `cyset.pyx`, `cyset.pyi` |
 | Surface | public + cimport |
 | Tracker lifecycle | decided (tier A + depth) |
 | Format | v2 |

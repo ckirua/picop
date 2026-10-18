@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.datetime` |
-| Sources | `src/cypy/cydatetime.pxd`, `.pyx`, `.pyi` |
+| Sources | `src/picop/cydatetime.pxd`, `.pyx`, `.pyi` |
 | Surface | public |
 | Tracker lifecycle | decided (tier A + depth) |
 | Format | v2 |

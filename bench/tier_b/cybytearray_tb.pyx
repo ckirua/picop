@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cybytearray cimport bytearray_len, bytearray_check, bytearray_check_exact
+from picop.cybytearray cimport bytearray_len, bytearray_check, bytearray_check_exact
 include "_sink.pxi"
 
 cpdef Py_ssize_t baseline_balen(bytearray ba, Py_ssize_t n):
@@ -49,4 +49,3 @@ cpdef bint cypy_bacheck_exact(object p, Py_ssize_t n):
         r = bytearray_check_exact(tb_obj(p, k))
         tb_sink_bint(r)
     return r
-

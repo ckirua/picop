@@ -36,10 +36,11 @@ python scripts/grade_trackers.py
 
 Run installed-artifact correctness on 3.14, 3.15, 3.14t and 3.15t with separate
 environments/builds. On t runtimes, first check `sys._is_gil_enabled()` before
-and after importing `picop` and `cypy` with `PYTHON_GIL` unset; both must remain
-false. Run a separate `python -X gil=0 -m pytest tests -q` concurrency suite.
-Do not reuse native binaries between ABIs. Rebuild downstream Cython consumers
-with `PYTHON=/path/to/python bash scripts/smoke_barrel_cimport.sh`.
+and after importing `picop` with `PYTHON_GIL` unset; it must remain false. Run a
+separate `python -X gil=0 -m pytest tests -q` concurrency suite. Do not reuse
+native binaries between ABIs. Rebuild downstream Cython consumers using the
+`picop` barrel and direct modules with
+`PYTHON=/path/to/python bash scripts/smoke_barrel_cimport.sh`.
 
 ## Pull requests
 
@@ -55,7 +56,7 @@ Use [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md). Deep
 - Removals / semantic changes need a major.
 - Soft aliases removed in **0.3** — **do not revive** them.
 
-**2.0 soft rename:** prefer `picop` imports/cimports. Deprecated `cypy` alias until **3.0** (then removed).
+**3.0 migration (unreleased):** use `picop` for Python imports and Cython cimports. The `cypy` package and cimport shims have been removed; no compatibility shim remains. Rebuild downstream Cython extensions after changing imports.
 
 Protocols / Runtime remain provisional under post-1.0 minor policy. See [`docs/RELEASE.md`](docs/RELEASE.md) and [`COVERAGE.md`](COVERAGE.md).
 

@@ -1,4 +1,4 @@
-"""Compare public :mod:`cypy` cymethod helpers vs plain Python (tier A).
+"""Compare public :mod:`picop` cymethod helpers vs plain Python (tier A).
 
 Run: python bench/cymethod_bench.py
 """
@@ -13,7 +13,7 @@ _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
 
-from cypy import method_check, method_get_function, method_new, method_get_self
+from picop import method_check, method_get_function, method_new, method_get_self
 
 from _bench_util import BenchSession
 

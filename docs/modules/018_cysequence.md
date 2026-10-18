@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.sequence` |
-| Sources | `src/cypy/cysequence.pxd`, `.pyx`, `.pyi` |
+| Sources | `src/picop/cysequence.pxd`, `.pyx`, `.pyi` |
 | Surface | public + cimport |
 | Tracker lifecycle | decided (tier A + depth) |
 | Format | v2 |

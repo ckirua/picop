@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `range` (custom; thin public wrap) |
-| Sources | `src/cypy/cyrange.pxd`, `.pyx`, `.pyi` |
+| Sources | `src/picop/cyrange.pxd`, `.pyx`, `.pyi` |
 | Surface | public + cimport |
 | Tracker lifecycle | decided |
 | Format | v2 |

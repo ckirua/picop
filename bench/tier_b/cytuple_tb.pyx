@@ -1,7 +1,7 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-"""Tier B loops: idiomatic typed Cython vs ``cypy.cytuple`` helpers."""
+"""Tier B loops: idiomatic typed Cython vs ``picop.cytuple`` helpers."""
 
-from cypy.cytuple cimport tuple_get, tuple_get_checked, tuple_len, tuple_size, tuple_check, tuple_check_exact
+from picop.cytuple cimport tuple_get, tuple_get_checked, tuple_len, tuple_size, tuple_check, tuple_check_exact
 
 include "_sink.pxi"
 

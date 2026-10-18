@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.bool` |
-| Sources | `src/cypy/cybool.pxd`, `.pyx`, `.pyi` |
+| Sources | `src/picop/cybool.pxd`, `.pyx`, `.pyi` |
 | Surface | public |
 | Tracker lifecycle | decided (tier A + depth) |
 | Format | v2 |

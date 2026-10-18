@@ -15,7 +15,7 @@ assert list_len([1, 2]) == 2
 
 Also supported: `from picop.cydict import dict_get` / `from picop import dict_get`, and Cython `cimport`. Soft letter/bare aliases were removed in **0.3** — use preferred names. Prefer a release-tag pin. Avoid `from picop import *`.
 
-**Import rename (2.0):** prefer `import picop`. The `cypy` import package is a **deprecated soft alias** (emits `DeprecationWarning`) and will be **removed in 3.0**.
+Use `picop` for Python imports and Cython cimports. The `cypy` package and cimport shims were removed in 3.0; this repository's 3.0 development version is unreleased.
 
 ## Hot starters
 

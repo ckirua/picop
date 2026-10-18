@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.number` |
-| Sources | `src/cypy/cynumber.pxd`, `.pyx`, `.pyi` |
+| Sources | `src/picop/cynumber.pxd`, `.pyx`, `.pyi` |
 | Surface | public |
 | Tracker lifecycle | decided (tier A + depth) |
 | Format | v2 |

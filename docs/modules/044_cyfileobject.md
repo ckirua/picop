@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.fileobject` |
-| Sources | `src/cypy/cyfileobject.pxd`, `.pyx`, `.pyi` |
+| Sources | `src/picop/cyfileobject.pxd`, `.pyx`, `.pyi` |
 | Surface | public |
 | Tracker lifecycle | decided |
 | Format | v2 |

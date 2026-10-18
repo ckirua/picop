@@ -179,7 +179,7 @@ After merge: next Order on a **new** branch from updated `main` (if any).
 ## Phase 5 (product polish) — complete
 
 Packaging, README/examples, and release checklist — see [`RELEASE.md`](RELEASE.md) / [`README.md`](README.md#status-complete--not-an-open-backlog) status.  
-**Out of prod:** [`future/MONKEY.md`](future/MONKEY.md) stays archive-only — do not restore builtin monkey-patches into `src/cypy`.
+**Out of prod:** [`future/MONKEY.md`](future/MONKEY.md) stays archive-only — do not restore builtin monkey-patches into `src/picop`.
 
 ## Phase 6 (usage examples) — complete
 

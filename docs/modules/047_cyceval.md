@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present (cimport) |
 | Maps to | `cpython.ceval` |
-| Sources | `src/cypy/cyceval.pxd` |
+| Sources | `src/picop/cyceval.pxd` |
 | Surface | cimport only |
 | Tracker lifecycle | decided |
 | Format | v2 |

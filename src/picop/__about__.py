@@ -1,3 +1,3 @@
 """Package version string for ``picop`` (PEP 440)."""
 
-__version__ = "2.1.0"
+__version__ = "3.0.0.dev0"

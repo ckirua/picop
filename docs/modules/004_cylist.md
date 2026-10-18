@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.list` (`Cython/Includes/cpython/list.pxd`) |
-| Sources | `src/cypy/cylist.pxd`, `cylist.pyx`, `cylist.pyi` |
+| Sources | `src/picop/cylist.pxd`, `cylist.pyx`, `cylist.pyi` |
 | Surface | public + cimport |
 | Tracker lifecycle | decided (tier A + depth) |
 | Format | v2 |

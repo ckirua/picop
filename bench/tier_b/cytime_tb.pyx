@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cytime cimport time_wall
+from picop.cytime cimport time_wall
 include "_sink.pxi"
 
 cdef extern from "Python.h":

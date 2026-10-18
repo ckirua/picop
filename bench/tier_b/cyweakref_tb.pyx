@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cyweakref cimport weakref_check
+from picop.cyweakref cimport weakref_check
 from weakref import ref
 include "_sink.pxi"
 

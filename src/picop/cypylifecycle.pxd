@@ -1,7 +1,7 @@
 # cypylifecycle.pxd
 # Interpreter lifecycle. cimport-only; public REJECTED (process-wide).
 # wchar Get/SetProgramName left out — REJECTED incomplete wrappers (broke
-# package-barrel ``from cypy cimport`` when pulled via ``__init__.pxd``).
+# package-barrel cimports when pulled via ``__init__.pxd``).
 
 cdef extern from "Python.h":
     void Py_Initialize() noexcept

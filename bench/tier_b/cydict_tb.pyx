@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from cypy.cydict cimport dict_get, dict_contains, dict_len, dict_check
+from picop.cydict cimport dict_get, dict_contains, dict_len, dict_check
 include "_sink.pxi"
 
 cpdef object baseline_dget(dict d, str key, Py_ssize_t n):
@@ -65,4 +65,3 @@ cpdef bint cypy_dcheck(object p, Py_ssize_t n):
         r = dict_check(tb_obj(p, k))
         tb_sink_bint(r)
     return r
-

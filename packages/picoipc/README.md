@@ -4,13 +4,13 @@ Linux-focused IPC primitives for Python and C++. The current implementation is a
 
 The ring is a standalone `smh_q` C++ engine with no external gateway, database, or exchange runtime dependencies.
 
-**Linux only.** Requires `shm_open`, `mmap`, and `futex`.
+**Linux only.** Requires `shm_open`, `mmap`, and `futex`; cross-backend wire compatibility requires little-endian Linux. The pure Python backend currently supports x86_64 and requires `libatomic.so.1` (`libatomic1` on Debian/Ubuntu), including aligned lock-free 32-bit atomics. Missing atomics raise `OSError`; there is no unsynchronized fallback.
 
 ## What is SPSC and why SHM + futex?
 
 | Concept | Meaning |
 |---------|---------|
-| **SPSC** | One writer, one reader. Sequence counters coordinate access without locks on the hot path. |
+| **SPSC** | One writer, one reader. The engine publishes with acquire/release sequence counters; Python bindings also protect handle lifetime against close. |
 | **POSIX SHM** | Named region in `/dev/shm` mapped into two processes — zero-copy IPC. |
 | **Futex** | Kernel wait/wake on `write_seq`. Consumer spins briefly, then sleeps until publish. |
 
@@ -67,11 +67,21 @@ cmake --build build/native
 
 ## Python
 
-**Python 3.14+ required** (`requires-python = ">=3.14"` in `pyproject.toml`).
+**Python 3.15 is primary; Python 3.14 remains supported.** Both regular and free-threaded CPython builds are supported: 3.14, 3.15, 3.14t and 3.15t. Free-threaded imports keep the GIL disabled without an override. This does not change SPSC into MPSC.
 
-Use `python3.14` (default build) or `python3.14t` (free-threaded / nogil) where available; both satisfy the version gate. The smoke CI workflow installs CPython 3.14 via `actions/setup-python`.
+Build each interpreter ABI separately. Source installs require a C++20 compiler, CMake, and `pybind11>=3.1.0`; build isolation installs the matching headers. For a direct native/Python build:
 
-Threaded free-threading A/B (full config): `./bench/run_freethreading.sh` (requires `python3.14` + `python3.14t` with matching `_native` builds).
+```bash
+PYTHON="$(command -v python3.15)"
+"$PYTHON" -m pip install 'pybind11>=3.1.0'
+cmake -S native -B build/python315 -DSMH_Q_BUILD_PYTHON=ON \
+  -DPython_EXECUTABLE="$PYTHON" \
+  -Dpybind11_DIR="$("$PYTHON" -m pybind11 --cmakedir)"
+cmake --build build/python315
+ctest --test-dir build/python315 --output-on-failure
+```
+
+The performance gate remains the committed **3.14 pybind11** lane: `PYTHON=/path/to/python3.14 ./bench/run_gate.sh`. Correctness on the other runtimes is independent of that baseline. Threaded A/B measurements use `./bench/run_freethreading.sh` with separately built interpreter ABIs.
 
 
 ## Python API
@@ -84,6 +94,13 @@ pip install -e .
 - `try_publish(bytes)`, `try_consume()`, `wait_readable(ms)`, `Ring.unlink(name)`
 
 Layout matches C++ — cross-language producer/consumer works.
+
+`close()` is idempotent and waits for active native operations before detaching the handle. Closed publish/claim-bool/wait operations return `False`, consume/claim return `None`, sequence queries return zero, and wake does nothing. The native `publish(buf, length)` overload raises `RuntimeError("Ring is closed")`.
+
+Native claim views and derived views retain the mapping after logical close or deletion of the Ring. Write a claimed slot only before publishing it; mapping lifetime does not make a published/reused slot safe to mutate. Native buffer operations require contiguous one-dimensional byte-sized storage, and consume destinations must be writable.
+
+Buffer exports pin storage, not contents. Synchronize mutable source buffers and
+consume destinations externally until the native operation returns.
 
 ## Examples
 
@@ -125,8 +142,8 @@ Production default is **pybind11** (`PICOIPC_BACKEND=pybind11`). ctypes and pure
 |---------|-----------------|-------|
 | pybind11 (default) | `pybind11` | Fast path; requires C++ build |
 | ctypes | `ctypes` | Loads `libsmh_q.so` via ctypes |
-| pure Python | `pure` | No native code; reference implementation |
-| cython | `cython` | Stub only (no extension in tree); fails or falls back |
+| pure Python | `pure` | Reference implementation using libc/libatomic through ctypes |
+| cython | `cython` | Compatibility selector re-exporting pure Python, not a separate native backend |
 
 Switch backend for a single command:
 

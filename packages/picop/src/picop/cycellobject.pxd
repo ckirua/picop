@@ -3,6 +3,7 @@
 # GET/SET macros: cdef unchecked.
 
 from cpython.object cimport PyObject, PyObject_RichCompareBool, Py_EQ
+import cython
 
 
 cdef extern from "Python.h":
@@ -44,10 +45,14 @@ cpdef inline bint cell_eq(object a, object b) except -1:
 
 
 cdef inline object cell_get_unchecked(object cell):
-    # No type check — UB if not a cell.
-    return PyCell_GET(cell)
+    # No type check — UB if not a cell. The caller must satisfy the cell
+    # type precondition; keep the borrowed load/promotion atomic.
+    with cython.critical_section(cell):
+        return PyCell_GET(cell)
 
 
 cdef inline void cell_set_unchecked(object cell, object value) noexcept:
-    # No refcount adjust / type check — UB if not a cell.
-    PyCell_SET(cell, value)
+    # No refcount adjustment/type check; caller retains the documented
+    # reference-transfer responsibility.
+    with cython.critical_section(cell):
+        PyCell_SET(cell, value)

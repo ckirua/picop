@@ -1,24 +1,24 @@
 """POSIX SHM SPSC ring — layout matches the bundled smh_q C++ engine."""
-
 from __future__ import annotations
-
 import ctypes
 import mmap
 import os
+import platform
 import struct
 import threading
 import time
 from typing import Optional
 
-MAGIC = 0x534D4851  # "SMHQ"
+MAGIC = 0x534D4851
 DEFAULT_SCHEMA_ID = 1
 DEFAULT_VERSION = 1
 CACHE_LINE = 64
 SLOT_HDR_SIZE = 8
-
-_HEADER_FMT = "<IHHIII"  # magic, schema, version, slot_count, slot_size, header_bytes
-_HEADER_SIZE = struct.calcsize(_HEADER_FMT)  # 20
+_HEADER_FMT = "<IHHIII"
+_HEADER_SIZE = struct.calcsize(_HEADER_FMT)
 _SLOT_HDR_FMT = "<II"
+FUTEX_WAIT = 0
+FUTEX_WAKE = 1
 
 
 def _align_up(value: int, alignment: int) -> int:
@@ -40,15 +40,7 @@ def _posix_name(name: str) -> str:
 def _libc() -> ctypes.CDLL:
     libc = ctypes.CDLL("libc.so.6", use_errno=True)
     libc.syscall.restype = ctypes.c_long
-    libc.syscall.argtypes = [
-        ctypes.c_long,
-        ctypes.c_void_p,
-        ctypes.c_int,
-        ctypes.c_int,
-        ctypes.c_void_p,
-        ctypes.c_void_p,
-        ctypes.c_int,
-    ]
+    libc.syscall.argtypes = [ctypes.c_long, ctypes.c_void_p, ctypes.c_int, ctypes.c_int, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_int]
     libc.shm_open.argtypes = [ctypes.c_char_p, ctypes.c_int, ctypes.c_uint]
     libc.shm_open.restype = ctypes.c_int
     libc.shm_unlink.argtypes = [ctypes.c_char_p]
@@ -56,42 +48,54 @@ def _libc() -> ctypes.CDLL:
     return libc
 
 
-FUTEX_WAIT = 0
-FUTEX_WAKE = 1
-SYS_futex = 202 if struct.calcsize("P") == 8 else 240
+_atomic_lock = threading.Lock()
+_atomic: ctypes.CDLL | None = None
+
+
+def _libatomic() -> ctypes.CDLL:
+    global _atomic
+    if _atomic is None:
+        with _atomic_lock:
+            if _atomic is None:
+                try:
+                    lib = ctypes.CDLL("libatomic.so.1")
+                    load = getattr(lib, "__atomic_load_4")
+                    load.argtypes = [ctypes.c_void_p, ctypes.c_int]
+                    load.restype = ctypes.c_uint32
+                    store = getattr(lib, "__atomic_store_4")
+                    store.argtypes = [ctypes.c_void_p, ctypes.c_uint32, ctypes.c_int]
+                    store.restype = None
+                    lock_free = getattr(lib, "__atomic_is_lock_free")
+                    lock_free.argtypes = [ctypes.c_size_t, ctypes.c_void_p]
+                    lock_free.restype = ctypes.c_bool
+                except (OSError, AttributeError) as exc:
+                    raise OSError("libatomic.so.1 with 32-bit atomic operations is required") from exc
+                _atomic = lib
+    return _atomic
 
 
 class Ring:
     """Single-producer / single-consumer byte ring over POSIX shm + futex."""
-
-    def __init__(
-        self,
-        name: str = "smh_q_demo",
-        *,
-        create: bool = False,
-        slot_count: int = 64,
-        slot_size: int = 256,
-        schema_id: int = DEFAULT_SCHEMA_ID,
-        version: int = DEFAULT_VERSION,
-        magic: int = MAGIC,
-    ) -> None:
+    def __init__(self, name: str = "smh_q_demo", *, create: bool = False, slot_count: int = 64,
+                 slot_size: int = 256, schema_id: int = DEFAULT_SCHEMA_ID, version: int = DEFAULT_VERSION,
+                 magic: int = MAGIC) -> None:
+        if platform.system() != "Linux" or platform.machine().lower() not in ("x86_64", "amd64"):
+            raise OSError("pure picoipc backend supports futex only on Linux x86_64")
+        if struct.pack("=I", 1)[0] != 1:
+            raise OSError("picoipc shared ring requires little-endian Linux")
         if slot_count < 2:
             raise ValueError("slot_count must be >= 2")
         if slot_size < 64:
             raise ValueError("slot_size must be >= 64")
-
         self.name = _posix_name(name)
-        self.slot_count = slot_count
-        self.slot_size = slot_size
-        self.schema_id = schema_id
-        self.version = version
-        self.magic = magic
+        self.slot_count, self.slot_size = slot_count, slot_size
+        self.schema_id, self.version, self.magic = schema_id, version, magic
         self._create = create
         self._fd: int | None = None
         self._mm: mmap.mmap | None = None
-        self._write_seq_off = 0
-        self._read_seq_off = 0
-        self._slots_off = 0
+        self._write_seq_off = _seq_offset()
+        self._read_seq_off = self._write_seq_off + CACHE_LINE
+        self._slots_off = _slots_offset()
         self._lock = threading.Lock()
         self._open()
 
@@ -101,65 +105,53 @@ class Ring:
 
     def _open(self) -> None:
         libc = _libc()
-        flags = os.O_RDWR
-        if self._create:
-            flags |= os.O_CREAT
-
-        self._write_seq_off = _seq_offset()
-        self._read_seq_off = self._write_seq_off + CACHE_LINE
-        self._slots_off = _slots_offset()
-        region_size = self.region_size
-
-        fd = libc.shm_open(self.name.encode(), flags, 0o600)
+        fd = libc.shm_open(self.name.encode(), os.O_RDWR | (os.O_CREAT if self._create else 0), 0o600)
         if fd < 0:
             raise OSError(ctypes.get_errno(), f"shm_open({self.name})")
-
+        mm = None
         try:
             if self._create:
-                os.ftruncate(fd, region_size)
-                mm = mmap.mmap(fd, region_size, mmap.MAP_SHARED, mmap.PROT_READ | mmap.PROT_WRITE)
+                os.ftruncate(fd, self.region_size)
+                mm = mmap.mmap(fd, self.region_size, mmap.MAP_SHARED, mmap.PROT_READ | mmap.PROT_WRITE)
+                mm[:] = b"\0" * self.region_size
+                mm[:_HEADER_SIZE] = struct.pack(_HEADER_FMT, self.magic, self.schema_id, self.version, self.slot_count, self.slot_size, self._slots_off)
             else:
-                st = os.fstat(fd)
-                if st.st_size < _HEADER_SIZE:
+                size = os.fstat(fd).st_size
+                if size < _HEADER_SIZE:
                     raise OSError(f"shm {self.name} too small")
-                mm = mmap.mmap(fd, st.st_size, mmap.MAP_SHARED, mmap.PROT_READ | mmap.PROT_WRITE)
-
-            if self._create:
-                mm[:region_size] = b"\x00" * region_size
-                mm[:_HEADER_SIZE] = struct.pack(
-                    _HEADER_FMT,
-                    self.magic,
-                    self.schema_id,
-                    self.version,
-                    self.slot_count,
-                    self.slot_size,
-                    self._slots_off,
-                )
-            else:
-                magic, schema, version, sc, ss, hb = struct.unpack(_HEADER_FMT, mm[:_HEADER_SIZE])
+                mm = mmap.mmap(fd, size, mmap.MAP_SHARED, mmap.PROT_READ | mmap.PROT_WRITE)
+                magic, schema, version, self.slot_count, self.slot_size, self._slots_off = struct.unpack_from(_HEADER_FMT, mm)
                 if magic != self.magic:
                     raise OSError(f"shm {self.name} magic mismatch: {magic:#x}")
                 if schema != self.schema_id:
                     raise OSError(f"shm {self.name} schema mismatch: {schema}")
-                self.slot_count = int(sc)
-                self.slot_size = int(ss)
-                self.version = int(version)
-                self._slots_off = int(hb)
-
-            self._fd = fd
-            self._mm = mm
+                self.version = version
+            atomic = _libatomic()
+            is_lock_free = getattr(atomic, "__atomic_is_lock_free")
+            for offset in (self._write_seq_off, self._read_seq_off):
+                if offset + 4 > len(mm):
+                    raise OSError("shared ring sequence counter is outside mapping")
+                cell = ctypes.c_uint32.from_buffer(mm, offset)
+                address = ctypes.addressof(cell)
+                if address % ctypes.alignment(ctypes.c_uint32) or not is_lock_free(4, address):
+                    del cell
+                    raise OSError("shared ring requires aligned lock-free 32-bit counters")
+                del cell
+            self._mm, self._fd = mm, fd
         except Exception:
+            if mm is not None:
+                mm.close()
             os.close(fd)
             raise
 
     def close(self, *, unlink: bool = False) -> None:
         with self._lock:
-            if self._mm is not None:
-                self._mm.close()
-                self._mm = None
-            if self._fd is not None:
-                os.close(self._fd)
-                self._fd = None
+            mm, fd = self._mm, self._fd
+            self._mm = self._fd = None
+            if mm is not None:
+                mm.close()
+            if fd is not None:
+                os.close(fd)
             if unlink and self._create:
                 _libc().shm_unlink(self.name.encode())
 
@@ -167,19 +159,34 @@ class Ring:
     def unlink(name: str) -> None:
         _libc().shm_unlink(_posix_name(name).encode())
 
-    def _load_u32(self, offset: int) -> int:
-        assert self._mm is not None
-        return struct.unpack_from("<I", self._mm, offset)[0]
+    def _atomic_u32_locked(self, offset: int, value: int | None = None) -> int:
+        mm = self._mm
+        if mm is None:
+            return 0
+        cell = ctypes.c_uint32.from_buffer(mm, offset)
+        address = ctypes.addressof(cell)
+        atomic = _libatomic()
+        try:
+            if value is None:
+                return int(getattr(atomic, "__atomic_load_4")(address, 2))
+            getattr(atomic, "__atomic_store_4")(address, value & 0xFFFFFFFF, 3)
+            return value & 0xFFFFFFFF
+        finally:
+            del cell
 
-    def _store_u32(self, offset: int, value: int) -> None:
-        assert self._mm is not None
-        struct.pack_into("<I", self._mm, offset, value & 0xFFFFFFFF)
+    def _write_seq_locked(self) -> int:
+        return self._atomic_u32_locked(self._write_seq_off)
+
+    def _read_seq_locked(self) -> int:
+        return self._atomic_u32_locked(self._read_seq_off)
 
     def write_seq(self) -> int:
-        return self._load_u32(self._write_seq_off)
+        with self._lock:
+            return self._write_seq_locked()
 
     def read_seq(self) -> int:
-        return self._load_u32(self._read_seq_off)
+        with self._lock:
+            return self._read_seq_locked()
 
     def _slot_offset(self, index: int) -> int:
         return self._slots_off + (index % self.slot_count) * self.slot_size
@@ -187,93 +194,84 @@ class Ring:
     def try_publish(self, payload: bytes) -> bool:
         if not isinstance(payload, (bytes, bytearray, memoryview)):
             payload = str(payload).encode()
-
-        max_payload = self.slot_size - SLOT_HDR_SIZE
-        if len(payload) > max_payload:
-            raise ValueError(f"payload exceeds slot capacity ({max_payload} bytes)")
-
+        capacity = self.slot_size - SLOT_HDR_SIZE
+        if len(payload) > capacity:
+            raise ValueError(f"payload exceeds slot capacity ({capacity} bytes)")
         with self._lock:
-            if self._mm is None:
+            mm = self._mm
+            if mm is None:
                 return False
-
-            write = self.write_seq()
-            read = self.read_seq()
-            if (write - read) >= self.slot_count:
+            write, read = self._write_seq_locked(), self._read_seq_locked()
+            if write - read >= self.slot_count:
                 return False
-
-            idx = write % self.slot_count
-            off = self._slot_offset(idx)
-            self._mm[off : off + SLOT_HDR_SIZE] = struct.pack(_SLOT_HDR_FMT, len(payload), 0)
-            self._mm[off + SLOT_HDR_SIZE : off + SLOT_HDR_SIZE + len(payload)] = payload
-            self._store_u32(self._write_seq_off, write + 1)
-            self.wake()
+            offset = self._slot_offset(write)
+            mm[offset:offset + SLOT_HDR_SIZE] = struct.pack(_SLOT_HDR_FMT, len(payload), 0)
+            mm[offset + SLOT_HDR_SIZE:offset + SLOT_HDR_SIZE + len(payload)] = payload
+            self._atomic_u32_locked(self._write_seq_off, write + 1)
+            self._wake_locked()
             return True
 
     def try_consume(self) -> Optional[bytes]:
         with self._lock:
-            if self._mm is None:
+            mm = self._mm
+            if mm is None:
                 return None
-
-            read = self.read_seq()
-            write = self.write_seq()
+            read, write = self._read_seq_locked(), self._write_seq_locked()
             if read >= write:
                 return None
-
-            idx = read % self.slot_count
-            off = self._slot_offset(idx)
-            length, _ = struct.unpack(_SLOT_HDR_FMT, self._mm[off : off + SLOT_HDR_SIZE])
-            if length == 0:
+            offset = self._slot_offset(read)
+            length, _ = struct.unpack_from(_SLOT_HDR_FMT, mm, offset)
+            if not length:
                 return None
+            length = min(length, self.slot_size - SLOT_HDR_SIZE)
+            payload = bytes(mm[offset + SLOT_HDR_SIZE:offset + SLOT_HDR_SIZE + length])
+            self._atomic_u32_locked(self._read_seq_off, read + 1)
+            return payload
 
-            max_payload = self.slot_size - SLOT_HDR_SIZE
-            length = min(int(length), max_payload)
-            raw = bytes(self._mm[off + SLOT_HDR_SIZE : off + SLOT_HDR_SIZE + length])
-            self._store_u32(self._read_seq_off, read + 1)
-            return raw
+    def _write_seq_pointer_locked(self):
+        mm = self._mm
+        if mm is None:
+            return None
+        cell = ctypes.c_uint32.from_buffer(mm, self._write_seq_off)
+        return cell, ctypes.c_void_p(ctypes.addressof(cell))
 
-    def _write_seq_addr(self) -> ctypes.c_void_p:
-        assert self._mm is not None
-        seq = ctypes.c_uint32.from_buffer(self._mm, self._write_seq_off)
-        return ctypes.cast(ctypes.byref(seq), ctypes.c_void_p)
+    def _wake_locked(self) -> None:
+        holder = self._write_seq_pointer_locked()
+        if holder is not None:
+            cell, pointer = holder
+            try:
+                _libc().syscall(202, pointer, FUTEX_WAKE, 0x7FFFFFFF, None, None, 0)
+            finally:
+                del cell, holder
 
     def wake(self) -> None:
-        libc = _libc()
-        libc.syscall(SYS_futex, self._write_seq_addr(), FUTEX_WAKE, 0x7FFFFFFF, None, None, 0)
+        with self._lock:
+            self._wake_locked()
 
     def wait_readable(self, timeout_ms: int) -> bool:
-        if self._mm is None:
-            return False
-
-        deadline = time.monotonic() + timeout_ms / 1000.0
-        read = self.read_seq()
-
-        for i in range(2000):
-            write = self.write_seq()
-            if write > read:
-                return True
-            if i > 64:
-                time.sleep(0)
-
+        deadline = time.monotonic() + max(timeout_ms, 0) / 1000
+        with self._lock:
+            if self._mm is None:
+                return False
+            read = self._read_seq_locked()
         libc = _libc()
-        while time.monotonic() < deadline:
-            write = self.write_seq()
-            if write > read:
-                return True
-
-            rem_ms = int((deadline - time.monotonic()) * 1000)
-            if rem_ms <= 0:
-                break
-
-            slice_ms = min(1, rem_ms)
-            ts = struct.pack("ll", slice_ms // 1000, (slice_ms % 1000) * 1_000_000)
-            libc.syscall(
-                SYS_futex,
-                self._write_seq_addr(),
-                FUTEX_WAIT,
-                write,
-                ctypes.c_char_p(ts),
-                None,
-                0,
-            )
-
-        return self.write_seq() > read
+        while True:
+            # Pin each bounded wait, not the whole deadline: a producer or
+            # closer using this same handle must be able to make progress.
+            with self._lock:
+                if self._mm is None:
+                    return False
+                write = self._write_seq_locked()
+                if write > read:
+                    return True
+                if time.monotonic() >= deadline:
+                    return False
+                holder = self._write_seq_pointer_locked()
+                assert holder is not None
+                cell, pointer = holder
+                try:
+                    timeout = struct.pack("ll", 0, 1_000_000)
+                    libc.syscall(202, pointer, FUTEX_WAIT, write, ctypes.c_char_p(timeout), None, 0)
+                finally:
+                    del cell, holder
+            time.sleep(0)

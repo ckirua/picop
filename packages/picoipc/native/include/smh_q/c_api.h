@@ -13,6 +13,8 @@ void smh_q_ring_wake(SmhQRing* ring);
 int smh_q_ring_wait_readable(SmhQRing* ring, int timeout_ms);
 void smh_q_ring_unlink(const char* name);
 uint32_t smh_q_ring_max_payload(SmhQRing* ring);
+uint32_t smh_q_ring_write_seq(SmhQRing* ring);
+uint32_t smh_q_ring_read_seq(SmhQRing* ring);
 #ifdef __cplusplus
 }
 #endif

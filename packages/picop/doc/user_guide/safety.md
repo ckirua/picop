@@ -17,6 +17,22 @@ C-string / UTF-8 borrow helpers (`uutf8`, `bas_string`, `bytes_as_string`, …) 
 
 Prefer owning APIs when you need a durable value (e.g. `uutf8_bytes`).
 
+## Free-threaded operation
+
+3.14t and 3.15t imports keep the GIL disabled. Owning helper results remain valid
+through concurrent replacement, but unchecked indices must stay in bounds for
+the whole call. Raw pointers need external owner-lifetime and mutation
+synchronization; no helper lock survives a pointer return. Hold a dictionary
+critical section across the whole `dict_next` iteration and consumption of its
+borrowed outputs. Noexcept memoryview metadata access requires an unreleased
+view; an acquired export prevents resize, not arbitrary concurrent content writes.
+
+Uninitialized bytes/tuple/list slots must be filled before publication, and
+caller-managed cell reference transfers remain caller-managed. Native calls
+still require an attached thread state. Rebuild Cython consumers for this
+migration: typed UUID factories remain, but private UUID layout fields do not.
+
+
 ## `marshal_loads`
 
 Untrusted data is **unsafe** — same class as stdlib `marshal.loads`. Only deserialize marshal payloads from a trusted source.

@@ -3,7 +3,6 @@
 # Swap / New / Delete interpreter APIs: REJECTED for casual wrappers (fatal if misused).
 
 from cpython.object cimport PyObject
-from cpython.ref cimport Py_INCREF
 from cpython.pystate cimport (
     PyGILState_STATE,
     PyThreadState,
@@ -22,9 +21,7 @@ cdef inline object pystate_get_dict():
     cdef PyObject *p = <PyObject *>PyThreadState_GetDict()
     if p is NULL:
         return None
-    cdef object obj = <object>p
-    Py_INCREF(obj)
-    return obj
+    return <object>p
 
 
 cdef inline PyGILState_STATE pystate_gil_ensure() noexcept:

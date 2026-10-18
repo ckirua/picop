@@ -2,8 +2,13 @@
 # ``memoryview`` helpers. Public docs in ``cymemoryview.pyi``.
 # FromMemory / FromBuffer / GET_* macros: cdef (pointers / lifetime).
 
-from cpython.buffer cimport Py_buffer, PyBUF_READ, PyBUF_WRITE, PyBuffer_IsContiguous
-from cpython.object cimport PyObject_RichCompareBool, Py_EQ
+import cython
+
+from cpython.buffer cimport (
+    Py_buffer, PyBUF_FULL_RO, PyBUF_READ, PyBUF_WRITE,
+    PyBuffer_IsContiguous, PyBuffer_Release, PyObject_GetBuffer,
+)
+from cpython.object cimport PyObject, PyObject_RichCompareBool, Py_EQ
 from libc.stddef cimport size_t
 from libc.string cimport memcmp, strcmp
 
@@ -15,7 +20,7 @@ cdef extern from "Python.h":
     memoryview PyMemoryView_GetContiguous(object obj, int buffertype, char order)
     bint PyMemoryView_Check(object obj) noexcept
     Py_buffer *PyMemoryView_GET_BUFFER(object mview) noexcept
-    object PyMemoryView_GET_BASE(object mview) noexcept
+    PyObject* PyMemoryView_GET_BASE(object mview) noexcept
 
 
 cdef inline bint mvcheck(object p) noexcept:
@@ -23,31 +28,40 @@ cdef inline bint mvcheck(object p) noexcept:
 
 
 cdef inline bint mveq(memoryview a, memoryview b):
-    # Contiguous same-layout fast path; else richcompare (correct for strides).
+    # Acquire independent exports so metadata and data pointers stay valid.
     if a is b:
         return True
-    cdef Py_buffer *pa = PyMemoryView_GET_BUFFER(a)
-    cdef Py_buffer *pb = PyMemoryView_GET_BUFFER(b)
+    cdef Py_buffer va
+    cdef Py_buffer vb
     cdef int i
     cdef size_t nbytes
-    if pa.ndim != pb.ndim or pa.itemsize != pb.itemsize or pa.len != pb.len:
-        return False
-    if pa.format is NULL or pb.format is NULL:
-        if pa.format is not pb.format:
-            return <bint>PyObject_RichCompareBool(a, b, Py_EQ)
-    elif strcmp(pa.format, pb.format) != 0:
-        return False
-    if pa.shape is not NULL and pb.shape is not NULL:
-        for i in range(pa.ndim):
-            if pa.shape[i] != pb.shape[i]:
+    if PyObject_GetBuffer(a, &va, PyBUF_FULL_RO) < 0:
+        raise
+    try:
+        if PyObject_GetBuffer(b, &vb, PyBUF_FULL_RO) < 0:
+            raise
+        try:
+            if va.ndim != vb.ndim or va.itemsize != vb.itemsize or va.len != vb.len:
                 return False
-    if not PyBuffer_IsContiguous(pa, b'C') or not PyBuffer_IsContiguous(pb, b'C'):
-        return <bint>PyObject_RichCompareBool(a, b, Py_EQ)
-    nbytes = <size_t>pa.len
-    if nbytes == 0:
-        return True
-    return memcmp(pa.buf, pb.buf, nbytes) == 0
-
+            if va.format is NULL or vb.format is NULL:
+                if va.format is not vb.format:
+                    return <bint>PyObject_RichCompareBool(a, b, Py_EQ)
+            elif strcmp(va.format, vb.format) != 0:
+                return False
+            if va.shape is not NULL and vb.shape is not NULL:
+                for i in range(va.ndim):
+                    if va.shape[i] != vb.shape[i]:
+                        return False
+            if not PyBuffer_IsContiguous(&va, b'C') or not PyBuffer_IsContiguous(&vb, b'C'):
+                return <bint>PyObject_RichCompareBool(a, b, Py_EQ)
+            nbytes = <size_t>va.len
+            if nbytes == 0:
+                return True
+            return memcmp(va.buf, vb.buf, nbytes) == 0
+        finally:
+            PyBuffer_Release(&vb)
+    finally:
+        PyBuffer_Release(&va)
 
 cdef inline bint mvne(memoryview a, memoryview b):
     return not mveq(a, b)
@@ -74,13 +88,19 @@ cdef inline memoryview mvfrom_buffer(Py_buffer *view):
 
 
 cdef inline Py_buffer *mvget_buffer(memoryview mview) noexcept:
-    # Private exporter buffer; mview must be a memoryview.
+    # Caller retains a valid, unreleased view and synchronizes all pointer use.
     return PyMemoryView_GET_BUFFER(mview)
 
 
 cdef inline object mvget_base(memoryview mview) noexcept:
-    # Exporting object, or None if FromMemory/FromBuffer.
-    return PyMemoryView_GET_BASE(mview)
+    cdef PyObject* pointer
+    cdef object owner
+    with cython.critical_section(mview):
+        pointer = PyMemoryView_GET_BASE(mview)
+        if pointer is NULL:
+            return None
+        owner = <object>pointer
+    return owner
 
 # Wave 4 N1/N5 preferred names (0.3: soft letter/bare are cdef-only)
 
@@ -110,17 +130,21 @@ cpdef inline memoryview memoryview_get_contiguous(object obj, int buffertype=PyB
 
 
 cpdef inline Py_ssize_t memoryview_nbytes(memoryview mview) noexcept:
-    return PyMemoryView_GET_BUFFER(mview).len
+    with cython.critical_section(mview):
+        return PyMemoryView_GET_BUFFER(mview).len
 
 
 cpdef inline Py_ssize_t memoryview_itemsize(memoryview mview) noexcept:
-    return PyMemoryView_GET_BUFFER(mview).itemsize
+    with cython.critical_section(mview):
+        return PyMemoryView_GET_BUFFER(mview).itemsize
 
 
 cpdef inline int memoryview_ndim(memoryview mview) noexcept:
-    return PyMemoryView_GET_BUFFER(mview).ndim
+    with cython.critical_section(mview):
+        return PyMemoryView_GET_BUFFER(mview).ndim
 
 
 cpdef inline bint memoryview_readonly(memoryview mview) noexcept:
-    return PyMemoryView_GET_BUFFER(mview).readonly != 0
+    with cython.critical_section(mview):
+        return PyMemoryView_GET_BUFFER(mview).readonly != 0
 

@@ -1,9 +1,9 @@
 # cyweakref.pxd
 # Weakref helpers. Public docs in ``cyweakref.pyi``.
-# GET_OBJECT macro: cdef.
+# The unchecked helper retains its cdef signature; both getters own results.
 
 from cpython.object cimport PyObject, PyObject_RichCompareBool, Py_EQ
-from cpython.ref cimport Py_INCREF
+from cpython.ref cimport Py_DECREF
 
 
 cdef extern from "Python.h":
@@ -12,8 +12,7 @@ cdef extern from "Python.h":
     bint PyWeakref_CheckProxy(object ob) noexcept
     object PyWeakref_NewRef(object ob, object callback)
     object PyWeakref_NewProxy(object ob, object callback)
-    PyObject *PyWeakref_GetObject(object ref) except? NULL
-    PyObject *PyWeakref_GET_OBJECT(object ref) noexcept
+    int PyWeakref_GetRef(object ref, PyObject **result) except -1
 
 
 cpdef inline bint weakref_check(object ob) noexcept:
@@ -37,11 +36,12 @@ cpdef inline object weakref_new_proxy(object ob, object callback=None):
 
 
 cpdef inline object weakref_get_object(object ref):
-    cdef PyObject *p = PyWeakref_GetObject(ref)
-    if p is NULL:
+    cdef PyObject *p = NULL
+    cdef int rc = PyWeakref_GetRef(ref, &p)
+    if rc == 0:
         return None
     cdef object obj = <object>p
-    Py_INCREF(obj)
+    Py_DECREF(obj)
     return obj
 
 
@@ -59,9 +59,10 @@ cpdef inline bint weakref_eq(object a, object b) except -1:
 
 
 cdef inline object weakref_get_object_unchecked(object ref):
-    cdef PyObject *p = PyWeakref_GET_OBJECT(ref)
-    if p is NULL:
+    cdef PyObject *p = NULL
+    cdef int rc = PyWeakref_GetRef(ref, &p)
+    if rc == 0:
         return None
     cdef object obj = <object>p
-    Py_INCREF(obj)
+    Py_DECREF(obj)
     return obj

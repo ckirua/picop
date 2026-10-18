@@ -2,7 +2,7 @@
 
 Product contract for what `picop` is, what it ships, and how to choose helpers.
 
-`picop` is **not** a reimplementation of the Python standard library, and it is **not** a full 1:1 port of Cython’s `Includes/cpython`. It is a curated **CPython C-API accelerator** for Cython on **Python ≥ 3.14**.
+`picop` is **not** a reimplementation of the Python standard library, and it is **not** a full 1:1 port of Cython’s `Includes/cpython`. It is a curated **CPython C-API accelerator** for Cython, primarily on **Python 3.15**, retaining 3.14 and free-threaded 3.14t/3.15t compatibility.
 
 Prefer `picop`. Deprecated soft alias `cypy` (`DeprecationWarning`) until **3.0**, then removed.
 

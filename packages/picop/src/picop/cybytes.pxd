@@ -2,6 +2,8 @@
 # Typed ``bytes`` helpers. Public docs live in ``cybytes.pyi``.
 # Construction with uninit / C pointers / concat-resize: cdef.
 
+cimport cython
+from cpython.ref cimport Py_INCREF
 from cpython.object cimport PyObject
 from libc.stddef cimport size_t
 from libc.string cimport memchr, memcmp
@@ -21,12 +23,14 @@ cdef extern from "Python.h":
     Py_ssize_t PyBytes_Size(object string) except -1
     char* PyBytes_AsString(object string) except NULL
     int PyBytes_AsStringAndSize(object obj, char **buffer, Py_ssize_t *length) except -1
-    void PyBytes_Concat(PyObject **string, object newpart)
-    void PyBytes_ConcatAndDel(PyObject **string, object newpart)
+    void PyBytes_Concat(PyObject **string, object newpart) except *
+    void PyBytes_ConcatAndDel(PyObject **string, object newpart) except *
     int _PyBytes_Resize(PyObject **string, Py_ssize_t newsize) except -1
     bint PyByteArray_Check(object o) noexcept
     char* PyByteArray_AS_STRING(object bytearray) noexcept
     Py_ssize_t PyByteArray_GET_SIZE(object bytearray) noexcept
+    PyObject* _bytes_owned_copy "PyBytes_FromStringAndSize"(const char *v, Py_ssize_t length) except NULL
+    void _bytes_decref "Py_DECREF"(PyObject *value) noexcept
 
 
 cdef inline bint bcheck(object p) noexcept:
@@ -87,7 +91,7 @@ cdef inline bint bne(bytes a, bytes b) noexcept:
     return not beq(a, b)
 
 
-cdef inline bint bba_eq(object a, object b) noexcept:
+cdef inline bint _bba_eq_locked(object a, object b) noexcept:
     # Content eq for ``bytes``/``bytearray`` either order (and same-type).
     # Prefer typed ``bytes_eq`` / ``bytearray_eq`` for known same-type hot paths.
     # Distinct from ``buf_eq`` (buffer-protocol / memoryview path).
@@ -120,6 +124,23 @@ cdef inline bint bba_eq(object a, object b) noexcept:
     if la == 0:
         return True
     return memcmp(pa, pb, <size_t>la) == 0
+
+
+cdef inline bint bba_eq(object a, object b) noexcept:
+    if a is b:
+        return True
+    if PyBytes_Check(a) and PyBytes_Check(b):
+        return beq(a, b)
+    if PyByteArray_Check(a):
+        if PyByteArray_Check(b):
+            with cython.critical_section(a, b):
+                return _bba_eq_locked(a, b)
+        with cython.critical_section(a):
+            return _bba_eq_locked(a, b)
+    if PyByteArray_Check(b):
+        with cython.critical_section(b):
+            return _bba_eq_locked(a, b)
+    return False
 
 
 cdef inline bint bstartswith(bytes s, bytes prefix) noexcept:
@@ -160,30 +181,35 @@ cdef inline bytes bnew(Py_ssize_t n):
 
 
 cdef inline bytes bconcat(bytes left, object newpart):
-    # Steals/owns ref at *left; if shared, Concat allocates a new object.
+    # Concat steals the temporary reference, never the caller's reference.
     cdef PyObject *p = <PyObject*>left
+    cdef bytes result
+    Py_INCREF(left)
     PyBytes_Concat(&p, newpart)
-    if p is NULL:
-        return None
-    return <bytes>p
+    result = <bytes>p
+    _bytes_decref(p)
+    return result
 
 
 cdef inline bytes bconcat_and_del(bytes left, object newpart):
-    # Concat + DECREF newpart (PyBytes_ConcatAndDel).
     cdef PyObject *p = <PyObject*>left
+    cdef bytes result
+    Py_INCREF(left)
+    Py_INCREF(newpart)
     PyBytes_ConcatAndDel(&p, newpart)
-    if p is NULL:
-        return None
-    return <bytes>p
+    result = <bytes>p
+    _bytes_decref(p)
+    return result
 
 
 cdef inline bytes bresize(bytes b, Py_ssize_t newsize):
-    # Caller must own the ref passed in. Non-unique → copy-out (not SystemError).
-    cdef PyObject *p = <PyObject*>b
-    cdef int rc = _PyBytes_Resize(&p, newsize)
-    if rc < 0 or p is NULL:
-        return None
-    return <bytes>p
+    # Resize requires exclusive ownership: copy without a Cython owning alias.
+    cdef PyObject *p = _bytes_owned_copy(PyBytes_AS_STRING(b), PyBytes_GET_SIZE(b))
+    cdef bytes result
+    _PyBytes_Resize(&p, newsize)
+    result = <bytes>p
+    _bytes_decref(p)
+    return result
 
 # Wave 4 N1/N5 preferred names (0.3: soft letter/bare are cdef-only)
 

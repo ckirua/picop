@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- Make CPython 3.15 primary while retaining 3.14 and genuine GIL-disabled 3.14t/3.15t operation. Require Cython 3.3 or newer and separate builds for each ABI.
+- Replace removed weakref APIs with `PyWeakref_GetRef`, balance strong references, and protect mutable container/function/cell access against concurrent replacement. Invalid weakref arguments propagate the strong-reference API's `TypeError`.
+- Repair stealing bytes concat/resize ownership, mutable bytearray/array comparisons, memoryview export lifetimes and ANSI initialization.
+- Replace UUID's fabricated MRO with a real final native `uuid.UUID` subtype. Eagerly initialize its stdlib integer slot, preserve typed factories and Python value behavior, reject reinitialization, and remove private lazy caches/layout fields. Downstream Cython extensions must rebuild; no old private binary layout is preserved.
+- Speed up UUID integer construction using the public `PyLongWriter` API on compatible layouts and remove redundant Cython factory reference transfers, preserving eager stdlib slots and genuine no-GIL behavior.
+- Reject undersized UUID entropy buffers at build time and fail import if fork-child entropy invalidation cannot be registered.
+- Validate one immutable release sdist independently on 3.14, 3.15, 3.14t and 3.15t before publishing. Keep `cypy` forwarding until the separately scheduled 3.0 removal.
+
 ## [2.1.0] — 2026-09-06 — systems call and buffer helpers
 
 - Add `cycall` zero-, one-, and two-argument CPython call helpers, including a cimport-only vectorcall primitive.

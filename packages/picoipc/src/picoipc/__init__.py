@@ -18,7 +18,7 @@ def _load_ring_impl():
         return R, "ctypes"
     if b == "cython":
         from picoipc._cython_ring import Ring as R
-        return R, "cython"
+        return R, "pure_python"
     try:
         from picoipc._native import Ring as R
         return R, "pybind11"

@@ -2,7 +2,7 @@
 
 Fast CPython C-API helpers for Cython — typed hot-path wrappers plus C-backed UUID values.
 
-Requires **Python ≥ 3.14**. Prefer `import picop` (the deprecated `cypy` soft alias emits `DeprecationWarning` and will be removed in **3.0**).
+Python **3.15 is primary**, with compatibility for 3.14 and genuine GIL-disabled 3.14t/3.15t support. Minimum Python remains 3.14. Prefer `import picop` (the deprecated `cypy` soft alias emits `DeprecationWarning` and will be removed in **3.0**).
 
 ```{toctree}
 :maxdepth: 2

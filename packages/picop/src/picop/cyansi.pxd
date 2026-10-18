@@ -11,19 +11,15 @@ cdef str _BOLD_ON
 cdef object _FG8_TABLE
 cdef object _BG8_TABLE
 cdef object _FG256_TABLE
-cdef bint _tables_initialized = False
 
 
 cdef inline void _cyansi_init_tables():
+    global _RESET, _BOLD_ON, _FG8_TABLE, _BG8_TABLE, _FG256_TABLE
     cdef int i
     cdef str seq
     cdef list fg8
     cdef list bg8
     cdef list fg256
-
-    global _tables_initialized, _RESET, _BOLD_ON, _FG8_TABLE, _BG8_TABLE, _FG256_TABLE
-    if _tables_initialized:
-        return
 
     _RESET = uintern(ANSI_RESET)
     _BOLD_ON = uintern(ANSI_BOLD_ON)
@@ -56,44 +52,37 @@ cdef inline void _cyansi_init_tables():
     _FG8_TABLE = tuple(fg8)
     _BG8_TABLE = tuple(bg8)
     _FG256_TABLE = tuple(fg256)
-    _tables_initialized = True
 
 
 cdef inline str reset():
-    _cyansi_init_tables()
     return _RESET
 
 
 cdef inline str fg8(int code):
-    _cyansi_init_tables()
     if 30 <= code <= 37:
         return <str>(<tuple>_FG8_TABLE)[code - 30]
     return f"\x1b[{code}m"
 
 
 cdef inline str bg8(int code):
-    _cyansi_init_tables()
     if 40 <= code <= 47:
         return <str>(<tuple>_BG8_TABLE)[code - 40]
     return f"\x1b[{code}m"
 
 
 cdef inline str fg256(int n):
-    _cyansi_init_tables()
     if 0 <= n <= 255:
         return <str>(<tuple>_FG256_TABLE)[n]
     return f"\x1b[38;5;{n}m"
 
 
 cdef inline str bold(bint on = True):
-    _cyansi_init_tables()
     if on:
         return _BOLD_ON
     return _RESET
 
 
 cdef inline str wrap(str prefix, str text, str suffix = *):
-    _cyansi_init_tables()
     if suffix is None:
         suffix = _RESET
     return prefix + text + suffix

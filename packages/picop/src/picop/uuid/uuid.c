@@ -29,10 +29,27 @@ uuid_random_after_fork(void)
     random_buffer_pos = UUID_RANDOM_BUFFER_SIZE;
 }
 
-__attribute__((constructor)) static void
+static pthread_once_t uuid_atfork_once = PTHREAD_ONCE_INIT;
+static int uuid_atfork_status;
+
+static void
 uuid_random_register_atfork(void)
 {
-    (void)pthread_atfork(NULL, NULL, uuid_random_after_fork);
+    uuid_atfork_status =
+        pthread_atfork(NULL, NULL, uuid_random_after_fork);
+}
+
+int
+c_uuid_init(void)
+{
+    int status = pthread_once(&uuid_atfork_once, uuid_random_register_atfork);
+    return status != 0 ? status : uuid_atfork_status;
+}
+#else
+int
+c_uuid_init(void)
+{
+    return 0;
 }
 #endif
 

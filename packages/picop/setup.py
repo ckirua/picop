@@ -16,6 +16,13 @@ if os.environ.get("CPY_NATIVE", "").strip() in ("1", "true", "yes"):
 cythonized_extensions = cythonize(
     [
         Extension(
+            "picop.uuid._uuid_native",
+            ["src/picop/uuid/_uuid_native.c"],
+            include_dirs=["src/picop/uuid"],
+            extra_compile_args=["-std=c11", *_compile_args],
+            language="c",
+        ),
+        Extension(
             "picop.uuid._uuid",
             [
                 "src/picop/uuid/_uuid.pyx",

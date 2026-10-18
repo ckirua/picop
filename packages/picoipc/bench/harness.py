@@ -22,9 +22,9 @@ except ImportError:
     yaml = None  # type: ignore[assignment]
 
 ROOT = Path(__file__).resolve().parent.parent
-CPP_BUILD = ROOT / "build" / "native"
+CPP_BUILD = Path(os.environ.get("SMH_Q_CPP_BUILD", ROOT / "build" / "native"))
 ARTIFACTS = ROOT / "artifacts"
-PYTHON_DIR = ROOT / "src"
+PYTHON_DIR = Path(os.environ.get("SMH_Q_PYTHON_DIR", ROOT / "src"))
 
 
 def _git_sha() -> str:
@@ -46,15 +46,10 @@ def _gil_enabled() -> bool | None:
 
 
 def _backend_impl() -> str:
-    backend = os.environ.get("PICOIPC_BACKEND", "pybind11").lower()
-    mapping = {
-        "pure": "pure_python",
-        "pure_python": "pure_python",
-        "ctypes": "ctypes",
-        "pybind11": "pybind11",
-        "cython": "cython",
-    }
-    return mapping.get(backend, backend)
+    _ensure_import_path()
+    from picoipc import impl_name
+
+    return impl_name()
 
 
 def _slot_bytes(payload_bytes: int) -> int:

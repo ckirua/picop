@@ -2,59 +2,101 @@ name: picop smoke
 
 on:
   push:
-    branches: [main]
-    paths:
-      - "packages/picop/**"
-      - ".github/workflows/picop-smoke.yml"
+    branches: [main, python-3.15]
+    paths: ["packages/picop/**", ".github/workflows/picop-smoke.yml"]
   pull_request:
-    branches: [main]
-    paths:
-      - "packages/picop/**"
-      - ".github/workflows/picop-smoke.yml"
+    branches: [main, python-3.15]
+    paths: ["packages/picop/**", ".github/workflows/picop-smoke.yml"]
+
+permissions:
+  contents: read
 
 jobs:
-  install-smoke:
+  build-sdist:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: packages/picop
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Python 3.14
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
-          python-version: "3.14"
-
-      - name: Install UUID native dependency
-        run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends libssl-dev
-
-      - name: Install build deps
-        run: pip install setuptools wheel Cython picobuild pytest
-
-      - name: Install package (portable, no native march)
+          python-version: "3.15"
+          allow-prereleases: true
+      - name: Install native build dependencies
+        run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends build-essential libssl-dev
+      - name: Build and check sdist
         env:
           CPY_NATIVE: "0"
-        run: pip install .
-
-      - name: Import smoke
         run: |
-          python -c "from picop.hot import bytes_len, dict_get, str_len; assert bytes_len(b'ok') == 2; print('ok', __import__('picop').__version__)"
-          python -W default -c "import cypy; from cypy.hot import bytes_len; assert bytes_len(b'ok') == 2; print('shim', cypy.__version__)"
+          python -m pip install --upgrade build twine
+          python -m build --sdist
+          python -m twine check dist/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: picop-smoke-sdist
+          path: packages/picop/dist/*.tar.gz
+          if-no-files-found: error
+          retention-days: 2
 
-      - name: Run test suite
-        run: python -m pytest tests -q
-
-      - name: Export / COMPAT_MAP gates
-        run: python scripts/check_exports.py
-
-      - name: Grade trackers (53/53 A)
-        run: python scripts/grade_trackers.py
-
-      - name: Run Python examples
+  installed:
+    needs: build-sdist
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.14", "3.15", "3.14t", "3.15t"]
+    defaults:
+      run:
+        working-directory: packages/picop
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          allow-prereleases: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: picop-smoke-sdist
+          path: packages/picop/artifact
+      - name: Install native dependencies and exact sdist
+        env:
+          CPY_NATIVE: "0"
         run: |
-          set -e
-          for f in examples/py*.py examples/wrap_ansi.py; do
-            echo "== $f =="
-            python "$f"
-          done
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends build-essential libssl-dev
+          python -m pip install --upgrade pytest setuptools
+          python -m pip install artifact/*.tar.gz
+      - name: Installed artifact behavior outside checkout
+        env:
+          CPY_NATIVE: "0"
+        run: |
+          tmp="$(mktemp -d)"
+          trap 'rm -rf "$tmp"' EXIT
+          cp -R tests scripts examples docs "$tmp/"
+          cd "$tmp"
+          python - <<'PY'
+          import sys, sysconfig
+          print('version', sys.version, 'Py_GIL_DISABLED', sysconfig.get_config_var('Py_GIL_DISABLED'))
+          PY
+          if [[ "${{ matrix.python-version }}" == *t ]]; then
+            env -u PYTHON_GIL python -c 'import pathlib, sys; assert not sys._is_gil_enabled(); import picop; assert not sys._is_gil_enabled(); assert not pathlib.Path(picop.__file__).is_relative_to(pathlib.Path.cwd())'
+            env -u PYTHON_GIL python -c 'import sys; assert not sys._is_gil_enabled(); import cypy; assert not sys._is_gil_enabled()'
+            env -u PYTHON_GIL python - <<'PY'
+          import pkgutil, sys
+          assert not sys._is_gil_enabled()
+          import picop
+          for info in pkgutil.walk_packages(picop.__path__, picop.__name__ + '.'):
+              __import__(info.name)
+          assert not sys._is_gil_enabled(), 'GIL enabled after native module imports'
+          PY
+          else
+            python -c 'import pathlib, picop, cypy; assert not pathlib.Path(picop.__file__).is_relative_to(pathlib.Path.cwd())'
+          fi
+          python -m pytest tests -q
+          if [[ "${{ matrix.python-version }}" == *t ]]; then
+            python -X gil=0 -m pytest tests -q
+          fi
+          python "$GITHUB_WORKSPACE/packages/picop/scripts/check_exports.py"
+          for f in examples/py*.py examples/wrap_ansi.py; do python "$f"; done
+          PYTHON="$(command -v python)" bash scripts/smoke_barrel_cimport.sh

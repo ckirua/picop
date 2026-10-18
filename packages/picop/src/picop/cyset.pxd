@@ -3,6 +3,7 @@
 # ``supdate`` uses exported ``_PySet_Update`` (no public PySet_Update).
 
 from cpython.object cimport PyObject, PyObject_RichCompareBool, Py_EQ
+import cython
 
 
 cdef extern from "Python.h":
@@ -75,16 +76,16 @@ cdef inline frozenset sfrozen_new(object iterable):
 
 
 cdef inline Py_ssize_t slen(set s) noexcept:
-    return PySet_GET_SIZE(s)
+    with cython.critical_section(s):
+        return PySet_GET_SIZE(s)
 
 
 cdef inline bint seteq(set a, set b):
-    # Identity / size short-circuit + richcompare (same semantics as ``==``).
-    # Soft name ``seteq`` (not ``seq``) avoids confusion with ``seq_*`` / ``sq*``.
     if a is b:
         return True
-    if PySet_GET_SIZE(a) != PySet_GET_SIZE(b):
-        return False
+    with cython.critical_section(a, b):
+        if PySet_GET_SIZE(a) != PySet_GET_SIZE(b):
+            return False
     return <bint>PyObject_RichCompareBool(a, b, Py_EQ)
 
 
@@ -129,7 +130,8 @@ cdef inline set scopy(set s):
 
 
 cdef inline int supdate(set s, object iterable) except -1:
-    return _PySet_Update(s, iterable)
+    with cython.critical_section(s):
+        return _PySet_Update(s, iterable)
 
 # Wave 4 N1/N5 preferred names (0.3: soft letter/bare are cdef-only)
 

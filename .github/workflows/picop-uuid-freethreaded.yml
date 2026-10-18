@@ -2,13 +2,11 @@ name: picop UUID free-threaded compatibility
 
 on:
   push:
-    paths:
-      - "packages/picop/**"
-      - ".github/workflows/picop-uuid-freethreaded.yml"
+    branches: [main, python-3.15]
+    paths: ["packages/picop/**", ".github/workflows/picop-uuid-freethreaded.yml"]
   pull_request:
-    paths:
-      - "packages/picop/**"
-      - ".github/workflows/picop-uuid-freethreaded.yml"
+    branches: [main, python-3.15]
+    paths: ["packages/picop/**", ".github/workflows/picop-uuid-freethreaded.yml"]
   workflow_dispatch:
 
 permissions:
@@ -16,34 +14,34 @@ permissions:
 
 jobs:
   uuid-freethreaded:
-    name: CPython 3.14t GIL compatibility
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.14t", "3.15t"]
+    name: CPython ${{ matrix.python-version }} genuine no-GIL UUID
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: packages/picop
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Set up CPython 3.14t
-        uses: actions/setup-python@v6
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v6
         with:
-          python-version: "3.14t"
-
+          python-version: ${{ matrix.python-version }}
+          allow-prereleases: true
       - name: Install native build dependency
         run: |
           sudo apt-get update
-          sudo apt-get install --yes --no-install-recommends libssl-dev
-
+          sudo apt-get install --yes --no-install-recommends build-essential libssl-dev
       - name: Create isolated build environment
         run: |
           python -m venv .venv-uuid-freethreaded
-          .venv-uuid-freethreaded/bin/python -m pip install --disable-pip-version-check setuptools Cython
-
-      - name: Build only the UUID extension
+          .venv-uuid-freethreaded/bin/python -m pip install --disable-pip-version-check setuptools 'Cython>=3.3.0'
+      - name: Build only the UUID extensions
+        env:
+          CPY_NATIVE: "0"
         run: .venv-uuid-freethreaded/bin/python scripts/ci/build_uuid_freethreaded.py
-
-      - name: Verify GIL compatibility and UUID APIs
+      - name: Verify genuine no-GIL UUID APIs
         env:
           PYTHONPATH: src
         run: |
@@ -53,32 +51,20 @@ jobs:
           import uuid
           from pathlib import Path
 
-          assert not sys._is_gil_enabled(), "CPython 3.14t did not start with the GIL disabled"
-
-          # This focused job builds only picop.uuid; provide its parent package
-          # without importing the unrelated prebuilt picop extension set.
-          package = types.ModuleType("picop")
-          package.__path__ = [str(Path("src/picop").resolve())]
-          sys.modules["picop"] = package
+          assert not sys._is_gil_enabled(), 'interpreter did not start with GIL disabled'
+          package = types.ModuleType('picop')
+          package.__path__ = [str(Path('src/picop').resolve())]
+          sys.modules['picop'] = package
 
           from picop.uuid import UUID, uuid4, uuid4_bytes
-
-          assert sys._is_gil_enabled(), (
-              "picop.uuid._uuid falsely loaded as native no-GIL compatible"
-          )
+          assert not sys._is_gil_enabled(), 'UUID extension enabled the GIL'
           assert uuid.UUID in UUID.__mro__
-
           value = uuid4()
           raw = uuid4_bytes()
-          assert isinstance(value, UUID)
-          assert isinstance(value, uuid.UUID)
-          assert value.version == 4
-          assert value.variant == uuid.RFC_4122
-          assert len(raw) == 16
-          assert raw[6] >> 4 == 4
-          assert raw[8] & 0xC0 == 0x80
-
+          assert isinstance(value, UUID) and isinstance(value, uuid.UUID)
+          assert value.version == 4 and value.variant == uuid.RFC_4122
+          assert len(raw) == 16 and raw[6] >> 4 == 4 and raw[8] & 0xC0 == 0x80
           reconstructed = UUID(raw)
-          assert reconstructed.version == 4
-          assert reconstructed.variant == uuid.RFC_4122
+          assert reconstructed.version == 4 and reconstructed.variant == uuid.RFC_4122
+          assert not sys._is_gil_enabled(), 'GIL was enabled during UUID use'
           PY

@@ -3,6 +3,7 @@
 # C-string key APIs and borrowed Next pointers: cdef.
 
 from cpython.object cimport PyObject, PyObject_RichCompareBool, Py_EQ
+import cython
 
 
 cdef extern from "Python.h":
@@ -20,11 +21,9 @@ cdef extern from "Python.h":
     int PyDict_DelItem(object mp, object key) except -1
     int PyDict_DelItemString(object mp, const char *key) except -1
     PyObject* PyDict_GetItem(object mp, object key) noexcept
-    PyObject* PyDict_GetItemWithError(object mp, object key) except? NULL
     PyObject* PyDict_GetItemString(object mp, const char *key) noexcept
     int PyDict_GetItemRef(object mp, object key, PyObject **result) except -1
     int PyDict_GetItemStringRef(object mp, const char *key, PyObject **result) except -1
-    PyObject* PyDict_SetDefault(object mp, object key, object default_value) except? NULL
     int PyDict_SetDefaultRef(object mp, object key, object default_value, PyObject **result) except -1
     list PyDict_Items(object mp)
     list PyDict_Keys(object mp)
@@ -58,23 +57,23 @@ cdef inline object dproxy(dict d):
 
 
 cdef inline object dget(dict d, str key) noexcept:
-    # Borrowed GetItem; missing and stored None both look like None.
-    cdef PyObject *res = PyDict_GetItem(d, key)
-    if res is NULL:
-        return None
-    return <object>res
+    # Preserve suppressing lookup semantics, but protect borrowed-result
+    # promotion from concurrent replacement/removal.
+    cdef PyObject *res
+    cdef object out
+    with cython.critical_section(d):
+        res = PyDict_GetItem(d, key)
+        if res is NULL:
+            return None
+        out = <object>res
+    return out
 
 
 cdef inline object dget_with_error(dict d, object key):
-    # Like GetItem but hash/eq errors propagate (except? NULL).
-    cdef PyObject *res = PyDict_GetItemWithError(d, key)
-    if res is NULL:
-        return None
-    return <object>res
+    return dget_ref(d, key)
 
 
 cdef inline object dget_ref(dict d, object key):
-    # Strong-ref get; distinguishes missing (None) from stored None.
     cdef PyObject *res = NULL
     cdef int rc = PyDict_GetItemRef(d, key, &res)
     cdef object out
@@ -90,20 +89,21 @@ cdef inline bint dcontains(dict d, str key) except -1:
 
 
 cdef inline Py_ssize_t dlen(dict d) noexcept:
-    return PyDict_GET_SIZE(d)
+    with cython.critical_section(d):
+        return PyDict_GET_SIZE(d)
 
 
 cdef inline bint deq(dict a, dict b):
-    # Identity / size short-circuit + richcompare (same semantics as ``==``).
     if a is b:
         return True
-    if PyDict_GET_SIZE(a) != PyDict_GET_SIZE(b):
-        return False
+    with cython.critical_section(a, b):
+        if PyDict_GET_SIZE(a) != PyDict_GET_SIZE(b):
+            return False
     return <bint>PyObject_RichCompareBool(a, b, Py_EQ)
 
-
 cdef inline Py_ssize_t dsize(object d) except -1:
-    return PyDict_Size(d)
+    with cython.critical_section(d):
+        return PyDict_Size(d)
 
 
 cdef inline int dset(dict d, str key, object value) except -1:
@@ -140,15 +140,17 @@ cdef inline int dmerge_from_seq2(dict d, object seq2, bint override=True) except
 
 
 cdef inline object dsetdefault(dict d, str key, object default=None):
-    # Borrowed SetDefault — cast INCREFs for Python return.
-    cdef PyObject *res = PyDict_SetDefault(d, key, default)
-    if res is NULL:
+    cdef PyObject *res = NULL
+    cdef int rc = PyDict_SetDefaultRef(d, key, default, &res)
+    cdef object out
+    if rc < 0 or res is NULL:
         return None
-    return <object>res
+    out = <object>res
+    Py_DECREF(res)
+    return out
 
 
 cdef inline object dsetdefault_ref(dict d, object key, object default=None):
-    # Strong-ref SetDefaultRef; returns existing or inserted value.
     cdef PyObject *res = NULL
     cdef int rc = PyDict_SetDefaultRef(d, key, default, &res)
     cdef object out
@@ -180,7 +182,8 @@ cdef inline list ditems(dict d):
 
 
 cdef inline bint dnext(dict d, Py_ssize_t *pos, PyObject **key, PyObject **val) noexcept:
-    # Borrowed key/value pointers — do not DECREF.
+    # Borrowed key/value pointers — do not DECREF. Caller must hold d's
+    # critical section for the full iteration/use period and retain d.
     return PyDict_Next(d, pos, key, val)
 
 
@@ -193,11 +196,15 @@ cdef inline int ddel_string(dict d, const char *key) except -1:
 
 
 cdef inline object dget_string(dict d, const char *key) noexcept:
-    # Borrowed GetItemString; builds a temporary unicode key internally.
-    cdef PyObject *res = PyDict_GetItemString(d, key)
-    if res is NULL:
-        return None
-    return <object>res
+    # Borrowed GetItemString; protect the result through promotion.
+    cdef PyObject *res
+    cdef object out
+    with cython.critical_section(d):
+        res = PyDict_GetItemString(d, key)
+        if res is NULL:
+            return None
+        out = <object>res
+    return out
 
 
 cdef inline object dget_string_ref(dict d, const char *key):

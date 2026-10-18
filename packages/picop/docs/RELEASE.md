@@ -121,12 +121,16 @@ Manual dry-run: Actions → **publish** → Run workflow → `testpypi`.
 
 ## Artifacts / local PyPI check
 
-Validate the exact source archive in a clean environment before upload. This
-requires CPython 3.14, a C compiler toolchain, and OpenSSL development headers.
+Build the source archive once with CPython 3.15, then validate that exact archive
+in clean 3.14, 3.15, 3.14t and 3.15t environments. A C compiler toolchain,
+OpenSSL development headers and Cython 3.3+ are required. Each ABI builds its
+own extensions. The publisher uploads one immutable sdist artifact and waits
+for all four validation jobs before publishing; it does not select a matrix
+build's arbitrary output.
 
 ```bash
 pip install build twine
-CPY_NATIVE=0 python -m build --sdist
+CPY_NATIVE=0 python3.15 -m build --sdist
 twine check dist/*
 smoke_dir="$(mktemp -d)"
 python -m venv "$smoke_dir/venv"
@@ -135,11 +139,18 @@ CPY_NATIVE=0 "$smoke_dir/venv/bin/python" -m pip install "$(pwd)"/dist/picop-*.t
 "$smoke_dir/venv/bin/python" -W default -c "import cypy; from cypy.hot import bytes_len; assert bytes_len(b'ok') == 2; assert cypy.__version__ == __import__('picop').__version__"
 PYTHON="$smoke_dir/venv/bin/python" bash scripts/smoke_barrel_cimport.sh
 rm -rf "$smoke_dir"
-
 # optional local upload (prefer CI Trusted Publishing):
 # twine upload --repository testpypi dist/*
 # twine upload dist/*
 ```
+
+Repeat the installation and downstream consumer checks for all four runtimes.
+On t runtimes, with `PYTHON_GIL` unset and no `-X gil` override, assert that
+`sys._is_gil_enabled()` is false before and after importing the full `picop`
+package, each native module, and `cypy`. Separately run the full behavior suite
+with `python -X gil=0 -m pytest tests -q`. A focused UUID-only import is not
+evidence that the full package remains GIL-disabled.
+
 
 ## Post-release verify
 

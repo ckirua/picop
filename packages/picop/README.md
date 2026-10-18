@@ -2,7 +2,7 @@
 
 Fast CPython C-API helpers for Cython — typed hot-path wrappers plus C-backed UUID values.
 
-Requires **Python ≥ 3.14**. Map of what is covered: [`COVERAGE.md`](COVERAGE.md). Primary license: [`LICENSE`](LICENSE) (MIT); adapted UUID portions retain their notices in [`NOTICE`](NOTICE) and [`LICENSES/Apache-2.0.txt`](LICENSES/Apache-2.0.txt). Contributing: [`CONTRIBUTING.md`](CONTRIBUTING.md). Security: [`SECURITY.md`](SECURITY.md). Safety / footguns: [`docs/SAFETY.md`](docs/SAFETY.md). Contributor process lives under [`docs/`](docs/) (not required for end users).
+**Python 3.15 is primary**, with Python 3.14 backward compatibility and genuine GIL-disabled support on **3.14t and 3.15t**. Minimum Python remains 3.14. Map of what is covered: [`COVERAGE.md`](COVERAGE.md). Primary license: [`LICENSE`](LICENSE) (MIT); adapted UUID portions retain their notices in [`NOTICE`](NOTICE) and [`LICENSES/Apache-2.0.txt`](LICENSES/Apache-2.0.txt). Contributing: [`CONTRIBUTING.md`](CONTRIBUTING.md). Security: [`SECURITY.md`](SECURITY.md). Safety / footguns: [`docs/SAFETY.md`](docs/SAFETY.md).
 
 **Import rename (2.0):** prefer `import picop` / `from picop…`. The `cypy` import package is a **deprecated soft alias** (emits `DeprecationWarning`) and will be **removed in 3.0**. PyPI name was already `picop`.
 
@@ -17,7 +17,7 @@ pip install picop
 # pin: pip install "picop==2.1.0"
 ```
 
-Build deps (`setuptools`, `wheel`, `Cython`, `picobuild`) are pulled via `pyproject.toml` `[build-system]`. Source installs need a C toolchain and OpenSSL headers (`libssl-dev` on Debian/Ubuntu).
+Build deps (`setuptools`, `wheel`, `Cython>=3.3.0`, `picobuild`) are pulled via `pyproject.toml` `[build-system]`. Source installs need a C toolchain and OpenSSL headers (`libssl-dev` on Debian/Ubuntu). Compile extensions separately for each interpreter ABI; regular and free-threaded binaries are not interchangeable.
 
 ### From git (users)
 
@@ -30,9 +30,9 @@ pip install "picop @ git+https://github.com/ckirua/picop.git@v2.1.0"
 ### Editable (contributors)
 
 ```bash
-python3.14 -m venv .venv
+python3.15 -m venv .venv
 source .venv/bin/activate
-pip install setuptools wheel Cython picobuild
+pip install setuptools wheel 'Cython>=3.3.0' picobuild
 pip install -e . --no-build-isolation
 ```
 
@@ -95,9 +95,20 @@ assert UUID(raw).version == 4
 from picop.uuid cimport UUID, uuid4, uuid4_bytes
 ```
 
-The C-backed `UUID` is final, accepts 32–36 character hexadecimal text or
-exactly 16 bytes, and remains a stdlib-compatible `uuid.UUID` value. Generation
-uses per-thread buffered OpenSSL entropy with fork-child invalidation.
+The C-backed `UUID` is a real final native subtype of `uuid.UUID`, accepts
+32–36 UTF-8 bytes of hexadecimal text or exactly 16 bytes, and is immutable.
+Its stdlib integer slot is initialized eagerly; hash and stdlib descriptor access
+use valid inherited storage rather than a fabricated MRO. Integer construction
+fills Python's public `PyLongWriter` digit buffer directly on compatible native
+layouts, retaining the general byte conversion on other layouts.
+Generation uses per-thread buffered OpenSSL entropy with fork-child invalidation.
+If the fork hook cannot be registered, import fails rather than allowing parent
+and child to reuse buffered entropy. Custom `UUID_RANDOM_BUFFER_SIZE` builds
+must use a positive multiple of 16 that fits OpenSSL's integer length limit.
+
+Downstream Cython extensions **must rebuild** for this migration. Documented
+typed factories remain available, including direct, barrel and `cypy` cimports;
+the old private UUID instance fields and their binary layout are not retained.
 
 ## Examples
 

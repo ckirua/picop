@@ -50,3 +50,9 @@ uint32_t smh_q_ring_max_payload(SmhQRing* ring) {
   if (!ring) return 0;
   return ring->ring.slot_size() > 8 ? ring->ring.slot_size() - 8 : 0;
 }
+uint32_t smh_q_ring_write_seq(SmhQRing* ring) {
+  return ring ? ring->ring.write_seq() : 0;
+}
+uint32_t smh_q_ring_read_seq(SmhQRing* ring) {
+  return ring ? ring->ring.read_seq() : 0;
+}

@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.0.0] — 2026-10-18 — picop 3.0 — picop-only imports
+
+- Promote the 3.0 release candidate to stable: Python imports and Cython cimports use `picop` only. The `cypy` compatibility package is gone; rebuild downstream Cython extensions.
+- Retain the RC1 native implementation, UUID behavior and Python 3.14/3.15 plus genuine GIL-disabled 3.14t/3.15t support.
+- Validate the existing Swissquote Cython market-data decoder against RC1 on all four ABIs: 13 offline tests per ABI plus a 1,000-frame/9,000-row workload. Its own extension enables the GIL by default; picop does not. Forced-no-GIL consumer tests passed but do not declare downstream threading support.
+- Complete Tier A benchmark scenarios for the three call helpers and eight buffer/memoryview metadata helpers; coverage does not imply a performance approval or change the frozen Core.
+- Add explicit UUID benchmark reference selection (`--baseline`) and a separately recorded native-implementation reference for the i7-6700 / CPython 3.15.0rc2 host. Preserve the historical baseline, result schema and 25% regression budget.
+
 ## [3.0.0rc1] — 2026-10-18 — picop 3.0 RC1 — picop-only imports
 
 - Make CPython 3.15 primary while retaining 3.14 and genuine GIL-disabled 3.14t/3.15t operation. Require Cython 3.3 or newer and separate builds for each ABI.

@@ -109,6 +109,30 @@ Ratio = cypy `cdef` loop / typed Cython baseline `==` loop (opaque + sink). **In
 **Tier B `*_eq` notes:**
 - **`buf_eq`:** **Lose 1.62–5.25x** (worst mv↔mv) — buffer-protocol acquisition dominates; prefer typed `memoryview_eq` / `bytes_eq` in cdef loops.
 
+### Metadata coverage run (2026-10-18)
+
+[`bench/cybuffer_bench.py`](../../bench/cybuffer_bench.py), CPython 3.15.0rc2,
+Intel i7-6700, portable installed RC1, CPU 2, N=80,000 × 5 runs.
+Python baselines inspect `memoryview(exporter)` metadata; helpers acquire and
+release their own exports. Fixtures include bytearray, non-byte-itemsize
+`array("I")`, a retained 2-D view and read-only bytes.
+
+| Helper | Case | Helper mean±σ (ms) | Python mean±σ (ms) | Ratio |
+|---|---|---:|---:|---:|
+| `buf_itemsize` | writable bytes | 3.13±0.30 | 12.46±0.27 | 0.25x |
+| `buf_itemsize` | writable uint | 3.01±0.06 | 12.61±0.20 | 0.24x |
+| `buf_nbytes` | writable bytes | 3.03±0.06 | 12.53±0.25 | 0.24x |
+| `buf_nbytes` | writable uint | 2.95±0.04 | 14.65±3.86 | 0.20x |
+| `buf_ndim` | 1-D bytes | 3.35±0.63 | 18.92±8.04 | 0.18x |
+| `buf_ndim` | 2-D bytes | 3.17±0.07 | 14.73±4.43 | 0.22x |
+| `buf_readonly` | writable | 2.99±0.04 | 16.40±4.41 | 0.18x |
+| `buf_readonly` | read-only | 5.58±3.16 | 15.62±5.11 | 0.36x |
+
+All four helpers now have timed Tier A coverage. A downstream build ran on
+another CPU; the noisy samples are retained, not filtered into an approval.
+This does not replace historical tables, change Core membership or establish
+cross-runtime speedups.
+
 ## Experiment conclusions
 
 **Tier B `*_eq` inventory:** see section **Tier B — `*_eq` (inventory)** table. **Lose 1.62–5.25x** (worst mv↔mv) — buffer-protocol acquisition dominates; prefer typed `memoryview_eq` / `bytes_eq` in cdef loops.

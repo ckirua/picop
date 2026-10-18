@@ -24,7 +24,7 @@ _RAW = bytes.fromhex("123e4567e89b42d3a456426614174000")
 _VALUE = UUID(_RAW)
 _STDLIB_VALUE = StdlibUUID(bytes=_RAW)
 
-# Prime the two lazy caches before timing their steady-state access.
+# Warm repeated-access paths; historical "*_cached" labels remain format IDs.
 _VALUE.int
 hash(_VALUE)
 

@@ -12,7 +12,7 @@ _compile_args = [
 if os.environ.get("CPY_NATIVE", "").strip() in ("1", "true", "yes"):
     _compile_args.insert(1, "-march=native")
 
-# Cython extensions — same shape as cycel.core.cpy, package name ``picop`` (``cypy`` soft shim).
+# Cython extensions use picop; no cypy compatibility package is built.
 cythonized_extensions = cythonize(
     [
         Extension(

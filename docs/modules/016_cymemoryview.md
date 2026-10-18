@@ -116,6 +116,29 @@ Harness: [`bench/cyne_search_inventory_bench.py`](../../bench/cyne_search_invent
 | `memoryview_ne` | eq/ne short | **0.48–0.50x** | **0.45x** | pass |
 | `memoryview_ne` | eq/ne 1KiB | **0.02x** | — | Python `!=` path very slow on large views |
 
+### Metadata coverage run (2026-10-18)
+
+[`bench/cymemoryview_bench.py`](../../bench/cymemoryview_bench.py),
+CPython 3.15.0rc2, Intel i7-6700, portable installed RC1, CPU 2,
+N=80,000 × 5 runs. Both sides inspect the same retained view: neither
+allocates a fresh `memoryview` per iteration. Fixtures cover writable/read-only,
+non-byte-itemsize and 2-D views.
+
+| Helper | Case | Helper mean±σ (ms) | Python mean±σ (ms) | Ratio |
+|---|---|---:|---:|---:|
+| `memoryview_itemsize` | writable bytes | 2.17±0.03 | 4.57±0.22 | 0.47x |
+| `memoryview_itemsize` | writable uint | 2.38±0.41 | 4.42±0.10 | 0.54x |
+| `memoryview_nbytes` | writable bytes | 2.21±0.11 | 4.30±0.02 | 0.51x |
+| `memoryview_nbytes` | writable uint | 2.19±0.05 | 4.57±0.09 | 0.48x |
+| `memoryview_ndim` | 1-D bytes | 2.30±0.20 | 4.46±0.22 | 0.52x |
+| `memoryview_ndim` | 2-D bytes | 2.21±0.06 | 4.68±0.39 | 0.47x |
+| `memoryview_readonly` | writable | 2.19±0.03 | 4.41±0.06 | 0.50x |
+| `memoryview_readonly` | read-only | 2.15±0.03 | 4.64±0.43 | 0.46x |
+
+This closes runnable metadata-helper coverage without changing performance
+approvals or Core membership. A downstream build shared the host on another
+CPU; the measured variation is retained. Historical results are unchanged.
+
 ## Experiment conclusions
 
 **Tier B `*_eq` inventory:** see section **Tier B — `*_eq` (inventory)** table. **0.39–0.41x** win vs typed Cython `memoryview == memoryview`.

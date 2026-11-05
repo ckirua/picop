@@ -199,6 +199,38 @@ def test_frame_chain_back() -> None:
     assert frame_back(frame_back(frame_back(inner_frame))) is not None
 
 
+def test_object_getters_hand_back_exactly_one_reference() -> None:
+    """New-reference C getters must not incref a reference they already own."""
+    import sys
+
+    anchor = ["probe"]
+
+    def make_frame():
+        captured = anchor
+        return sys._getframe()
+
+    frame = make_frame()
+    code = frame_code(frame)
+
+    def drift(fn, *args) -> int:
+        target = fn(*args)
+        before = sys.getrefcount(target)
+        for _ in range(2000):
+            fn(*args)
+        return sys.getrefcount(target) - before
+
+    def returns_anchor(*_args):
+        return anchor
+
+    assert drift(call_twoargs, returns_anchor, 1, 2) == 0
+    assert drift(frame_code, frame) == 0
+    assert drift(frame_back, frame) == 0
+    assert drift(frame_var, frame, "captured") == 0
+    assert drift(frame_var_cstr, frame, b"captured") == 0
+    assert drift(code_code, code) == 0
+    assert drift(code_consts, code) == 0
+
+
 @pytest.mark.skipif(not hasattr(builtins, "sentinel"), reason="requires Python 3.15 sentinel")
 def test_sentinel_checks() -> None:
     value = sentinel_new("runtime_helper_test")

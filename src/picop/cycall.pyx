@@ -20,7 +20,12 @@ cpdef object call_twoargs(object callable, object arg0, object arg1):
     cdef PyObject *args[2]
     args[0] = <PyObject *>arg0
     args[1] = <PyObject *>arg1
-    return <object>PyObject_Vectorcall(<PyObject *>callable, args, 2, NULL)
+    # ``PyObject_Vectorcall`` returns a new reference; the ``<object>`` cast
+    # would incref it again, so convert and release the raw pointer.
+    cdef PyObject *result = PyObject_Vectorcall(<PyObject *>callable, args, 2, NULL)
+    cdef object out = <object>result
+    Py_DECREF(result)
+    return out
 
 
 cdef object call_vector(object callable, PyObject *const *args, size_t nargsf, PyObject *kwnames):
@@ -31,7 +36,10 @@ cdef object call_vector(object callable, PyObject *const *args, size_t nargsf, P
     allowed when ``args[-1]`` is a live reserved slot. ``kwnames`` must be NULL or
     a tuple; ``Py_None`` is undefined (measured SIGSEGV).
     """
-    return <object>PyObject_Vectorcall(<PyObject *>callable, args, nargsf, kwnames)
+    cdef PyObject *result = PyObject_Vectorcall(<PyObject *>callable, args, nargsf, kwnames)
+    cdef object out = <object>result
+    Py_DECREF(result)
+    return out
 
 
 cdef object call_method_noargs(object self, object name):
@@ -46,7 +54,10 @@ cdef object call_method_onearg(object self, object name, object arg):
 
 cdef object call_method_vector(object name, PyObject *const *args, size_t nargsf, PyObject *kwnames):
     """Vectorcall a looked-up method; ``args[0]`` is the receiver and counts in ``nargsf``."""
-    return <object>PyObject_VectorcallMethod(<PyObject *>name, args, nargsf, kwnames)
+    cdef PyObject *result = PyObject_VectorcallMethod(<PyObject *>name, args, nargsf, kwnames)
+    cdef object out = <object>result
+    Py_DECREF(result)
+    return out
 
 
 cdef Py_ssize_t vectorcall_nargs(size_t nargsf) noexcept:

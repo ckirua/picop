@@ -7,16 +7,18 @@ cdef extern from "Python.h":
         pass
 
 
+# The shim getters return a *new* reference; declaring them as ``object`` makes
+# Cython take that reference instead of incref-ing a borrowed one.
 cdef extern from "cycode_shim.h":
-    PyObject *cy_code_name(PyCodeObject *code) noexcept
-    PyObject *cy_code_qualname(PyCodeObject *code) noexcept
-    PyObject *cy_code_filename(PyCodeObject *code) noexcept
+    object cy_code_name(PyCodeObject *code) noexcept
+    object cy_code_qualname(PyCodeObject *code) noexcept
+    object cy_code_filename(PyCodeObject *code) noexcept
     int cy_code_firstlineno(PyCodeObject *code) noexcept
     int cy_code_argcount(PyCodeObject *code) noexcept
     int cy_code_posonlyargcount(PyCodeObject *code) noexcept
     int cy_code_kwonlyargcount(PyCodeObject *code) noexcept
-    PyObject *cy_code_consts(PyCodeObject *code) noexcept
-    PyObject *cy_code_names(PyCodeObject *code) noexcept
+    object cy_code_consts(PyCodeObject *code) noexcept
+    object cy_code_names(PyCodeObject *code) noexcept
 
 cdef extern from "cpython/code.h":
     bint PyCode_Check(object code) noexcept
@@ -32,13 +34,13 @@ cpdef inline bint code_check(object code) noexcept:
     return PyCode_Check(code)
 
 cpdef inline object code_name(object code):
-    return <object>cy_code_name(<PyCodeObject *>code)
+    return cy_code_name(<PyCodeObject *>code)
 
 cpdef inline object code_qualname(object code):
-    return <object>cy_code_qualname(<PyCodeObject *>code)
+    return cy_code_qualname(<PyCodeObject *>code)
 
 cpdef inline object code_filename(object code):
-    return <object>cy_code_filename(<PyCodeObject *>code)
+    return cy_code_filename(<PyCodeObject *>code)
 
 cpdef inline int code_firstlineno(object code) noexcept:
     return cy_code_firstlineno(<PyCodeObject *>code)
@@ -53,10 +55,10 @@ cpdef inline int code_kwonlyargcount(object code) noexcept:
     return cy_code_kwonlyargcount(<PyCodeObject *>code)
 
 cpdef inline object code_consts(object code):
-    return <object>cy_code_consts(<PyCodeObject *>code)
+    return cy_code_consts(<PyCodeObject *>code)
 
 cpdef inline object code_names(object code):
-    return <object>cy_code_names(<PyCodeObject *>code)
+    return cy_code_names(<PyCodeObject *>code)
 
 cpdef inline object code_code(object code):
     return PyCode_GetCode(<PyCodeObject *>code)

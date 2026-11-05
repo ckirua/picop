@@ -22,6 +22,29 @@ Prefer owning APIs when you need a durable value (e.g. `uutf8_bytes`).
 `tb_next_borrow` returns a borrowed `PyObject *` and may be `NULL`; keep the
 traceback alive for the whole walk.
 
+## New-reference getters must not be double-increfed
+
+`PyObject_Vectorcall`, `PyFrame_GetCode`, `PyFrame_GetBack`, `PyFrame_GetGenerator`,
+`PyFrame_GetVar`, `PyFrame_GetVarString`, `PyFrame_New` and the `cy*_shim.h` field
+readers return a **new** reference. Declaring such a C function as `PyObject *` and
+returning `<object>result` increfs a reference Cython already owns — one leaked
+object per call. Either declare the extern as `object` (Cython takes the reference)
+or convert and release:
+
+```pyx
+cdef PyObject *result = PyObject_Vectorcall(<PyObject *>callable, args, nargsf, kwnames)
+cdef object out = <object>result
+Py_DECREF(result)
+return out
+```
+
+The opposite direction matters just as much: macro getters such as `PyCell_GET`
+return a **borrowed** pointer, so they must stay `PyObject *` and be promoted with
+an `<object>` cast. Declaring them as `object` increfs a reference nobody owns and
+drives the target's refcount down by one per call. Both directions are pinned by
+`test_object_getters_hand_back_exactly_one_reference` in
+[`tests/test_systems.py`](../tests/test_systems.py).
+
 ## Free-threaded callers
 
 The supported runtimes are 3.14, 3.15, 3.14t and 3.15t; t imports must not enable

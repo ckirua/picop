@@ -16,6 +16,7 @@ cdef extern from "Python.h":
     ) except NULL
     # Macro: strips PY_VECTORCALL_ARGUMENTS_OFFSET from nargsf.
     Py_ssize_t PyVectorcall_NARGS(size_t nargsf) noexcept
+    void Py_DECREF(PyObject *o)
 
 cpdef object call_noargs(object callable)
 cpdef object call_onearg(object callable, object arg)

@@ -10,7 +10,9 @@ cdef extern from "Python.h":
     bint PyCell_Check(object ob) noexcept
     object PyCell_New(object ob)
     object PyCell_Get(object cell)
-    object PyCell_GET(object cell)
+    # ``PyCell_GET`` is the macro form: it returns a *borrowed* pointer, so it
+    # must be promoted with an ``<object>`` cast, never declared as ``object``.
+    PyObject *PyCell_GET(PyObject *cell) noexcept
     int PyCell_Set(object cell, object value) except -1
     void PyCell_SET(object cell, object value) noexcept
 
@@ -46,9 +48,11 @@ cpdef inline bint cell_eq(object a, object b) except -1:
 
 cdef inline object cell_get_unchecked(object cell):
     # No type check — UB if not a cell. The caller must satisfy the cell
-    # type precondition; keep the borrowed load/promotion atomic.
+    # type precondition; keep the borrowed load and its promotion atomic.
+    cdef PyObject *res
     with cython.critical_section(cell):
-        return PyCell_GET(cell)
+        res = PyCell_GET(<PyObject *>cell)
+        return <object>res
 
 
 cdef inline void cell_set_unchecked(object cell, object value) noexcept:

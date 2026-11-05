@@ -46,6 +46,7 @@ P26-07-22 — `*_eq` inventory Tier A (`cyeq_inventory_bench`)|
 | public | APPROVED | 1 |
 | cell_eq / celleq | APPROVED | 1 |
 | macros | APPROVED (cimport) | 1 |
+| `cell_get_unchecked` | APPROVED (cimport) — `PyCell_GET` is a borrowed macro, so it is declared `PyObject *` and promoted with an `<object>` cast; declaring it as `object` decref'd the target once per call | 2 |
 
 ## Bench notes
 

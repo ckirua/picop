@@ -57,6 +57,8 @@ cdef inline object tget(tuple t, Py_ssize_t i) noexcept:
 
 
 cdef inline object tget_checked(tuple t, Py_ssize_t i):
+    # Bounds-checked.  ``PyTuple_GetItem`` returns a *borrowed* reference, so
+    # the ``<object>`` cast is the incref that hands the caller a new one.
     return <object>PyTuple_GetItem(t, i)
 
 

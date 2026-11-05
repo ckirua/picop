@@ -2,6 +2,18 @@
 
 ## [Unreleased]
 
+### Added
+
+- `cyframe`: add 11 public frame readers and two cimport-only helpers for frame
+  construction and entry-frame detection. The same API is available on CPython
+  3.14 and 3.15; `frame_locals` preserves the PEP 667 proxy, and missing
+  `frame_var` names raise `NameError`.
+- `cycode`: add 15 public code-object readers and two cimport-only helpers on CPython
+  3.11+; adaptive `co_code` is version-sensitive, and `code_eq` remains rejected in
+  favor of identity via `obj_eq`.
+- `cytraceback`: add public traceback helpers `tb_check`, `tb_next`, `tb_frame`,
+  `tb_lineno`, `tb_lasti`, and `tb_depth`; `tb_next_borrow` is cimport-only.
+
 ### Fixes
 
 - `cycall`, `cyframe`, `cycode`: new-reference C getters (`PyObject_Vectorcall`,
@@ -39,14 +51,6 @@
   typed Cython baselines) with correctness/depth probes; measured tables are in
   [`docs/modules/056_cycall.md`](docs/modules/056_cycall.md). No public helper
   changed behaviour and the frozen Core is untouched.
-- `cyframe`: add 11 public frame readers and two cimport-only helpers for frame
-  construction and entry-frame detection. The same API is available on CPython
-  3.14 and 3.15; `frame_locals` preserves the PEP 667 proxy, and missing
-  `frame_var` names raise `NameError`.
-- `cycode`: add 15 public code-object readers and two cimport-only helpers on CPython 3.11+; adaptive `co_code` is version-sensitive, and `code_eq` remains rejected in favor of identity via `obj_eq`.
-
-- `cytraceback`: add public traceback helpers `tb_check`, `tb_next`, `tb_frame`,
-  `tb_lineno`, `tb_lasti`, and `tb_depth`; `tb_next_borrow` is cimport-only.
 
 ## [3.0.0] — 2026-10-18 — picop 3.0 — picop-only imports
 

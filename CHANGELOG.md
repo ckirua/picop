@@ -28,6 +28,9 @@
   `frame_var` names raise `NameError`.
 - `cycode`: add 15 public code-object readers and two cimport-only helpers on CPython 3.11+; adaptive `co_code` is version-sensitive, and `code_eq` remains rejected in favor of identity via `obj_eq`.
 
+- `cytraceback`: add public traceback helpers `tb_check`, `tb_next`, `tb_frame`,
+  `tb_lineno`, `tb_lasti`, and `tb_depth`; `tb_next_borrow` is cimport-only.
+
 ## [3.0.0] — 2026-10-18 — picop 3.0 — picop-only imports
 
 - Promote the 3.0 release candidate to stable: Python imports and Cython cimports use `picop` only. The `cypy` compatibility package is gone; rebuild downstream Cython extensions.

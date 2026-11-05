@@ -492,6 +492,12 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 | `time_monotonic` | tierA | Tier A `session.compare` present |
 | `time_perf_counter` | tierA | Tier A `session.compare` present |
 | `time_wall` | tierB | Tier A+B compare labels present |
+| `tb_check` | tierA | Tier A `session.compare` present |
+| `tb_depth` | tierA | Tier A `session.compare` present |
+| `tb_frame` | tierA | Tier A `session.compare` present |
+| `tb_lasti` | tierA | Tier A `session.compare` present |
+| `tb_lineno` | tierA | Tier A `session.compare` present |
+| `tb_next` | tierA | Tier A `session.compare` present |
 | `tuple_check` | tierB | Tier A+B compare labels present |
 | `tuple_check_exact` | tierB | Tier A+B compare labels present |
 | `tuple_eq` | tierB | Tier A+B compare labels present |

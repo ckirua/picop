@@ -12,6 +12,8 @@ from picop.uuid._uuid cimport UUID as DirectUUID, uuid_from_buf
 from picop.cymemoryview cimport memoryview_get_base, memoryview_from_memory
 from picop.cysentinel cimport sentinel_check, sentinel_check_exact, sentinel_new, sentinel_type
 
+from cpython.object cimport PyObject
+from picop.cytraceback cimport tb_check, tb_lineno, tb_next_borrow
 import sys
 from picop.cycode cimport PyCodeObject
 from picop.cyframe cimport (
@@ -97,6 +99,17 @@ cpdef bint check_frames(object caller):
     assert frame_var_cstr(caller, b"values") is not None
     cdef object back = frame_back(caller)
     assert back is None or frame_check(back)
+    return True
+
+cpdef bint check_traceback():
+    try:
+        raise ValueError("probe")
+    except ValueError:
+        tb = sys.exc_info()[2]
+    assert tb_check(tb)
+    assert tb_lineno(tb) > 0
+    cdef PyObject *nxt = tb_next_borrow(tb)
+    assert nxt == NULL
     return True
 
 

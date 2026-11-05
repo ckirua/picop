@@ -562,6 +562,14 @@ from .cycode cimport (
     code_qualname,
     code_varnames,
 )
+from .cytraceback cimport (
+    tb_check,
+    tb_depth,
+    tb_frame,
+    tb_lasti,
+    tb_lineno,
+    tb_next,
+)
 from .cyfloat cimport (
     float_check,
     float_check_exact,

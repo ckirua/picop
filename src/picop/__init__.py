@@ -408,6 +408,14 @@ from .cycode import (
     code_qualname,
     code_varnames,
 )
+from .cytraceback import (
+    tb_check,
+    tb_depth,
+    tb_frame,
+    tb_lasti,
+    tb_lineno,
+    tb_next,
+)
 from .cyfloat import (
     float_as_double,
     float_check,

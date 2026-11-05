@@ -27,6 +27,12 @@ from picop import (
     code_posonlyargcount,
     code_qualname,
     code_varnames,
+    tb_check,
+    tb_depth,
+    tb_frame,
+    tb_lasti,
+    tb_lineno,
+    tb_next,
     frame_back,
     frame_builtins,
     frame_check,
@@ -88,6 +94,63 @@ def test_code_addr2line() -> None:
 def test_code_check_rejects_non_code() -> None:
     assert not code_check(lambda: None)
     assert not code_check(None)
+
+
+def test_traceback_readers() -> None:
+    import sys
+
+    def leaf() -> None:
+        raise ValueError("boom")
+
+    def mid() -> None:
+        leaf()
+
+    def top() -> None:
+        mid()
+
+    try:
+        top()
+    except ValueError:
+        tb = sys.exc_info()[2]
+
+    assert tb_check(tb) is True
+    assert tb_lineno(tb) == tb.tb_lineno
+    assert tb_lasti(tb) == tb.tb_lasti
+    assert tb_frame(tb) is tb.tb_frame
+    assert tb_next(tb) is not None
+
+
+def test_traceback_chain_depth() -> None:
+    import sys
+
+    def leaf() -> None:
+        raise ValueError("boom")
+
+    def mid() -> None:
+        leaf()
+
+    def top() -> None:
+        mid()
+
+    try:
+        top()
+    except ValueError:
+        tb = sys.exc_info()[2]
+
+    count = 0
+    current = tb
+    while current is not None:
+        count += 1
+        current = current.tb_next
+    assert tb_depth(tb) == count == 4
+    assert tb_next(tb_next(tb_next(tb))) is not None
+
+
+def test_tb_check_rejects_non_traceback() -> None:
+    assert tb_check(None) is False
+    assert tb_check(1) is False
+
+
 
 def test_frame_helpers() -> None:
     import sys

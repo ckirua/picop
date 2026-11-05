@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [3.2.0] — 2026-11-05 — Frame, code, and traceback accessors with refcount-balanced getters
 
 ### Added
 

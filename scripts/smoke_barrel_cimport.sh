@@ -31,6 +31,7 @@ def _frame_probe():
 
 assert _frame_probe()
 assert demo.check_code()
+assert demo.check_traceback()
 assert demo.check_direct_uuid()
 assert demo.check_memoryview_ownership()
 assert not free or not sys._is_gil_enabled()

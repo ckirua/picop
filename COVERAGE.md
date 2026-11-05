@@ -78,6 +78,7 @@ As of **`1.0.0`**:
 | `cyerr`, `cymem`, `cythread`, `cyatomic`, `cyref`, `cygetargs`, `cyceval`, `cypystate`, `cypylifecycle`, `cypyport`, `cyversion`, `cylongintrepr` | **cimport only** | Embedding / process footguns — not pure-Python. `cyerr` prefers raised-exception get/set lifecycle APIs on Python ≥3.14. |
 | `cyframe` | public + cimport | Frame readers: `frame_*`; `frame_new` and `frame_is_entry_frame` are cimport-only |
 | `cycode` | public + cimport | Code-object readers: 15 `code_*` helpers public; `code_num_free` and `code_addr2_location` cimport-only |
+| `cytraceback` | public + cimport | Traceback readers: `tb_check`, `tb_next`, `tb_frame`, `tb_lineno`, `tb_lasti`, `tb_depth`; `tb_next_borrow` is cimport-only |
 | `cysentinel` | public (CPython 3.15+; 3.14 checks answer `False`, constructors/type access raise `NotImplementedError`) | `sentinel_check`, `sentinel_check_exact`, `sentinel_new`, `sentinel_type` |
 | `cyinstance` | **none** | Classic-class ABI gone on 3.14 |
 

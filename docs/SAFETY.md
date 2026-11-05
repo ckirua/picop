@@ -19,6 +19,9 @@ C-string / UTF-8 borrow helpers (`uutf8`, `bas_string`, `bytes_as_string`, …) 
 
 Prefer owning APIs when you need a durable value (e.g. `uutf8_bytes`).
 
+`tb_next_borrow` returns a borrowed `PyObject *` and may be `NULL`; keep the
+traceback alive for the whole walk.
+
 ## Free-threaded callers
 
 The supported runtimes are 3.14, 3.15, 3.14t and 3.15t; t imports must not enable

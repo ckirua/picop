@@ -27,6 +27,7 @@ Submodules
    cybytearray
    cybytes
    cycellobject
+   cycode
    cycodecs
    cycomplex
    cycontextvars

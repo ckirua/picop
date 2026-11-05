@@ -26,6 +26,7 @@
   construction and entry-frame detection. The same API is available on CPython
   3.14 and 3.15; `frame_locals` preserves the PEP 667 proxy, and missing
   `frame_var` names raise `NameError`.
+- `cycode`: add 15 public code-object readers and two cimport-only helpers on CPython 3.11+; adaptive `co_code` is version-sensitive, and `code_eq` remains rejected in favor of identity via `obj_eq`.
 
 ## [3.0.0] — 2026-10-18 — picop 3.0 — picop-only imports
 

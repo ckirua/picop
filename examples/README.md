@@ -84,6 +84,7 @@ for f in examples/py*.py examples/wrap_ansi.py; do python "$f" || exit 1; done
 | 57 | `cyfrozendict` | smoke | [`pyfrozendict.py`](pyfrozendict.py) |
 | 58 | `cysentinel` | smoke | [`py_sentinel.py`](py_sentinel.py) |
 | 59 | `cyframe` | smoke | [`pyframe.py`](pyframe.py) |
+| 60 | `cycode` | smoke | [`pycode.py`](pycode.py) |
 
 ## Cython recipes
 

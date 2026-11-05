@@ -1,5 +1,22 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixes
+
+- `cycall`, `cyframe`, `cycode`: new-reference C getters (`PyObject_Vectorcall`,
+  `PyFrame_GetCode` / `GetBack` / `GetGenerator` / `GetVar` / `GetVarString` /
+  `PyFrame_New`, and the `cycode_shim.h` field readers) were declared as `PyObject *`
+  and returned through an `<object>` cast, which incref'd a reference Cython already
+  owned — one leaked object per call. They now hand the reference straight to Cython
+  (or convert and `Py_DECREF`). Pinned by
+  `test_object_getters_hand_back_exactly_one_reference` in `tests/test_systems.py`.
+- `cycellobject`: `cell_get_unchecked` declared the *borrowed* `PyCell_GET` macro as
+  `object`, which dropped the cell contents' refcount by one per call. The macro is now
+  declared `PyObject *` and promoted with an `<object>` cast inside the same critical
+  section.
+- Ownership convention recorded in [`docs/SAFETY.md`](docs/SAFETY.md).
+
 ## [3.1.0] — 2026-11-05 — CPython 3.15 sentinel, frozendict, and vectorcall helpers
 
 - `cysentinel`: add CPython 3.15 sentinel checks and constructors. On Python 3.14,

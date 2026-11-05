@@ -87,6 +87,7 @@ Full selected code-object accessor surface. Raw fields are accessed through the 
 | Public helpers (15) | Thin wrappers beat attribute baselines | Tier A harness | All ratios ≤0.65x across default and depth | APPROVED | 0 |
 | `code_check` / `code_name` / `code_firstlineno` / `code_argcount` | Direct C access beats typed attribute baseline | Tier B harness | 0.15–0.37x in both passes | APPROVED | 0 |
 | `code_num_free` / `code_addr2_location` | Useful low-level Cython readers | API review | C-only surface | APPROVED (cimport) | 0 |
+| shim object readers (`code_name`/`code_qualname`/`code_filename`/`code_consts`/`code_names`) | `<object>PyObject *` cast of a `Py_NewRef` result is safe | `sys.getrefcount` drift probe, 2 000 calls | leaked one reference per call (+2000 refs); `object`-declared externs measure 0 | APPROVED (fix) | 1 |
 | Construction / extras / watchers / optimizer | Candidate APIs add value | ABI and lifecycle review | Construction or unstable ABI; callback ABI; legacy path | REJECTED | 0 |
 | `code_eq` | Structural equality could aid callers | Policy review | Expensive, adaptive/version-sensitive structure; identity already supported | REJECTED | 0 |
 

@@ -63,6 +63,7 @@ Provide GIL-held Cython call helpers that avoid temporary argument tuples for th
 | `call_method_vector` | method vectorcall is a useful depth path | Tier B | **1.05x** (σ 2.0 ms over 11 runs) | APPROVED (cimport), no speed claim | 1 |
 | `vectorcall_nargs` | macro spelling costs nothing | Tier B | **1.02x** vs a literal count | APPROVED (cimport) | 1 |
 | reserved-slot (`nargsf` with offset bit) | matches what Cython emits, so it should be free | Tier B | **1.00x** vs plain count | keep as documented option | 1 |
+| refcount audit of `call_twoargs` / `call_vector` / `call_method_vector` | `<object>` cast of a new-reference call is safe | `sys.getrefcount` drift probe, 2 000 calls | leaked one reference per call (+2000 refs); `object`-declared externs or convert-then-`Py_DECREF` measured 0 | APPROVED (fix) | 2 |
 
 ## Safety
 

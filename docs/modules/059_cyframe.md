@@ -88,6 +88,7 @@ frame APIs are recorded as rejected in workflow decisions.
 | `frame_var_cstr` | C-string lookup beats locals mapping | Tier A harness | 0.59x / 0.61x | APPROVED | 0 |
 | `frame_new` | Direct construction useful to Cython | ABI / safety review | Thread-state-dependent unstable API | APPROVED (cimport) | 0 |
 | `frame_is_entry_frame` | Entry-frame detection useful to Cython | ABI review | Explicitly unstable API | APPROVED (cimport) | 0 |
+| `frame_code` / `frame_back` / `frame_generator` / `frame_var` / `frame_var_cstr` | `<object>` cast of a new-reference getter is safe | `sys.getrefcount` drift probe, 2 000 calls | leaked one reference per call (+2000 refs); new-reference externs declared as `object` measure 0 | APPROVED (fix) | 1 |
 | Deprecated sync helpers | Locals synchronization useful | CPython API review | No-op since 3.13 | REJECTED | 0 |
 | Interpreter-frame APIs | Internal readers useful | Header / ABI review | Requires `Py_BUILD_CORE` internal header | REJECTED | 0 |
 

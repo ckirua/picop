@@ -21,9 +21,9 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 
 | Metric | Count |
 |--------|------:|
-| Public barrel helpers | 471 |
-| `tierA` | 329 |
-| `tierB` | 130 |
+| Public barrel helpers | 486 |
+| `tierA` | 340 |
+| `tierB` | 134 |
 | `pending` | 0 |
 | `n/a` | 12 |
 
@@ -98,6 +98,21 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 | `cell_get` | tierA | Tier A `session.compare` present |
 | `cell_new` | tierA | Tier A `session.compare` present |
 | `cell_set` | tierA | Tier A `session.compare` present |
+| `code_addr2line` | tierA | Tier A `session.compare` present |
+| `code_argcount` | tierB | Tier A+B compare labels present |
+| `code_cellvars` | tierA | Tier A `session.compare` present |
+| `code_check` | tierB | Tier A+B compare labels present |
+| `code_code` | tierA | Tier A `session.compare` present |
+| `code_consts` | tierA | Tier A `session.compare` present |
+| `code_filename` | tierA | Tier A `session.compare` present |
+| `code_firstlineno` | tierB | Tier A+B compare labels present |
+| `code_freevars` | tierA | Tier A `session.compare` present |
+| `code_kwonlyargcount` | tierA | Tier A `session.compare` present |
+| `code_name` | tierB | Tier A+B compare labels present |
+| `code_names` | tierA | Tier A `session.compare` present |
+| `code_posonlyargcount` | tierA | Tier A `session.compare` present |
+| `code_qualname` | tierA | Tier A `session.compare` present |
+| `code_varnames` | tierA | Tier A `session.compare` present |
 | `codec_backslashreplace_errors` | tierA | Tier A `session.compare` present |
 | `codec_decode` | tierA | Tier A `session.compare` present |
 | `codec_decoder` | tierA | Tier A `session.compare` present |

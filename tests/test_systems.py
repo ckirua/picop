@@ -12,6 +12,21 @@ from picop import (
     call_noargs,
     call_onearg,
     call_twoargs,
+    code_addr2line,
+    code_argcount,
+    code_cellvars,
+    code_check,
+    code_code,
+    code_consts,
+    code_filename,
+    code_firstlineno,
+    code_freevars,
+    code_kwonlyargcount,
+    code_name,
+    code_names,
+    code_posonlyargcount,
+    code_qualname,
+    code_varnames,
     frame_back,
     frame_builtins,
     frame_check,
@@ -32,6 +47,47 @@ from picop import (
     sentinel_new,
     sentinel_type,
 )
+
+def test_code_readers() -> None:
+    def outer(prefix):
+        captured = prefix
+
+        def inner(posonly, /, regular, *, keyword):
+            local = captured + regular + keyword
+            return local
+
+        return inner
+
+    function = outer("value")
+    code = function.__code__
+    assert code_check(code)
+    assert code_name(code) == "inner"
+    assert code_qualname(code).endswith("outer.<locals>.inner")
+    assert code_filename(code) == __file__
+    assert code_firstlineno(code) > 0
+    assert code_argcount(code) == 2
+    assert code_posonlyargcount(code) == 1
+    assert code_kwonlyargcount(code) == 1
+    assert isinstance(code_consts(code), tuple)
+    assert isinstance(code_names(code), tuple)
+    assert code_varnames(code) == ("posonly", "regular", "keyword", "local")
+    assert code_cellvars(code) == ()
+    assert code_freevars(code) == ("captured",)
+
+
+def test_code_addr2line() -> None:
+    def target(value):
+        result = value + 1
+        return result
+
+    code = target.__code__
+    assert code_addr2line(code, 0) == code.co_firstlineno
+    assert code_addr2line(code, 4) == code.co_firstlineno + 1
+
+
+def test_code_check_rejects_non_code() -> None:
+    assert not code_check(lambda: None)
+    assert not code_check(None)
 
 def test_frame_helpers() -> None:
     import sys

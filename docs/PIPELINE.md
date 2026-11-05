@@ -184,4 +184,4 @@ Packaging, README/examples, and release checklist — see [`RELEASE.md`](RELEASE
 ## Phase 6 (usage examples) — complete
 
 Every Order has a runnable **python** example, a **cython** recipe pointer, or honest **n/a** — see [`examples/README.md`](../examples/README.md).  
-CI runs `scripts/grade_trackers.py` (59/59 A) and all `examples/py*.py`. Do not invent pure-Python demos for cimport-only modules.
+CI runs `scripts/grade_trackers.py` (60/60 A) and all `examples/py*.py`. Do not invent pure-Python demos for cimport-only modules.

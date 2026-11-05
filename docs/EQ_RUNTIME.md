@@ -40,7 +40,7 @@ Status key: **done** · **skip** · **n/a** (no comparable value type)
 
 ## Explicit non-goals
 
-- No `code_eq` without a `cycode` module (already noted under misc eq batch).
+- `cycode` now exists (Order 060), but `code_eq` stays out: code objects compare by identity, and a structural comparison over `co_code`/`co_consts` is expensive and version-sensitive. Use `obj_eq` on the code object.
 - No mass identity wrappers that only alias `obj_eq`.
 
 Closes the acceptance checklist for [#44](https://github.com/ckirua/picop/issues/44).

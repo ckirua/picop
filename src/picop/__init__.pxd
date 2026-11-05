@@ -545,6 +545,23 @@ from .cyframe cimport (
     frame_var,
     frame_var_cstr,
 )
+from .cycode cimport (
+    code_addr2line,
+    code_argcount,
+    code_cellvars,
+    code_check,
+    code_code,
+    code_consts,
+    code_filename,
+    code_firstlineno,
+    code_freevars,
+    code_kwonlyargcount,
+    code_name,
+    code_names,
+    code_posonlyargcount,
+    code_qualname,
+    code_varnames,
+)
 from .cyfloat cimport (
     float_check,
     float_check_exact,

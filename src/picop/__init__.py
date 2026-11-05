@@ -391,6 +391,23 @@ from .cyframe import (
     frame_var,
     frame_var_cstr,
 )
+from .cycode import (
+    code_addr2line,
+    code_argcount,
+    code_cellvars,
+    code_check,
+    code_code,
+    code_consts,
+    code_filename,
+    code_firstlineno,
+    code_freevars,
+    code_kwonlyargcount,
+    code_name,
+    code_names,
+    code_posonlyargcount,
+    code_qualname,
+    code_varnames,
+)
 from .cyfloat import (
     float_as_double,
     float_check,

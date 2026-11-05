@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased]
+
+- `cycall`: add the cimport-only bound-method helpers `call_method_noargs`,
+  `call_method_onearg`, `call_method_vector` and the `PyVectorcall_NARGS` wrapper
+  `vectorcall_nargs`; document that `call_vector` forwards `nargsf` unchanged
+  (reserved-slot offset bit allowed) and that `kwnames` must be `NULL` or a
+  tuple — `Py_None` is undefined and was measured to crash with SIGSEGV.
+- Add the Tier B call harness `bench/tier_b/cycall.py` (picop `cdef` helpers vs
+  typed Cython baselines) with correctness/depth probes; measured tables are in
+  [`docs/modules/056_cycall.md`](docs/modules/056_cycall.md). No public helper
+  changed behaviour and the frozen Core is untouched.
+
 ## [3.0.0] — 2026-10-18 — picop 3.0 — picop-only imports
 
 - Promote the 3.0 release candidate to stable: Python imports and Cython cimports use `picop` only. The `cypy` compatibility package is gone; rebuild downstream Cython extensions.

@@ -16,14 +16,14 @@ def main() -> None:
     frame = _frame()
     session = tier_b_session("cyframe — Tier B")
     session.header(); print(f"inner loop N={N:,}"); print()
-    for label, cypy, baseline in (
-        ("frame_check", tb.cypy_frame_check, tb.baseline_frame_check),
-        ("frame_lineno", tb.cypy_frame_lineno, tb.baseline_frame_lineno),
-        ("frame_code", tb.cypy_frame_code, tb.baseline_frame_code),
-        ("frame_back", tb.cypy_frame_back, tb.baseline_frame_back),
-    ):
-        session.section(label)
-        session.compare(label, cypy, baseline, frame, N)
+    session.section("frame_check")
+    session.compare("frame_check", tb.cypy_frame_check, tb.baseline_frame_check, frame, N)
+    session.section("frame_lineno")
+    session.compare("frame_lineno", tb.cypy_frame_lineno, tb.baseline_frame_lineno, frame, N)
+    session.section("frame_code")
+    session.compare("frame_code", tb.cypy_frame_code, tb.baseline_frame_code, frame, N)
+    session.section("frame_back")
+    session.compare("frame_back", tb.cypy_frame_back, tb.baseline_frame_back, frame, N)
     session.summary(); print("Markdown (paste under ### Tier B):"); print(markdown_table(session._rows)); print()
 
 

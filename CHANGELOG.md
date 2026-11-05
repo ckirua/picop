@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [3.1.0] — 2026-11-05 — CPython 3.15 sentinel, frozendict, and vectorcall helpers
 
 - `cysentinel`: add CPython 3.15 sentinel checks and constructors. On Python 3.14,
   checks return `False` and constructors raise `NotImplementedError`.

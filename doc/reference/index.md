@@ -13,8 +13,9 @@ Docstrings for compiled helpers are taken from adjacent `.pyi` stubs when the ru
 | **Bytes / str** | {mod}`picop.cybytes`, {mod}`picop.cybytearray`, {mod}`picop.cystr`, {mod}`picop.cyunicode`, {mod}`picop.cyansi` |
 | **Buffers** | {mod}`picop.cyarray`, {mod}`picop.cymemoryview`, {mod}`picop.cybuffer`, {mod}`picop.cyslice` |
 | **Protocols** | {mod}`picop.cymapping`, {mod}`picop.cysequence`, {mod}`picop.cynumber`, {mod}`picop.cyobject` |
-| **Scalars / object model** | {mod}`picop.cybool`, {mod}`picop.cylong`, {mod}`picop.cyfloat`, {mod}`picop.cycomplex`, {mod}`picop.cytype`, {mod}`picop.cyfunction`, {mod}`picop.cymethod`, {mod}`picop.cymodule`, … |
-| **Runtime** | {mod}`picop.cydatetime`, {mod}`picop.cycodecs`, {mod}`picop.cymarshal`, {mod}`picop.cyfileobject`, {mod}`picop.cyweakref`, {mod}`picop.cypycapsule`, {mod}`picop.cycontextvars`, {mod}`picop.cytime`, {mod}`picop.cygc`, {mod}`picop.cysentinel`, {mod}`picop.cyframe` |
+| **Scalars / object model** | {mod}`picop.cybool`, {mod}`picop.cylong`, {mod}`picop.cyfloat`, {mod}`picop.cycomplex`, {mod}`picop.cytype`, {mod}`picop.cyfunction`, {mod}`picop.cymethod`, {mod}`picop.cymodule`, {mod}`picop.cydescr`, {mod}`picop.cyconversion` |
+| **Frames / code / calls** | {mod}`picop.cycall`, {mod}`picop.cyframe`, {mod}`picop.cycode`, {mod}`picop.cytraceback`, {mod}`picop.cycellobject`, {mod}`picop.cygenobject`, {mod}`picop.cyiterator`, {mod}`picop.cyiterobject` |
+| **Runtime** | {mod}`picop.cydatetime`, {mod}`picop.cycodecs`, {mod}`picop.cymarshal`, {mod}`picop.cyfileobject`, {mod}`picop.cyweakref`, {mod}`picop.cypycapsule`, {mod}`picop.cycontextvars`, {mod}`picop.cytime`, {mod}`picop.cygc`, {mod}`picop.cysentinel` |
 | **UUID** | {mod}`picop.uuid` |
 
 ```{toctree}

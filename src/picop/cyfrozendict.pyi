@@ -3,7 +3,7 @@
 ``frozendict`` is **not** a ``dict`` subclass, so ``dict_check`` /
 ``dict_check_exact`` are ``False`` for it. Use the ``anydict_*`` helpers when a
 value may be either. On CPython 3.14 the checks answer ``False`` and the
-constructors raise :exception:`NotImplementedError` — never a mutable ``dict``.
+constructors raise ``NotImplementedError`` — never a mutable ``dict``.
 """
 
 def frozendict_check(obj: object) -> bool:
@@ -34,21 +34,21 @@ def frozendict_new(iterable: object) -> object:
     Notes: ``None`` is not iterable — use ``frozendict_empty()`` for the
     no-iterable path. Passing an existing frozendict returns **the same
     object** with an incremented reference, not a copy. Raises
-    :exception:`NotImplementedError` on 3.14.
+    ``NotImplementedError`` on 3.14.
     """
     ...
 
 def frozendict_empty() -> object:
     """Return an empty frozendict without building an iterable.
 
-    Notes: raises :exception:`NotImplementedError` on 3.14.
+    Notes: raises ``NotImplementedError`` on 3.14.
     """
     ...
 
 def anydict_len(obj: object) -> int:
     """Return the entry count of a dict or frozendict.
 
-    Notes: raises :exception:`TypeError` for anything else; the read uses the
+    Notes: raises ``TypeError`` for anything else; the read uses the
     ``PyDict_GET_SIZE`` layout shared by dict and frozendict.
     """
     ...

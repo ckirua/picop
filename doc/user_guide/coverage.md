@@ -56,7 +56,7 @@ As of **`1.0.0`**:
 
 ### Runtime (public and/or cimport)
 
-Public Runtime helpers include datetime, codecs, marshal, file, weakref, capsule, contextvars, `cytime` clocks, and object-model / scalar modules (`cyfunction`, `cymethod`, `cylong`, …). Embedding / process helpers such as `cyerr`, `cymem`, `cythread` are **cimport only** and are not documented here as Python callables.
+Public Runtime helpers include datetime, codecs, marshal, file, weakref, capsule, contextvars, `cytime` clocks, sentinel checks, and object-model / scalar modules (`cyfunction`, `cymethod`, `cylong`, …). Since 3.1/3.2, `cycall` adds tuple-free calls, and `cyframe`, `cycode`, `cytraceback`, and `cycellobject` add frame, code-object, traceback, and cell readers. Embedding / process helpers such as `cyerr`, `cymem`, `cythread` are **cimport only** and are not documented here as Python callables.
 
 ## Import surfaces
 

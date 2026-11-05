@@ -26,6 +26,7 @@ Submodules
    cybuffer
    cybytearray
    cybytes
+   cycall
    cycellobject
    cycode
    cycodecs

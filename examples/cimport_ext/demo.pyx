@@ -12,6 +12,15 @@ from picop.uuid._uuid cimport UUID as DirectUUID, uuid_from_buf
 from picop.cymemoryview cimport memoryview_get_base, memoryview_from_memory
 from picop.cysentinel cimport sentinel_check, sentinel_check_exact, sentinel_new, sentinel_type
 
+import sys
+from picop.cyframe cimport (
+    frame_back,
+    frame_check,
+    frame_code,
+    frame_lineno,
+    frame_var,
+    frame_var_cstr,
+)
 import gc
 import weakref
 
@@ -68,6 +77,19 @@ cpdef bint check_sentinels():
         and sentinel_type() is type(marker)
     )
 
+
+cpdef bint check_frames(object caller):
+    # ``cdef`` locals live in the C frame, not in ``co_varnames``, and
+    # ``PyFrame_GetVar`` only sees fast locals, so the caller passes a
+    # Python frame with Python-level locals.
+    assert frame_check(caller)
+    assert frame_lineno(caller) > 0
+    assert frame_code(caller) is caller.f_code
+    assert frame_var(caller, "values") is not None
+    assert frame_var_cstr(caller, b"values") is not None
+    cdef object back = frame_back(caller)
+    assert back is None or frame_check(back)
+    return True
 
 cpdef bint check_containers():
     cdef list values = [object()]

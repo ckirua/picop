@@ -25,6 +25,11 @@ assert demo.check_uuid()
 assert demo.check_ownership()
 assert demo.check_containers()
 assert demo.check_sentinels()
+def _frame_probe():
+    values = [1, 2]
+    return demo.check_frames(sys._getframe())
+
+assert _frame_probe()
 assert demo.check_direct_uuid()
 assert demo.check_memoryview_ownership()
 assert not free or not sys._is_gil_enabled()

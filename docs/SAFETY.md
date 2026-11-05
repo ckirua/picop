@@ -37,6 +37,9 @@ That does not remove trusted-caller preconditions:
   exporters; synchronize content mutations separately.
 - Fill uninitialized bytes/tuple/list slots exclusively before publication.
   Unchecked cell setters retain their caller-managed reference-transfer rules.
+- Frame accessors return new references. Under free-threading, `frame_back`,
+  `frame_generator`, and `frame_var` are not lock-protected; keep the frame alive
+  for the entire call. Cython `cdef` locals are invisible to `frame_var`.
 - C API calls require an attached thread state even with the GIL disabled.
   Object-domain allocators are for Python objects, not general-purpose buffers.
 

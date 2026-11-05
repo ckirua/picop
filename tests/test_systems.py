@@ -12,16 +12,71 @@ from picop import (
     call_noargs,
     call_onearg,
     call_twoargs,
-    obj_call,
+    frame_back,
+    frame_builtins,
+    frame_check,
+    frame_code,
+    frame_generator,
+    frame_globals,
+    frame_lasti,
+    frame_lineno,
+    frame_var,
+    frame_var_cstr,
     memoryview_itemsize,
     memoryview_nbytes,
     memoryview_ndim,
     memoryview_readonly,
+    obj_call,
     sentinel_check,
     sentinel_check_exact,
     sentinel_new,
     sentinel_type,
 )
+
+def test_frame_helpers() -> None:
+    import sys
+
+    def inner():
+        value = 42
+        return sys._getframe()
+
+    frame = inner()
+    assert frame_check(frame)
+    assert not frame_check(1)
+    assert not frame_check(None)
+    assert frame_lineno(frame) == frame.f_lineno
+    assert frame_lasti(frame) == frame.f_lasti
+    assert frame_code(frame) is frame.f_code
+    assert frame_globals(frame) is frame.f_globals
+    assert frame_builtins(frame) is frame.f_builtins
+    assert frame_var(frame, "value") == 42
+    assert frame_var_cstr(frame, b"value") == 42
+
+
+def test_frame_var_propagates_name_error() -> None:
+    import sys
+
+    with pytest.raises(NameError):
+        frame_var(sys._getframe(), "missing")
+
+
+def test_frame_generator_identity() -> None:
+    generator = (value for value in range(3))
+    next(generator)
+    assert frame_generator(generator.gi_frame) is generator
+
+
+def test_frame_chain_back() -> None:
+    import sys
+
+    def inner():
+        return sys._getframe()
+
+    def outer():
+        return inner()
+
+    inner_frame = outer()
+    assert frame_back(frame_back(frame_back(inner_frame))) is not None
 
 
 @pytest.mark.skipif(not hasattr(builtins, "sentinel"), reason="requires Python 3.15 sentinel")

@@ -76,6 +76,7 @@ As of **`1.0.0`**:
 | `cytime` | public | Thin `time_wall` / `time_time` / `time_monotonic` / `time_perf_counter` — **Runtime**, not Core (`picop.hot` excludes them). Prefer stdlib `time` unless you need these wrappers; prefer `time_wall` over stutter `time_time`. |
 | `cycall`, `cyfunction`, `cymethod`, `cymodule`, `cyiterator`, `cyiterobject`, `cygenobject`, `cycellobject`, `cydescr`, `cytype`, `cylong`, `cyfloat`, … | public | Object-model / scalar helpers; `cycall` supplies tuple-free calls; `func_eq` / `method_eq` / `mod_eq` / `gen_eq` / `iter_eq` / `type_eq` identity-or-richcompare / `cell_eq` content (not `hot`) |
 | `cyerr`, `cymem`, `cythread`, `cyatomic`, `cyref`, `cygetargs`, `cyceval`, `cypystate`, `cypylifecycle`, `cypyport`, `cyversion`, `cylongintrepr` | **cimport only** | Embedding / process footguns — not pure-Python. `cyerr` prefers raised-exception get/set lifecycle APIs on Python ≥3.14. |
+| `cyframe` | public + cimport | Frame readers: `frame_*`; `frame_new` and `frame_is_entry_frame` are cimport-only |
 | `cysentinel` | public (CPython 3.15+; 3.14 checks answer `False`, constructors/type access raise `NotImplementedError`) | `sentinel_check`, `sentinel_check_exact`, `sentinel_new`, `sentinel_type` |
 | `cyinstance` | **none** | Classic-class ABI gone on 3.14 |
 

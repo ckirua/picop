@@ -378,6 +378,19 @@ from .cyfrozendict import (
     frozendict_new,
 )
 from .cysentinel import (sentinel_check, sentinel_check_exact, sentinel_new, sentinel_type)
+from .cyframe import (
+    frame_back,
+    frame_builtins,
+    frame_check,
+    frame_code,
+    frame_locals,
+    frame_generator,
+    frame_globals,
+    frame_lasti,
+    frame_lineno,
+    frame_var,
+    frame_var_cstr,
+)
 from .cyfloat import (
     float_as_double,
     float_check,

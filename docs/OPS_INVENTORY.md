@@ -21,9 +21,9 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 
 | Metric | Count |
 |--------|------:|
-| Public barrel helpers | 456 |
-| `tierA` | 320 |
-| `tierB` | 124 |
+| Public barrel helpers | 460 |
+| `tierA` | 322 |
+| `tierB` | 126 |
 | `pending` | 0 |
 | `n/a` | 12 |
 
@@ -386,6 +386,10 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 | `obj_str` | tierA | Tier A `session.compare` present |
 | `obj_type` | tierB | Tier A+B compare labels present |
 | `range_eq` | tierB | Tier A+B compare labels present |
+| `sentinel_check` | tierB | Tier A+B compare labels present |
+| `sentinel_check_exact` | tierB | Tier A+B compare labels present |
+| `sentinel_new` | tierA | Tier A `session.compare` present |
+| `sentinel_type` | tierA | Tier A `session.compare` present (direct shim accessor) |
 | `seq_check` | tierA | Tier A `session.compare` present |
 | `seq_concat` | tierA | Tier A `session.compare` present |
 | `seq_contains` | tierA | Tier A `session.compare` present |

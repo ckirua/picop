@@ -10,6 +10,7 @@ from picop.cydict cimport dict_get, dict_get_with_error
 from picop.cyobject cimport obj_call
 from picop.uuid._uuid cimport UUID as DirectUUID, uuid_from_buf
 from picop.cymemoryview cimport memoryview_get_base, memoryview_from_memory
+from picop.cysentinel cimport sentinel_check, sentinel_check_exact, sentinel_new, sentinel_type
 
 import gc
 import weakref
@@ -53,6 +54,19 @@ cpdef bint check_ownership():
     else:
         raise AssertionError("concat must propagate buffer errors")
     return True
+
+
+cpdef bint check_sentinels():
+    try:
+        marker = sentinel_new("marker", module="demo", repr="<marker>")
+    except NotImplementedError:
+        return not sentinel_check(object()) and not sentinel_check_exact(object())
+    return (
+        sentinel_check(marker)
+        and sentinel_check_exact(marker)
+        and repr(marker) == "<marker>"
+        and sentinel_type() is type(marker)
+    )
 
 
 cpdef bint check_containers():

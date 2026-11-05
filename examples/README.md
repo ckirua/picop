@@ -82,6 +82,7 @@ for f in examples/py*.py examples/wrap_ansi.py; do python "$f" || exit 1; done
 | 52 | `cyversion` | cython-recipe | see [cython/](cython/) + tracker |
 | 53 | `cytime` | smoke | [`pytime.py`](pytime.py) |
 | 57 | `cyfrozendict` | smoke | [`pyfrozendict.py`](pyfrozendict.py) |
+| 58 | `cysentinel` | smoke | [`py_sentinel.py`](py_sentinel.py) |
 
 ## Cython recipes
 
@@ -90,6 +91,7 @@ for f in examples/py*.py examples/wrap_ansi.py; do python "$f" || exit 1; done
 | [`cython/README.md`](cython/README.md) | cimport-only Orders |
 | [`cython/borrow_vs_owned.md`](cython/borrow_vs_owned.md) | `dget`/`lget` ownership (DX-05) |
 | [`cython/frozendict_vs_dict.md`](cython/frozendict_vs_dict.md) | frozendict is not a dict; typed access + copy semantics |
+| [`cython/sentinel_markers.md`](cython/sentinel_markers.md) | `sentinel` checks, marker construction, and Python 3.14 behavior |
 
 | Order | Module | Why not Python example |
 |------:|--------|------------------------|

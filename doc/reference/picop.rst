@@ -61,5 +61,6 @@ Submodules
    cytime
    cytuple
    cytype
+   cysentinel
    cyunicode
    cyweakref

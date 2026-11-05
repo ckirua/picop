@@ -14,7 +14,7 @@ Docstrings for compiled helpers are taken from adjacent `.pyi` stubs when the ru
 | **Buffers** | {mod}`picop.cyarray`, {mod}`picop.cymemoryview`, {mod}`picop.cybuffer`, {mod}`picop.cyslice` |
 | **Protocols** | {mod}`picop.cymapping`, {mod}`picop.cysequence`, {mod}`picop.cynumber`, {mod}`picop.cyobject` |
 | **Scalars / object model** | {mod}`picop.cybool`, {mod}`picop.cylong`, {mod}`picop.cyfloat`, {mod}`picop.cycomplex`, {mod}`picop.cytype`, {mod}`picop.cyfunction`, {mod}`picop.cymethod`, {mod}`picop.cymodule`, … |
-| **Runtime** | {mod}`picop.cydatetime`, {mod}`picop.cycodecs`, {mod}`picop.cymarshal`, {mod}`picop.cyfileobject`, {mod}`picop.cyweakref`, {mod}`picop.cypycapsule`, {mod}`picop.cycontextvars`, {mod}`picop.cytime`, {mod}`picop.cygc` |
+| **Runtime** | {mod}`picop.cydatetime`, {mod}`picop.cycodecs`, {mod}`picop.cymarshal`, {mod}`picop.cyfileobject`, {mod}`picop.cyweakref`, {mod}`picop.cypycapsule`, {mod}`picop.cycontextvars`, {mod}`picop.cytime`, {mod}`picop.cygc`, {mod}`picop.cysentinel` |
 | **UUID** | {mod}`picop.uuid` |
 
 ```{toctree}

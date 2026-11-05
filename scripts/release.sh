@@ -96,6 +96,11 @@ TAG="picop-v${VERSION}"
 TODAY="$(date -u +%Y-%m-%d)"
 [[ -n "$TITLE" ]] || TITLE="release ${VERSION}"
 
+# gh does not always resolve an SSH origin remote, so pass the repo explicitly.
+GH_REPO="$(git remote get-url origin | sed -E 's#^.*github\.com[:/]([^/]+/[^/]+?)(\.git)?$#\1#')"
+[[ -n "$GH_REPO" ]] || die "cannot derive GitHub owner/repo from origin remote"
+gh_repo() { gh --repo "$GH_REPO" "$@"; }
+
 info "release ${OLD} → ${VERSION} (tag ${TAG})"
 
 # Preconditions

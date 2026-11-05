@@ -377,6 +377,7 @@ from .cyfrozendict import (
     frozendict_empty,
     frozendict_new,
 )
+from .cysentinel import (sentinel_check, sentinel_check_exact, sentinel_new, sentinel_type)
 from .cyfloat import (
     float_as_double,
     float_check,

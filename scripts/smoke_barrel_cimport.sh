@@ -24,6 +24,7 @@ assert demo.check_submodule() == 2
 assert demo.check_uuid()
 assert demo.check_ownership()
 assert demo.check_containers()
+assert demo.check_sentinels()
 assert demo.check_direct_uuid()
 assert demo.check_memoryview_ownership()
 assert not free or not sys._is_gil_enabled()

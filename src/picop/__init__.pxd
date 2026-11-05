@@ -526,6 +526,12 @@ from .cyfrozendict cimport (
     frozendict_empty,
     frozendict_new,
 )
+from .cysentinel cimport (
+    sentinel_check,
+    sentinel_check_exact,
+    sentinel_new,
+    sentinel_type,
+)
 from .cyfloat cimport (
     float_check,
     float_check_exact,

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- `cysentinel`: add CPython 3.15 sentinel checks and constructors. On Python 3.14,
+  checks return `False` and constructors raise `NotImplementedError`.
 - `cyfrozendict`: add the CPython 3.15 `frozendict` surface — `frozendict_check`,
   `frozendict_check_exact`, `frozendict_new`, `frozendict_empty`, plus the
   dict-or-frozendict gates `anydict_check` / `anydict_check_exact` and the

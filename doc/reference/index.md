@@ -9,7 +9,7 @@ Docstrings for compiled helpers are taken from adjacent `.pyi` stubs when the ru
 | Area | Modules |
 |------|---------|
 | **Hot / facades** | {mod}`picop.hot`, {mod}`picop.containers`, {mod}`picop.buffers`, {mod}`picop.protocols` |
-| **Core containers** | {mod}`picop.cydict`, {mod}`picop.cylist`, {mod}`picop.cytuple`, {mod}`picop.cyset`, {mod}`picop.cydeque`, {mod}`picop.cyrange` |
+| **Core containers** | {mod}`picop.cydict`, {mod}`picop.cylist`, {mod}`picop.cytuple`, {mod}`picop.cyset`, {mod}`picop.cydeque`, {mod}`picop.cyrange`, {mod}`picop.cyfrozendict` |
 | **Bytes / str** | {mod}`picop.cybytes`, {mod}`picop.cybytearray`, {mod}`picop.cystr`, {mod}`picop.cyunicode`, {mod}`picop.cyansi` |
 | **Buffers** | {mod}`picop.cyarray`, {mod}`picop.cymemoryview`, {mod}`picop.cybuffer`, {mod}`picop.cyslice` |
 | **Protocols** | {mod}`picop.cymapping`, {mod}`picop.cysequence`, {mod}`picop.cynumber`, {mod}`picop.cyobject` |

@@ -517,6 +517,15 @@ from .cydict cimport (
     dict_set_string,
     dict_values,
 )
+from .cyfrozendict cimport (
+    anydict_check,
+    anydict_check_exact,
+    anydict_len,
+    frozendict_check,
+    frozendict_check_exact,
+    frozendict_empty,
+    frozendict_new,
+)
 from .cyfloat cimport (
     float_check,
     float_check_exact,

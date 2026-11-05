@@ -1,4 +1,10 @@
-"""GIL-held CPython call helpers for Cython extensions."""
+"""GIL-held CPython call helpers for Cython extensions.
+
+Public (``picop.hot``): ``call_noargs``, ``call_onearg``, ``call_twoargs``.
+Cython-only (``cimport cycall``): ``call_vector``, ``call_method_noargs``,
+``call_method_onearg``, ``call_method_vector``, ``vectorcall_nargs`` — these take
+raw borrowed argument vectors and cannot be called from Python.
+"""
 
 
 def call_noargs(callable: object) -> object:

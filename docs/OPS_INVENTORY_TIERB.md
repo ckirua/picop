@@ -10,6 +10,7 @@ Tier B = cypy `cdef` loop vs typed Cython baseline (opaque + sink).
 | `*_eq` | [`bench/tier_b/cyeq_inventory.py`](../bench/tier_b/cyeq_inventory.py) | Identity/memcmp wins; abstract `seq_eq`/`map_eq`/`buf_eq`/`num_eq` lose |
 | `*_ne` / start/end/contains | [`bench/tier_b/cyne_search.py`](../bench/tier_b/cyne_search.py) | All wins (`bytearray_contains` **0.24x**, `bytes_ne` **0.68–0.95x**) |
 | `str_cmp` / ordering / check | [`bench/tier_b/cystr_order.py`](../bench/tier_b/cystr_order.py) | `str_cmp` **0.26x**; ordering **0.47–0.63x**; `str_check`/`str_is` ~tie |
+| `call_*` / `call_method_*` | [`bench/tier_b/cycall.py`](../bench/tier_b/cycall.py) | `call_noargs` **0.97x**, `call_vector` NULL/pos+kw **0.93–0.98x**; method/arity variants **1.0–1.1x** (Cython already vectorcalls with a reserved slot) |
 
 See also [`EQ_INVENTORY_TIERB.md`](EQ_INVENTORY_TIERB.md).
 

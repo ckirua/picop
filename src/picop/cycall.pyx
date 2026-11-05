@@ -23,5 +23,32 @@ cpdef object call_twoargs(object callable, object arg0, object arg1):
     return <object>PyObject_Vectorcall(<PyObject *>callable, args, 2, NULL)
 
 
-cdef object call_vector(object callable, PyObject *const *args, size_t nargs, PyObject *kwnames):
-    return <object>PyObject_Vectorcall(<PyObject *>callable, args, nargs, kwnames)
+cdef object call_vector(object callable, PyObject *const *args, size_t nargsf, PyObject *kwnames):
+    """Vectorcall with a caller-owned argument vector.
+
+    ``args`` and ``kwnames`` are borrowed for the duration of the call. ``nargsf``
+    is passed straight to CPython, so the PY_VECTORCALL_ARGUMENTS_OFFSET bit is
+    allowed when ``args[-1]`` is a live reserved slot. ``kwnames`` must be NULL or
+    a tuple; ``Py_None`` is undefined (measured SIGSEGV).
+    """
+    return <object>PyObject_Vectorcall(<PyObject *>callable, args, nargsf, kwnames)
+
+
+cdef object call_method_noargs(object self, object name):
+    """Call ``self.name()`` without an argument tuple."""
+    return PyObject_CallMethodNoArgs(self, name)
+
+
+cdef object call_method_onearg(object self, object name, object arg):
+    """Call ``self.name(arg)`` without an argument tuple."""
+    return PyObject_CallMethodOneArg(self, name, arg)
+
+
+cdef object call_method_vector(object name, PyObject *const *args, size_t nargsf, PyObject *kwnames):
+    """Vectorcall a looked-up method; ``args[0]`` is the receiver and counts in ``nargsf``."""
+    return <object>PyObject_VectorcallMethod(<PyObject *>name, args, nargsf, kwnames)
+
+
+cdef Py_ssize_t vectorcall_nargs(size_t nargsf) noexcept:
+    """Strip the PY_VECTORCALL_ARGUMENTS_OFFSET bit from ``nargsf``."""
+    return PyVectorcall_NARGS(nargsf)

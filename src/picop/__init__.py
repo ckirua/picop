@@ -368,6 +368,15 @@ from .cydict import (
     dict_size,
     dict_update,
 )
+from .cyfrozendict import (
+    anydict_check,
+    anydict_check_exact,
+    anydict_len,
+    frozendict_check,
+    frozendict_check_exact,
+    frozendict_empty,
+    frozendict_new,
+)
 from .cyfloat import (
     float_as_double,
     float_check,

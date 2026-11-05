@@ -37,6 +37,7 @@ Submodules
    cydict
    cyfileobject
    cyfloat
+   cyfrozendict
    cyfunction
    cygc
    cygenobject

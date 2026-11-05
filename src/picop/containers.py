@@ -1,4 +1,4 @@
-"""Category facade: typed Core containers (dict / list / set / tuple).
+"""Category facade: typed Core containers (dict / frozendict / list / set / tuple).
 
 Prefer ``from picop.hot import …`` for micro-opt starters. This module groups
 word-prefix container helpers for discovery without a flat barrel dump.
@@ -24,6 +24,15 @@ from .cydict import (
     dict_setdefault,
     dict_size,
     dict_update,
+)
+from .cyfrozendict import (
+    anydict_check,
+    anydict_check_exact,
+    anydict_len,
+    frozendict_check,
+    frozendict_check_exact,
+    frozendict_empty,
+    frozendict_new,
 )
 from .cydeque import deque_eq
 from .cyrange import range_eq
@@ -86,6 +95,13 @@ __all__: tuple[str, ...] = (
     "dict_clear",
     "dict_copy",
     "dict_new",
+    "frozendict_check",
+    "frozendict_check_exact",
+    "frozendict_empty",
+    "frozendict_new",
+    "anydict_check",
+    "anydict_check_exact",
+    "anydict_len",
     "list_check",
     "list_check_exact",
     "deque_eq",

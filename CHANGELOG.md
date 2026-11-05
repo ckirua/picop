@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+- `cyfrozendict`: add the CPython 3.15 `frozendict` surface — `frozendict_check`,
+  `frozendict_check_exact`, `frozendict_new`, `frozendict_empty`, plus the
+  dict-or-frozendict gates `anydict_check` / `anydict_check_exact` and the
+  shared-layout reader `anydict_len`. On Python 3.14 the checks return `False`
+  and the constructors raise `NotImplementedError` instead of silently
+  returning a mutable `dict`. `frozendict_new` on an existing frozendict is a
+  refcount bump, not a copy — build from an iterable for a new object.
+  Bench tables in [`docs/modules/057_cyfrozendict.md`](docs/modules/057_cyfrozendict.md);
+  examples in [`examples/pyfrozendict.py`](examples/pyfrozendict.py).
 - `cycall`: add the cimport-only bound-method helpers `call_method_noargs`,
   `call_method_onearg`, `call_method_vector` and the `PyVectorcall_NARGS` wrapper
   `vectorcall_nargs`; document that `call_vector` forwards `nargsf` unchanged

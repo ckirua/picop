@@ -1,6 +1,6 @@
 # Module trackers
 
-One `NNN_cy{name}.md` per area — **`NNN` = QUEUE Order** (zero-padded, `001`…`055`).  
+One `NNN_cy{name}.md` per area — **`NNN` = QUEUE Order** (zero-padded, `001`…`057`).  
 **Process docs are one level up:** [`../README.md`](../README.md), [`../PIPELINE.md`](../PIPELINE.md), [`../TEMPLATE.md`](../TEMPLATE.md).
 
 Gold exemplar: [`001_cytuple.md`](001_cytuple.md).
@@ -23,6 +23,7 @@ Gold exemplar: [`001_cytuple.md`](001_cytuple.md).
 | 12 | [012_cythread.md](012_cythread.md) | `cpython.pythread` | **v2** |
 | 13 | [013_cyatomic.md](013_cyatomic.md) | custom (C11 `stdatomic`) | **v2** |
 | 56 | [056_cycall.md](056_cycall.md) | `Python.h` call / vectorcall | v2 |
+| 57 | [057_cyfrozendict.md](057_cyfrozendict.md) | `cpython.frozendict` (3.15+) | v2 |
 
 ## Absent
 

@@ -21,11 +21,11 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 
 | Metric | Count |
 |--------|------:|
-| Public barrel helpers | 449 |
-| `tierA` | 319 |
-| `tierB` | 119 |
+| Public barrel helpers | 456 |
+| `tierA` | 320 |
+| `tierB` | 124 |
 | `pending` | 0 |
-| `n/a` | 11 |
+| `n/a` | 12 |
 
 ## Checklist
 
@@ -38,6 +38,9 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 | `ansi_reset` | tierA | Tier A `session.compare` present |
 | `ansi_strip` | tierA | Tier A `session.compare` present |
 | `ansi_wrap` | tierA | Tier A `session.compare` present |
+| `anydict_check` | tierB | Tier A+B compare labels present |
+| `anydict_check_exact` | tierB | Tier A+B compare labels present |
+| `anydict_len` | tierB | Tier A+B compare labels present |
 | `array_check` | tierB | Tier A+B compare labels present |
 | `array_check_exact` | tierA | Tier A `session.compare` present |
 | `array_clone` | tierA | Tier A `session.compare` present |
@@ -200,6 +203,10 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 | `float_eq` | tierB | Tier A+B compare labels present |
 | `float_from_cstr` | tierA | Tier A `session.compare` present |
 | `float_from_double` | tierA | Tier A `session.compare` present |
+| `frozendict_check` | tierB | Tier A+B compare labels present |
+| `frozendict_check_exact` | tierB | Tier A+B compare labels present |
+| `frozendict_empty` | n/a (allocation-dominated constructor) | explicit skip |
+| `frozendict_new` | tierA | Tier A `session.compare` present |
 | `frozenset_check` | tierA | Tier A `session.compare` present |
 | `frozenset_check_exact` | tierA | Tier A `session.compare` present |
 | `frozenset_empty` | tierA | Tier A `session.compare` present |

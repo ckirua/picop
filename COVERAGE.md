@@ -28,6 +28,7 @@ Timed public-ops checklist: [`docs/OPS_INVENTORY.md`](docs/OPS_INVENTORY.md) (ga
 | `cydict` | `dict` | public + cimport | `dict_get`, `dict_pop`, `dict_set`, `dict_len`, `dict_eq`, … |
 | `cydeque` | `collections.deque` | public | `deque_eq` |
 | `cyrange` | `range` | public | `range_eq` |
+| `cyfrozendict` | `frozendict` (3.15+) | public + cimport | `frozendict_check`, `anydict_check`, `anydict_len`, `frozendict_new` |
 | `cylist` | `list` | public + cimport | `list_append`, `list_get` / `list_get_checked`, `list_len`, `list_eq`, … |
 | `cyset` | `set` / `frozenset` | public + cimport | `set_add`, `set_contains`, `set_eq`, `frozenset_eq`, … |
 | `cytuple` | `tuple` | public + cimport | `tuple_get`, `tuple_len`, `tuple_pack*`; builders mostly cimport |

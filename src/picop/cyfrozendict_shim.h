@@ -33,6 +33,8 @@ static inline int cy_anydict_check_exact(PyObject *obj)
 
 static inline PyObject *cy_frozendict_new(PyObject *iterable)
 {
+    /* NULL means "no iterable" for C callers; Python callers pass None, which
+       CPython rejects with TypeError — use cy_frozendict_new_empty() instead. */
     return PyFrozenDict_New(iterable);
 }
 

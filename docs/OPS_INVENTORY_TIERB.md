@@ -11,7 +11,7 @@ Tier B = cypy `cdef` loop vs typed Cython baseline (opaque + sink).
 | `*_ne` / start/end/contains | [`bench/tier_b/cyne_search.py`](../bench/tier_b/cyne_search.py) | All wins (`bytearray_contains` **0.24x**, `bytes_ne` **0.68–0.95x**) |
 | `str_cmp` / ordering / check | [`bench/tier_b/cystr_order.py`](../bench/tier_b/cystr_order.py) | `str_cmp` **0.26x**; ordering **0.47–0.63x**; `str_check`/`str_is` ~tie |
 | `call_*` / `call_method_*` | [`bench/tier_b/cycall.py`](../bench/tier_b/cycall.py) | `call_noargs` **0.97x**, `call_vector` NULL/pos+kw **0.93–0.98x**; method/arity variants **1.0–1.1x** (Cython already vectorcalls with a reserved slot) |
-| `frozendict_*` / `anydict_*` | [`bench/tier_b/cyfrozendict.py`](../bench/tier_b/cyfrozendict.py) | `anydict_check_exact` **0.46–0.48x**, `anydict_len` **0.43–0.51x**, `_exact`/`anydict` checks **0.59–0.76x**; `frozendict_check` ties (Cython emits the same `PyObject_TypeCheck`) |
+| `frozendict_*` / `anydict_*` | [`bench/tier_b/cyfrozendict.py`](../bench/tier_b/cyfrozendict.py) | `anydict_check_exact` **0.45–0.46x**, `anydict_len` **0.41–0.48x**, `_exact`/`anydict` checks **0.54–0.75x**; `frozendict_check` ties (Cython emits the same `PyObject_TypeCheck`) |
 
 See also [`EQ_INVENTORY_TIERB.md`](EQ_INVENTORY_TIERB.md).
 

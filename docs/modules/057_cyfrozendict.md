@@ -33,7 +33,7 @@ everything Cython's `frozendict.pxd` exposes). No skim.
 | `PyFrozenDict_CheckExact` | C-API | macro (`Py_IS_TYPE`) | `frozendict_check_exact` | exact type only |
 | `PyAnyDict_Check` | C-API | macro | `anydict_check` | dict **or** frozendict, subtypes included |
 | `PyAnyDict_CheckExact` | C-API | macro | `anydict_check_exact` | excludes `dict` subclasses such as `defaultdict` |
-| `PyFrozenDict_New(iterable)` | C-API | function | `frozendict_new` | `NULL` iterable → empty frozendict |
+| `PyFrozenDict_New(iterable)` | C-API | function | `frozendict_new` | `NULL` iterable → empty frozendict (C path; `frozendict_new(None)` raises `TypeError`, like the builtin) |
 | — (`NULL` iterable) | used-by | — | `frozendict_empty` | zero-arg fast path, no iterable build |
 | `PyDict_GET_SIZE` | C-API | static inline (asserts `PyAnyDict_Check`) | `anydict_len` | shared dict layout; valid on frozendict |
 | `PyDict_GetItem` / `PyDict_Contains` | C-API | function | — | work on frozendict (borrowed return); not exported — subscript is already fast |
@@ -90,20 +90,20 @@ unmapped.
 
 | operation | case | picop mean±σ | p99 | ratio | p99× | verdict |
 |-----------|------|-------------|-----|-------|------|---------|
-| `frozendict_check` | frozendict hit | 2.54±0.77ms | 3.80ms | **0.53x** | 0.58x | APPROVED |
-| `frozendict_check` | dict miss | 2.19±0.05ms | 2.27ms | **0.39x** | 0.40x | APPROVED |
-| `frozendict_check_exact` | hit | 2.01±0.04ms | 2.08ms | **0.50x** | 0.51x | APPROVED |
-| `anydict_check` | frozendict | 2.06±0.05ms | 2.11ms | **0.27x** | 0.28x | APPROVED |
-| `anydict_check` | dict | 1.99±0.03ms | 2.04ms | **0.32x** | 0.33x | APPROVED |
-| `anydict_check_exact` | frozendict | 2.17±0.03ms | 2.22ms | **0.40x** | 0.40x | APPROVED |
-| `anydict_check_exact` | dict | 2.09±0.02ms | 2.12ms | **0.45x** | 0.45x | APPROVED |
-| `frozendict_new` | from dict (4 items) | 8.82±0.06ms | 8.88ms | 1.01x | 1.00x | tie — API-clarity keep |
-| `frozendict_new` | from frozendict | 2.28±0.02ms | 2.32ms | **0.51x** | 0.51x | APPROVED |
-| `frozendict_empty` | no iterable | 4.62±0.05ms | 4.69ms | **0.77x** | 0.78x | APPROVED |
-| `anydict_len` | frozendict, 4 items | 2.19±0.05ms | 2.25ms | **0.53x** | 0.46x | APPROVED |
-| `anydict_len` | dict, 4 items | 2.11±0.03ms | 2.15ms | **0.49x** | 0.38x | APPROVED |
+| `frozendict_check` | frozendict hit | 2.01±0.03ms | 2.05ms | **0.44x** | 0.39x | APPROVED |
+| `frozendict_check` | dict miss | 2.23±0.07ms | 2.33ms | **0.39x** | 0.40x | APPROVED |
+| `frozendict_check_exact` | hit | 2.40±0.51ms | 3.23ms | **0.57x** | 0.74x | APPROVED |
+| `anydict_check` | frozendict | 2.24±0.26ms | 2.55ms | **0.30x** | 0.33x | APPROVED |
+| `anydict_check` | dict | 3.03±0.96ms | 3.87ms | **0.47x** | 0.53x | APPROVED |
+| `anydict_check_exact` | frozendict | 2.13±0.14ms | 2.36ms | **0.40x** | 0.44x | APPROVED |
+| `anydict_check_exact` | dict | 2.07±0.02ms | 2.09ms | **0.41x** | 0.34x | APPROVED |
+| `frozendict_new` | from dict (4 items) | 9.31±0.45ms | 10.07ms | 0.97x | 0.93x | tie — API-clarity keep |
+| `frozendict_new` | from frozendict | 2.23±0.03ms | 2.25ms | **0.51x** | 0.51x | APPROVED |
+| `frozendict_empty` | no iterable | 4.67±0.04ms | 4.73ms | **0.75x** | 0.65x | APPROVED |
+| `anydict_len` | frozendict, 4 items | 2.15±0.03ms | 2.20ms | **0.55x** | 0.55x | APPROVED |
+| `anydict_len` | dict, 4 items | 2.13±0.04ms | 2.18ms | **0.51x** | 0.43x | APPROVED |
 
-11/12 picop faster, 11/12 pass the ≥5% gate, mean ratio 0.52x, median 0.49x.
+12/12 picop faster, 11/12 pass the ≥5% gate, mean ratio 0.52x, median 0.49x.
 `frozendict_new` from a plain `dict` sits at 0.97–1.01x across runs —
 allocation-bound, no measurable win.
 
@@ -111,15 +111,15 @@ allocation-bound, no measurable win.
 
 | operation | case | picop loop | cython baseline | ratio | p99× | note |
 |-----------|------|------------|-----------------|-------|------|------|
-| `frozendict_check` | hit | 3.18±0.20ms | 3.19±0.19ms | 1.00x | 1.00x | tie — Cython already emits the same `TypeCheck` |
-| `frozendict_check` | dict miss | 7.72±0.51ms | 7.49±0.16ms | 1.03x | 1.10x | baseline marginally faster |
-| `frozendict_check_exact` | hit | 2.85±0.24ms | 4.83±0.01ms | **0.59x** | 0.65x | win |
-| `anydict_check` | dict | 3.21±0.02ms | 4.22±0.01ms | **0.76x** | 0.76x | win |
-| `anydict_check` | frozendict | 3.74±0.12ms | 5.55±0.44ms | **0.67x** | 0.63x | win |
-| `anydict_check_exact` | frozendict | 2.69±0.05ms | 5.58±0.08ms | **0.48x** | 0.49x | win |
-| `anydict_check_exact` | dict | 2.57±0.05ms | 5.55±0.04ms | **0.46x** | 0.48x | win |
-| `anydict_len` | frozendict | 3.76±0.06ms | 7.39±0.03ms | **0.51x** | 0.51x | win |
-| `anydict_len` | dict | 3.25±0.08ms | 7.52±0.14ms | **0.43x** | 0.44x | win |
+| `frozendict_check` | hit | 3.08±0.04ms | 3.28±0.38ms | 0.94x | 0.80x | ~tie — Cython already emits the same `PyObject_TypeCheck` |
+| `frozendict_check` | dict miss | 8.36±0.82ms | 7.97±0.48ms | 1.05x | 1.08x | baseline marginally faster |
+| `frozendict_check_exact` | hit | 2.68±0.03ms | 4.94±0.12ms | **0.54x** | 0.53x | win |
+| `anydict_check` | dict | 3.16±0.00ms | 4.36±0.08ms | **0.73x** | 0.71x | win |
+| `anydict_check` | frozendict | 3.96±0.25ms | 5.29±0.03ms | **0.75x** | 0.82x | win |
+| `anydict_check_exact` | frozendict | 2.55±0.00ms | 5.61±0.05ms | **0.45x** | 0.45x | win |
+| `anydict_check_exact` | dict | 2.61±0.05ms | 5.64±0.24ms | **0.46x** | 0.44x | win |
+| `anydict_len` | frozendict | 3.73±0.08ms | 7.80±0.48ms | **0.48x** | 0.45x | win |
+| `anydict_len` | dict | 3.17±0.02ms | 7.71±0.62ms | **0.41x** | 0.37x | win |
 
 `frozendict_new` / `frozendict_empty`: n/a — alloc-dominated (see
 [`OPS_INVENTORY_TIERB.md`](../OPS_INVENTORY_TIERB.md)).

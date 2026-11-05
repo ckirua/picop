@@ -13,6 +13,7 @@ from picop.cymemoryview cimport memoryview_get_base, memoryview_from_memory
 from picop.cysentinel cimport sentinel_check, sentinel_check_exact, sentinel_new, sentinel_type
 
 import sys
+from picop.cycode cimport PyCodeObject
 from picop.cyframe cimport (
     frame_back,
     frame_check,
@@ -20,6 +21,13 @@ from picop.cyframe cimport (
     frame_lineno,
     frame_var,
     frame_var_cstr,
+)
+from picop.cycode cimport (
+    code_addr2_location,
+    code_check,
+    code_firstlineno,
+    code_name,
+    code_num_free,
 )
 import gc
 import weakref
@@ -91,6 +99,25 @@ cpdef bint check_frames(object caller):
     assert back is None or frame_check(back)
     return True
 
+
+def inner():
+    return None
+
+
+cpdef bint check_code():
+    cdef object f = inner
+    cdef object code = f.__code__
+    cdef tuple location = code_addr2_location(<PyCodeObject *>code, 0)
+    assert code_check(f.__code__)
+    assert code_name(inner.__code__) == "inner"
+    assert code_firstlineno(inner.__code__) > 0
+    assert code_num_free(<PyCodeObject *>code) >= 0
+    assert len(location) == 4
+    assert isinstance(location[0], int)
+    assert isinstance(location[1], int)
+    assert isinstance(location[2], int)
+    assert isinstance(location[3], int)
+    return True
 cpdef bint check_containers():
     cdef list values = [object()]
     assert list_get(values, 0) is values[0]

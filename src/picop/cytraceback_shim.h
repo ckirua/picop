@@ -28,7 +28,8 @@ static inline int cy_tb_lineno(PyObject *tb)
         return t->tb_lineno;
     }
     if (t->tb_lasti >= 0) {
-        PyCodeObject *code = (PyCodeObject *)PyFrame_GetCode(t->tb_frame);
+        /* PyFrame_GetCode returns a new reference; release it after the lookup. */
+        PyCodeObject *code = PyFrame_GetCode(t->tb_frame);
         int lineno = PyCode_Addr2Line(code, t->tb_lasti);
         Py_DECREF(code);
         return lineno;

@@ -24,13 +24,16 @@ static inline PyObject *cy_tb_frame(PyObject *tb)
 static inline int cy_tb_lineno(PyObject *tb)
 {
     PyTracebackObject *t = (PyTracebackObject *)tb;
-    if (t->tb_lineno < 0) {
+    if (t->tb_lineno >= 0) {
+        return t->tb_lineno;
+    }
+    if (t->tb_lasti >= 0) {
         PyCodeObject *code = (PyCodeObject *)PyFrame_GetCode(t->tb_frame);
         int lineno = PyCode_Addr2Line(code, t->tb_lasti);
         Py_DECREF(code);
         return lineno;
     }
-    return t->tb_lineno;
+    return PyFrame_GetLineNumber(t->tb_frame);
 }
 
 static inline int cy_tb_lasti(PyObject *tb)

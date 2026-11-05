@@ -140,6 +140,7 @@ def test_traceback_chain_depth() -> None:
     count = 0
     current = tb
     while current is not None:
+        assert tb_lineno(current) == current.tb_lineno
         count += 1
         current = current.tb_next
     assert tb_depth(tb) == count == 4

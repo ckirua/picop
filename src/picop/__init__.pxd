@@ -532,6 +532,19 @@ from .cysentinel cimport (
     sentinel_new,
     sentinel_type,
 )
+from .cyframe cimport (
+    frame_back,
+    frame_builtins,
+    frame_check,
+    frame_code,
+    frame_generator,
+    frame_locals,
+    frame_globals,
+    frame_lasti,
+    frame_lineno,
+    frame_var,
+    frame_var_cstr,
+)
 from .cyfloat cimport (
     float_check,
     float_check_exact,

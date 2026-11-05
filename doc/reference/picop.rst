@@ -38,6 +38,7 @@ Submodules
    cyfileobject
    cyfloat
    cyfrozendict
+   cyframe
    cyfunction
    cygc
    cygenobject

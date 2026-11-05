@@ -22,6 +22,10 @@
   typed Cython baselines) with correctness/depth probes; measured tables are in
   [`docs/modules/056_cycall.md`](docs/modules/056_cycall.md). No public helper
   changed behaviour and the frozen Core is untouched.
+- `cyframe`: add 11 public frame readers and two cimport-only helpers for frame
+  construction and entry-frame detection. The same API is available on CPython
+  3.14 and 3.15; `frame_locals` preserves the PEP 667 proxy, and missing
+  `frame_var` names raise `NameError`.
 
 ## [3.0.0] — 2026-10-18 — picop 3.0 — picop-only imports
 

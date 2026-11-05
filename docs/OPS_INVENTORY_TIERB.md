@@ -13,6 +13,7 @@ Tier B = cypy `cdef` loop vs typed Cython baseline (opaque + sink).
 | `call_*` / `call_method_*` | [`bench/tier_b/cycall.py`](../bench/tier_b/cycall.py) | `call_noargs` **0.97x**, `call_vector` NULL/pos+kw **0.93–0.98x**; method/arity variants **1.0–1.1x** (Cython already vectorcalls with a reserved slot) |
 | `frozendict_*` / `anydict_*` | [`bench/tier_b/cyfrozendict.py`](../bench/tier_b/cyfrozendict.py) | `anydict_check_exact` **0.45–0.46x**, `anydict_len` **0.41–0.48x**, `_exact`/`anydict` checks **0.54–0.75x**; `frozendict_check` ties (Cython emits the same `PyObject_TypeCheck`) |
 | `sentinel_check` / `sentinel_check_exact` | [`bench/tier_b/cysentinel.py`](../bench/tier_b/cysentinel.py) | Tier B checks 0.05–0.13x; compares against dynamically imported Python type-check logic, not an identical C macro baseline |
+| `frame_*` | [`bench/tier_b/cyframe.py`](../bench/tier_b/cyframe.py) | `frame_check` 0.35–0.37x, `frame_lineno` 0.64–0.70x, `frame_code` 0.24–0.26x, `frame_back` 0.34x across default/depth passes |
 
 See also [`EQ_INVENTORY_TIERB.md`](EQ_INVENTORY_TIERB.md).
 

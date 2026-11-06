@@ -676,6 +676,13 @@ from .cylist cimport (
     list_new,
     list_set,
 )
+from .cylock cimport (
+    PyMutex,
+    mutex_init,
+    mutex_is_locked,
+    mutex_lock,
+    mutex_unlock,
+)
 from .cymem cimport (
     mem_calloc,
     mem_free,

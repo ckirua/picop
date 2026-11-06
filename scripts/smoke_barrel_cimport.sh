@@ -25,6 +25,17 @@ assert demo.check_uuid()
 assert demo.check_ownership()
 assert demo.check_containers()
 assert demo.check_sentinels()
+assert demo.check_locks()
+import threading
+import time
+
+holder = threading.Thread(target=demo.hold_shared, args=(0.3,))
+holder.start()
+time.sleep(0.1)
+assert demo.shared_is_locked(), "mutex state not visible across threads"
+holder.join()
+assert not demo.shared_is_locked()
+
 def _frame_probe():
     values = [1, 2]
     return demo.check_frames(sys._getframe())

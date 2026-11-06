@@ -86,6 +86,7 @@ for f in examples/py*.py examples/wrap_ansi.py; do python "$f" || exit 1; done
 | 59 | `cyframe` | smoke | [`pyframe.py`](pyframe.py) |
 | 60 | `cycode` | smoke | [`pycode.py`](pycode.py) |
 | 61 | `cytraceback` | smoke | [`pytraceback.py`](pytraceback.py) |
+| 63 | `cylock` | cython-recipe | [`cython/free_threading_locks.md`](cython/free_threading_locks.md) |
 
 ## Cython recipes
 
@@ -95,6 +96,7 @@ for f in examples/py*.py examples/wrap_ansi.py; do python "$f" || exit 1; done
 | [`cython/borrow_vs_owned.md`](cython/borrow_vs_owned.md) | `dget`/`lget` ownership (DX-05) |
 | [`cython/frozendict_vs_dict.md`](cython/frozendict_vs_dict.md) | frozendict is not a dict; typed access + copy semantics |
 | [`cython/sentinel_markers.md`](cython/sentinel_markers.md) | `sentinel` checks, marker construction, and Python 3.14 behavior |
+| [`cython/free_threading_locks.md`](cython/free_threading_locks.md) | typed `PyMutex` locks vs `cython.critical_section` |
 
 | Order | Module | Why not Python example |
 |------:|--------|------------------------|
@@ -111,3 +113,4 @@ for f in examples/py*.py examples/wrap_ansi.py; do python "$f" || exit 1; done
 | 49 | `cypylifecycle` | cimport-only ABI / process footguns |
 | 50 | `cypyport` | cimport-only ABI / process footguns |
 | 52 | `cyversion` | cimport-only ABI / process footguns |
+| 63 | `cylock` | cimport-only ABI / process footguns |

@@ -76,6 +76,23 @@ outside the concurrency contract. Rebuild downstream Cython extensions; the old
 private UUID layout is not a binary compatibility promise.
 
 
+## Locks (`cylock`, cimport-only)
+
+`mutex_lock`, `mutex_unlock` and `mutex_is_locked` take a **borrowed** `PyMutex *`.
+The mutex is a one-byte value your extension declares (`cdef PyMutex mu`); picop
+never owns it and never reads its contents.
+
+- The mutex must outlive every call that received its address. A stack-local
+  `PyMutex` is fine for one critical section; do not keep the pointer past the
+  scope that declared it.
+- `PyMutex` is **not reentrant**: locking a mutex the current thread already holds
+  parks the thread. Use `cython.critical_section` for the common "protect one
+  object" case and reach for `cylock` only for locks Cython cannot express (a
+  mutex stored in a C struct, or one shared with a library).
+- Unlocking a mutex you do not hold is silent corruption — no check, no exception,
+  no error code.
+- `mutex_init` zeroes the struct; zero is CPython's unlocked state.
+
 ## `marshal_loads`
 
 Untrusted data is **unsafe** — same class as stdlib `marshal.loads`. Only deserialize marshal payloads from a trusted source.

@@ -25,8 +25,8 @@ description: >-
 ## Install (consumer project)
 
 ```bash
-pip install "picop==3.2.0"
-# or from git: pip install "picop @ git+https://github.com/ckirua/picop.git@picop-v3.2.0"
+pip install "picop==3.3.0"
+# or from git: pip install "picop @ git+https://github.com/ckirua/picop.git@picop-v3.3.0"
 ```
 
 Requires **Python ≥ 3.14**.

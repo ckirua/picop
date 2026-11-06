@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [3.3.0] — 2026-11-06 — PyMutex cimport helpers and perf-parity gates
 
 ### Added
 

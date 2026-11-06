@@ -1,9 +1,8 @@
 """Buffer-protocol helpers for objects that expose a buffer.
 
 Prefer :mod:`picop.cybuffer` when comparing or copying buffer views without a
-known concrete type; use typed :mod:`picop.cybytes` /
-:mod:`picop.cymemoryview` when possible. See :doc:`/user_guide/quickstart` for
-import patterns.
+known concrete type; use typed :mod:`picop.cybytes` / :mod:`picop.cymemoryview`
+when possible. See :doc:`/user_guide/quickstart` for import patterns.
 """
 
 def buf_check(obj: object) -> bool:
@@ -25,6 +24,9 @@ def buf_eq(a: object, b: object) -> bool:
 
     Notes
     -----
+    Mixed Tier A parity: 0.74x (mv↔mv), 0.77x (bytes↔ba), 1.15x (ne); buffer-
+    protocol comparison.
+
     C-contiguous buffers use ``memcmp``; otherwise memoryview richcompare.
     Format/size mismatch yields ``False``.
     """

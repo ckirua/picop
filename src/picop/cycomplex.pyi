@@ -27,7 +27,13 @@ def complex_from_doubles(real: float, imag: float) -> object:
     ...
 
 def complex_real_as_double(op: object) -> float:
-    """Return the real part of ``op`` as a C ``double`` (``PyComplex_RealAsDouble``)."""
+    """Return the real part of ``op`` as a C ``double`` (``PyComplex_RealAsDouble``).
+
+    Notes
+    -----
+    Mixed Tier A parity: 0.55x (Z.real), 1.55x (int 7); unpacks a ``complex`` into C
+    doubles.
+    """
     ...
 
 def complex_imag_as_double(op: object) -> float:

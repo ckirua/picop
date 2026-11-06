@@ -13,7 +13,13 @@ def bool_eq(a: object, b: object) -> bool:
     ...
 
 def bool_from_long(v: int) -> object:
-    """Return ``True`` or ``False`` via ``PyBool_FromLong`` (nonzero → True)."""
+    """Return ``True`` or ``False`` via ``PyBool_FromLong`` (nonzero → True).
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``bool(x)`` (Tier A 1.03–1.08x); returns
+    the C ``bool`` for a Cython ``int``.
+    """
     ...
 
 def bool_true() -> object:

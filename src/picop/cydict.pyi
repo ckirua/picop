@@ -1,9 +1,9 @@
 """Typed C-API helpers for :class:`dict` hot paths.
 
 Prefer :mod:`picop.cydict` (or starters in :mod:`picop.hot`) over builtin
-``dict`` methods when the concrete type is known. See
-:doc:`/user_guide/safety` for borrowed-ref and trusted-caller caveats, and
-:doc:`/user_guide/quickstart` for import patterns.
+``dict`` methods when the concrete type is known. See :doc:`/user_guide/safety`
+for borrowed-ref and trusted-caller caveats, and :doc:`/user_guide/quickstart`
+for import patterns.
 """
 
 # Preferred public names (0.3 hard trim)
@@ -135,7 +135,13 @@ def dict_setdefault(d: dict, key: str, default: object = None) -> object:
     ...
 
 def dict_setdefault_ref(d: dict, key: object, default: object = None) -> object:
-    """Return ``setdefault`` via strong-ref ``PyDict_SetDefaultRef``."""
+    """Return ``setdefault`` via strong-ref ``PyDict_SetDefaultRef``.
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``d.setdefault(key, default)`` (Tier A
+    1.18x); unchecked ``PyDict`` mutation on a known dict.
+    """
     ...
 
 def dict_size(d: object) -> int:

@@ -1,7 +1,7 @@
 """Python function-object accessors wrapping ``PyFunction_*``.
 
-Prefer attribute access from Python unless you need owned-ref C-API getters
-on a known function object. Status-int setters return ``0`` on success. See
+Prefer attribute access from Python unless you need owned-ref C-API getters on
+a known function object. Status-int setters return ``0`` on success. See
 :doc:`/user_guide/quickstart`.
 """
 

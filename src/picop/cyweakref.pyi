@@ -1,7 +1,7 @@
 """Weak-reference construction and checks wrapping ``PyWeakref_*``.
 
-Prefer :mod:`weakref` from Python unless you need C-API construction on a
-known referent. See :doc:`/user_guide/quickstart`.
+Prefer :mod:`weakref` from Python unless you need C-API construction on a known
+referent. See :doc:`/user_guide/quickstart`.
 """
 
 def weakref_check(ob: object) -> bool:

@@ -89,5 +89,6 @@ jobs:
             python -X gil=0 -m pytest tests -q
           fi
           python "$GITHUB_WORKSPACE/scripts/check_exports.py"
+          python "$GITHUB_WORKSPACE/scripts/ops_inventory_coverage.py" --strict
           for f in examples/py*.py examples/wrap_ansi.py; do python "$f"; done
           PYTHON="$(command -v python)" bash scripts/smoke_barrel_cimport.sh

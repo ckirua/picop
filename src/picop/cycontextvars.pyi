@@ -1,8 +1,7 @@
 """Context / ContextVar helpers wrapping ``PyContext_*`` / ``PyContextVar_*``.
 
-Prefer :mod:`contextvars` from Python unless you need C-API enter/exit or
-var construction. ContextVar names take ``bytes``. See
-:doc:`/user_guide/safety`.
+Prefer :mod:`contextvars` from Python unless you need C-API enter/exit or var
+construction. ContextVar names take ``bytes``. See :doc:`/user_guide/safety`.
 """
 
 def context_eq(a: object, b: object) -> bool:
@@ -69,6 +68,9 @@ def ctxvar_reset(var: object, token: object) -> int:
 
     Notes
     -----
+    Slower than the plain-Python equivalent ``var.reset(token)`` (Tier A 1.02x);
+    context-variable token plumbing.
+
     Returns ``0`` on success; errors raise — do not use the status as a bool.
     """
     ...

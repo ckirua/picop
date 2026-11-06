@@ -2,7 +2,7 @@
 
 Use when the concrete type is unknown. Prefer typed ``list_*`` / ``tuple_*``
 from Core or :mod:`picop.hot` when the type is known. Tier A losers remain
-``cpdef`` but are omitted from these stubs. See :doc:`/user_guide/safety`.
+``cpdef`` and carry a parity note in the stub. See :doc:`/user_guide/safety`.
 """
 
 def seq_check(o: object) -> bool:
@@ -53,7 +53,13 @@ def seq_index(o: object, value: object) -> int:
     ...
 
 def seq_inplace_concat(o1: object, o2: object) -> object:
-    """Return ``o1 += o2`` result via ``PySequence_InPlaceConcat``."""
+    """Return ``o1 += o2`` result via ``PySequence_InPlaceConcat``.
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``a += b`` (Tier A 1.03x); works on any
+    sequence, not just ``list``.
+    """
     ...
 
 def seq_inplace_repeat(o: object, count: int) -> object:
@@ -87,9 +93,39 @@ def seq_set_slice(o: object, i1: int, i2: int, v: object) -> int:
     ...
 
 def seq_slice(o: object, i1: int, i2: int) -> object:
-    """Return ``o[i1:i2]`` via ``PySequence_GetSlice``."""
+    """Return ``o[i1:i2]`` via ``PySequence_GetSlice``.
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``x[a:b]`` (Tier A 1.18x); works on any
+    sequence, not just ``list``.
+    """
     ...
 
 def seq_tuple(o: object) -> tuple:
     """Return ``tuple(o)`` via ``PySequence_Tuple``."""
+    ...
+
+def seq_count(o: object, value: object) -> int:
+    """Return the number of occurrences of ``value`` in sequence ``o`` (``PySequence_Count``)."""
+    ...
+
+def seq_len(o: object) -> int:
+    """Return the length of sequence ``o`` (``PySequence_Length``).
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``len(x)`` (Tier A 1.21x); works on any
+    sequence, not just ``list``.
+    """
+    ...
+
+def seq_size(o: object) -> int:
+    """Return the size of sequence ``o`` (``PySequence_Size``, alias of ``PySequence_Length``).
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``len(x)`` (Tier A 1.22x); works on any
+    sequence, not just ``list``.
+    """
     ...

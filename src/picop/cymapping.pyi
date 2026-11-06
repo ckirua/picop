@@ -1,8 +1,8 @@
 """Abstract mapping-protocol helpers via the CPython C-API.
 
 Use when the concrete type is unknown. Prefer typed ``dict_*`` from Core /
-:mod:`picop.hot` when you know the object is a ``dict``. Tier A losers
-(ratio > 1.02 vs Python) stay as ``cpdef`` but are omitted here. See
+:mod:`picop.hot` when you know the object is a ``dict``. Tier A losers (ratio >
+1.02 vs Python) stay as ``cpdef`` with a parity note here. See
 :doc:`/user_guide/safety` for ``*_cstr`` key typing.
 """
 
@@ -81,5 +81,15 @@ def map_setitem_cstr(o: object, key: bytes, v: object) -> int:
     -----
     ``key`` must be ``bytes``, not ``str``. Returns ``0`` on success; errors
     raise — do not use the status as a bool. Alias of ``map_setitem_string``.
+    """
+    ...
+
+def map_len(o: object) -> int:
+    """Return the size of mapping ``o`` (``PyMapping_Length``).
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``len(x)`` (Tier A 1.09x); the typed
+    Cython call site.
     """
     ...

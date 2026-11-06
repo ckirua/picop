@@ -184,5 +184,5 @@ Ratio = cypy `cdef` loop / typed Cython baseline `==` loop (opaque + sink). **In
 
 ### Stub visibility (2026-08-02)
 
-- Stub-hidden (Tier A `>1.02x`): `set_pop`. Still `cpdef`.
+- Stub-visible with a parity note (Tier A `>1.02x`): `set_pop`. Still `cpdef`.
 

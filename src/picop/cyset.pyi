@@ -2,8 +2,8 @@
 
 Prefer :mod:`picop.cyset` (or starters in :mod:`picop.hot`) when the concrete
 set type is known; use protocol helpers only for unknown containers. Tier A
-losers (ratio > 1.02 vs Python) are omitted from stubs but remain ``cpdef``.
-See :doc:`/user_guide/quickstart` for import patterns.
+losers (ratio > 1.02 vs Python) remain ``cpdef`` and carry a parity note. See
+:doc:`/user_guide/quickstart` for import patterns.
 """
 
 # Preferred public names (0.3 hard trim)
@@ -13,6 +13,9 @@ def set_add(s: set, value: object) -> int:
 
     Notes
     -----
+    Slower than the plain-Python equivalent ``s.add(v)`` (Tier A 1.14x); unchecked
+    set mutation.
+
     Returns ``0`` on success; errors raise. Do not use the status int as a
     bool.
     """
@@ -39,6 +42,9 @@ def set_clear(s: set) -> int:
 
     Notes
     -----
+    Slower than the plain-Python equivalent ``s.clear()`` (Tier A 1.04x); unchecked
+    set mutation.
+
     Returns ``0`` on success; errors raise. Do not use the status int as a
     bool.
     """
@@ -57,6 +63,9 @@ def set_discard(s: set, value: object) -> int:
 
     Notes
     -----
+    Slower than the plain-Python equivalent ``s.discard(v)`` (Tier A 1.02–1.06x);
+    unchecked set mutation.
+
     Returns ``1`` if removed, ``0`` if absent (no ``KeyError``). Errors raise.
     Do not treat the status int as a plain bool for success/failure.
     """
@@ -79,7 +88,13 @@ def frozenset_empty() -> frozenset:
     ...
 
 def frozenset_new(iterable: object) -> frozenset:
-    """Return a new frozenset from ``iterable`` via ``PyFrozenSet_New``."""
+    """Return a new frozenset from ``iterable`` via ``PyFrozenSet_New``.
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``frozenset(it)`` (Tier A 1.20x);
+    unchecked set mutation.
+    """
     ...
 
 def frozenset_eq(a: frozenset, b: frozenset) -> bool:
@@ -113,7 +128,20 @@ def set_update(s: set, iterable: object) -> int:
 
     Notes
     -----
+    Slower than the plain-Python equivalent ``s.update(it)`` (Tier A 1.04x);
+    unchecked set mutation.
+
     Returns ``0`` on success; errors raise. Do not use the status int as a
     bool.
+    """
+    ...
+
+def set_pop(s: set) -> object:
+    """Return and remove an arbitrary element of ``s`` (``PySet_Pop``).
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``s.pop()`` (Tier A 1.11x); unchecked
+    set mutation.
     """
     ...

@@ -122,7 +122,7 @@ fi
 if git rev-parse "$TAG" >/dev/null 2>&1; then
   die "tag $TAG already exists"
 fi
-if gh release view "$TAG" >/dev/null 2>&1; then
+if gh_repo release view "$TAG" >/dev/null 2>&1; then
   die "GitHub release $TAG already exists"
 fi
 
@@ -259,7 +259,7 @@ pip install \"picop=={ver}\"
 fi
 
 info "GitHub release $TAG"
-run gh release create "$TAG" --title "picop ${VERSION}" --notes-file "$NOTES_TMP"
+run gh_repo release create "$TAG" --title "picop ${VERSION}" --notes-file "$NOTES_TMP"
 
 info "watching publish workflow (Ctrl+C to detach)"
 if [[ "$DRY_RUN" -eq 1 ]]; then
@@ -267,16 +267,16 @@ if [[ "$DRY_RUN" -eq 1 ]]; then
 else
   # Give Actions a moment to register the tag push
   sleep 3
-  run_id="$(gh run list --workflow=publish.yml --branch "$TAG" --limit 1 --json databaseId --jq '.[0].databaseId // empty')"
+  run_id="$(gh_repo run list --workflow=publish.yml --branch "$TAG" --limit 1 --json databaseId --jq '.[0].databaseId // empty')"
   if [[ -z "$run_id" ]]; then
-    run_id="$(gh run list --workflow=publish.yml --limit 1 --json databaseId,headBranch --jq "[.[] | select(.headBranch==\"$TAG\")][0].databaseId // empty")"
+    run_id="$(gh_repo run list --workflow=publish.yml --limit 1 --json databaseId,headBranch --jq "[.[] | select(.headBranch==\"$TAG\")][0].databaseId // empty")"
   fi
   if [[ -n "$run_id" ]]; then
-    gh run watch "$run_id" --exit-status
+    gh_repo run watch "$run_id" --exit-status
     echo
     echo "PyPI: https://pypi.org/project/picop/${VERSION}/"
     echo "Verify: pip install \"picop==${VERSION}\" && python -c \"from picop.hot import bytes_len; assert bytes_len(b'ok')==2\""
   else
-    echo "warn: publish run not found yet; check: gh run list --workflow=publish.yml"
+    echo "warn: publish run not found yet; check: gh_repo run list --workflow=publish.yml"
   fi
 fi

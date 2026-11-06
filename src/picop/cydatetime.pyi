@@ -1,8 +1,8 @@
 """DateTime C-API construction, field getters, and equality helpers.
 
-Prefer :mod:`datetime` from Python unless you need unchecked C-API
-constructors or field access on known date/time objects. Unchecked ``*_new``
-helpers are trusted-caller — see :doc:`/user_guide/safety`.
+Prefer :mod:`datetime` from Python unless you need unchecked C-API constructors
+or field access on known date/time objects. Unchecked ``*_new`` helpers are
+trusted-caller — see :doc:`/user_guide/safety`.
 """
 
 def dt_date_check(o: object) -> bool:

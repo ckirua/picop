@@ -1,8 +1,8 @@
 """Thin C-API wrappers for the cyclic garbage collector.
 
-Prefer :mod:`picop.cygc` when you need GC enable/disable/collect from typed
-hot paths; otherwise use :mod:`gc`. See :doc:`/user_guide/quickstart` for
-import patterns.
+Prefer :mod:`picop.cygc` when you need GC enable/disable/collect from typed hot
+paths; otherwise use :mod:`gc`. See :doc:`/user_guide/quickstart` for import
+patterns.
 """
 
 def gc_collect() -> int:

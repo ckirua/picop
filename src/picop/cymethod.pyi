@@ -1,8 +1,8 @@
 """Bound-method checks and accessors wrapping ``PyMethod_*``.
 
-Prefer attribute access from Python unless you need checked C-API getters on
-a known method. Tier A losers remain ``cpdef`` but are omitted from stubs.
-See :doc:`/user_guide/quickstart`.
+Prefer attribute access from Python unless you need checked C-API getters on a
+known method. Tier A losers remain ``cpdef`` and carry a parity note in the
+stub. See :doc:`/user_guide/quickstart`.
 """
 
 def method_check(o: object) -> bool:
@@ -28,5 +28,15 @@ def method_get_self(meth: object) -> object | None:
     Notes
     -----
     Preferred spelling of ``method_self``.
+    """
+    ...
+
+def method_new(func: object, self: object) -> object:
+    """Return a bound method for ``func`` and ``self`` (``PyMethod_New``).
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``types.MethodType`` (Tier A 1.23x); the
+    typed Cython call site.
     """
     ...

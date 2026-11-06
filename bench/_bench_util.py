@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 import statistics
 import time
@@ -331,6 +332,23 @@ class BenchSession:
             f"{gate_wins}/{len(self._rows)} pass ≥5% gate  ·  "
             f"mean ratio {mean_ratio:.2f}x  ·  median {median_ratio:.2f}x"
         )
+
+        if os.environ.get("CPY_BENCH_JSON"):
+            # Machine-readable rows for scripts/perf_parity_report.py.
+            print(
+                "BENCH_JSON "
+                + json.dumps(
+                    [
+                        {
+                            "label": row.label,
+                            "case": row.param,
+                            "ratio": round(row.ratio_mean, 4),
+                            "p99_ratio": round(row.ratio_p99, 4),
+                        }
+                        for row in self._rows
+                    ]
+                )
+            )
 
         if len(self._sections) <= 1:
             print()

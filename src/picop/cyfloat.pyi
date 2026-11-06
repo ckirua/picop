@@ -1,7 +1,8 @@
 """Float checks and equality with CPython float parity.
 
 Prefer builtins for ordinary float work from Python. Tier A losers remain
-``cpdef`` but are omitted from stubs. See :doc:`/user_guide/quickstart`.
+``cpdef`` and carry a parity note in the stub. See
+:doc:`/user_guide/quickstart`.
 """
 
 def float_check(p: object) -> bool:
@@ -18,5 +19,35 @@ def float_eq(a: object, b: object) -> bool:
     Notes
     -----
     Matches CPython: ``NaN != NaN``, and ``+0.0 == -0.0``.
+    """
+    ...
+
+def float_as_double(pyfloat: object) -> float:
+    """Return the C ``double`` of a Python float (``PyFloat_AsDouble``).
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``float(x)`` (Tier A 1.26–1.47x); hands
+    Cython a C ``double``.
+    """
+    ...
+
+def float_from_double(v: float) -> object:
+    """Return a Python float from a C ``double`` (``PyFloat_FromDouble``).
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``float(x)`` (Tier A 1.18x); hands
+    Cython a C ``double``.
+    """
+    ...
+
+def float_from_cstr(s: object) -> object:
+    """Return a float parsed from a ``str``/``bytes`` object (``PyFloat_FromString``).
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``float(x)`` (Tier A 1.03x); hands
+    Cython a C ``double``.
     """
     ...

@@ -9,6 +9,8 @@ _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
 
+from itertools import count
+
 from picop import iter_check, iter_next
 
 from _bench_util import BenchSession
@@ -21,8 +23,9 @@ def main() -> None:
     session.section("iter_check  [primary]")
     session.compare("iter_check", iter_check, lambda o: hasattr(o, "__next__"), it, param="iter")
     session.compare("iter_check", iter_check, lambda o: hasattr(o, "__next__"), [1], param="list")
-    # next: use fresh iterators each time via mutate pattern — simple one-shot compare on list iter next
-    session.compare("iter_next", iter_next, next, iter(range(10**6)), param="range-iter")
+    # ``next`` on a live iterator: ``count()`` never exhausts, so raising the
+    # run count cannot make the baseline raise StopIteration.
+    session.compare("iter_next", iter_next, next, count(), param="count-iter")
     session.summary()
 
 

@@ -16,6 +16,16 @@ Use `picop` for Python imports and Cython cimports. The former `cypy` imports an
 
 **Rule of thumb:** prefer **Core** when the type is known; use **Protocols** only when it is not; use **Runtime** for non-hot-path / embedding needs.
 
+### Parity: helpers that are not faster from plain Python
+
+Not every helper beats the builtin. The Tier A bench finds helpers that lose to the
+builtin in **every** measured case, and a few that win or lose depending on the input —
+mostly Protocols/Runtime thin wrappers, with a handful of Core names (`dict_pop`,
+`set_add`, `tuple_get`, `tuple_pack2`). They stay in the API: the loss is the cpdef
+wrapper cost at the Python boundary, and it vanishes inside Cython. Each docstring says
+so, and `docs/PERF_PARITY.md` in the repository lists each one with the builtin to use
+instead.
+
 ### Core (prefer for micro-opts)
 
 | Module | Maps to | Notes |

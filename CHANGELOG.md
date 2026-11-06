@@ -1,5 +1,18 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- `docs/PERF_PARITY.md` and `scripts/perf_parity_report.py`: a machine-generated table
+  of the public helpers that are **slower** than the plain-Python builtin in every Tier A
+  case, plus the case-dependent ones, with the builtin to use instead.
+- Every Tier-A-losing public helper now has a `.pyi` stub with a
+  `Slower than the plain-Python equivalent …` docstring note (46 stub entries added for
+  helpers that were `cpdef` but undocumented).
+- `scripts/ops_inventory_coverage.py --strict` now cross-checks that table against the
+  `.pyi` docstrings in both directions, and runs in the smoke workflow.
+
 ## [3.2.0] — 2026-11-05 — Frame, code, and traceback accessors with refcount-balanced getters
 
 ### Added

@@ -184,4 +184,5 @@ Packaging, README/examples, and release checklist — see [`RELEASE.md`](RELEASE
 ## Phase 6 (usage examples) — complete
 
 Every Order has a runnable **python** example, a **cython** recipe pointer, or honest **n/a** — see [`examples/README.md`](../examples/README.md).  
-CI runs `scripts/grade_trackers.py` (63/63 A) and all `examples/py*.py`. Do not invent pure-Python demos for cimport-only modules.
+CI runs `scripts/grade_trackers.py` (63/63 A) and all `examples/py*.py`. Do not invent pure-Python demos for cimport-only modules.  
+CI also runs `scripts/ops_inventory_coverage.py --strict`, which cross-checks [`PERF_PARITY.md`](PERF_PARITY.md) against the `.pyi` docstrings: a new public helper that loses **every** Tier A case must carry the `Slower than the plain-Python equivalent …` note and a row in [`PERF_PARITY.md`](PERF_PARITY.md).

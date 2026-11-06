@@ -1,8 +1,8 @@
 """Capsule type checks wrapping ``PyCapsule_*``.
 
 Prefer :mod:`ctypes` / extension APIs that expose capsules unless you need
-exact-type or name validation on a known capsule. Capsule names take
-``bytes``. See :doc:`/user_guide/safety`.
+exact-type or name validation on a known capsule. Capsule names take ``bytes``.
+See :doc:`/user_guide/safety`.
 """
 
 def capsule_check_exact(o: object) -> bool:

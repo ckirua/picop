@@ -68,7 +68,13 @@ def mod_import(name: bytes) -> object:
     ...
 
 def mod_import_object(name: object) -> object:
-    """Import module ``name`` via ``PyImport_Import``."""
+    """Import module ``name`` via ``PyImport_Import``.
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``__import__(name)`` (Tier A 2.18x);
+    module plumbing for embedding code.
+    """
     ...
 
 def mod_reload(m: object) -> object:

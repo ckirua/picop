@@ -1,7 +1,7 @@
 """Cell-object construction and access wrapping ``PyCell_*``.
 
-Prefer closure introspection from Python unless you need C-API cell get/set
-on a known cell. Status-int setters return ``0`` on success. See
+Prefer closure introspection from Python unless you need C-API cell get/set on
+a known cell. Status-int setters return ``0`` on success. See
 :doc:`/user_guide/quickstart`.
 """
 

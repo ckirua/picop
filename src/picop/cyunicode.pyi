@@ -17,7 +17,13 @@ def uutf8_bytes(s: str) -> bytes:
     ...
 
 def uintern(s: str) -> str:
-    """Intern ``s`` via ``PyUnicode_InternInPlace`` and return the canonical instance."""
+    """Intern ``s`` via ``PyUnicode_InternInPlace`` and return the canonical instance.
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``sys.intern(s)`` (Tier A 1.08–1.12x);
+    interning on the typed Cython path.
+    """
     ...
 
 def unicode_eq(a: str, b: str) -> bool:

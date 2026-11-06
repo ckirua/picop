@@ -1,7 +1,7 @@
 """Descriptor introspection via ``PyDescr_IsData``.
 
-Prefer :mod:`inspect` / attribute protocol from Python unless you need a
-C-API data-descriptor check. See :doc:`/user_guide/quickstart`.
+Prefer :mod:`inspect` / attribute protocol from Python unless you need a C-API
+data-descriptor check. See :doc:`/user_guide/quickstart`.
 """
 
 def descr_is_data(descr: object) -> bool:

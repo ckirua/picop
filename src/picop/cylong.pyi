@@ -1,8 +1,8 @@
 """Integer (``PyLong``) conversion and checks for known-type hot paths.
 
 Prefer builtins for ordinary arithmetic from Python. Tier A losers remain
-``cpdef`` but are omitted from stubs. Mask helpers wrap on overflow without
-raising — trusted-caller. See :doc:`/user_guide/safety`.
+``cpdef`` and carry a parity note in the stub. Mask helpers wrap on overflow
+without raising — trusted-caller. See :doc:`/user_guide/safety`.
 """
 
 def long_check(p: object) -> bool:
@@ -22,19 +22,43 @@ def int_eq(a: object, b: object) -> bool:
     ...
 
 def long_from_ulong(v: int) -> object:
-    """Return an :class:`int` from an unsigned long via ``PyLong_FromUnsignedLong``."""
+    """Return an :class:`int` from an unsigned long via ``PyLong_FromUnsignedLong``.
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.15x); hands Cython
+    a C integer type.
+    """
     ...
 
 def long_from_size(v: int) -> object:
-    """Return an :class:`int` from ``size_t`` via ``PyLong_FromSize_t``."""
+    """Return an :class:`int` from ``size_t`` via ``PyLong_FromSize_t``.
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.12x); hands Cython
+    a C integer type.
+    """
     ...
 
 def long_from_longlong(v: int) -> object:
-    """Return an :class:`int` from ``long long`` via ``PyLong_FromLongLong``."""
+    """Return an :class:`int` from ``long long`` via ``PyLong_FromLongLong``.
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.76x); hands Cython
+    a C integer type.
+    """
     ...
 
 def long_from_ulonglong(v: int) -> object:
-    """Return an :class:`int` from ``unsigned long long`` via ``PyLong_FromUnsignedLongLong``."""
+    """Return an :class:`int` from ``unsigned long long`` via ``PyLong_FromUnsignedLongLong``.
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.72x); hands Cython
+    a C integer type.
+    """
     ...
 
 def long_as_long_overflow(pylong: object) -> tuple[int, int]:
@@ -42,15 +66,33 @@ def long_as_long_overflow(pylong: object) -> tuple[int, int]:
     ...
 
 def long_as_ulong(pylong: object) -> int:
-    """Return an unsigned long via ``PyLong_AsUnsignedLong``."""
+    """Return an unsigned long via ``PyLong_AsUnsignedLong``.
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.19x); hands Cython
+    a C integer type.
+    """
     ...
 
 def long_as_longlong(pylong: object) -> int:
-    """Return a ``long long`` via ``PyLong_AsLongLong``."""
+    """Return a ``long long`` via ``PyLong_AsLongLong``.
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``int(x)`` (Tier A 2.41x); hands Cython
+    a C integer type.
+    """
     ...
 
 def long_as_ulonglong(pylong: object) -> int:
-    """Return an ``unsigned long long`` via ``PyLong_AsUnsignedLongLong``."""
+    """Return an ``unsigned long long`` via ``PyLong_AsUnsignedLongLong``.
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``int(x)`` (Tier A 2.17x); hands Cython
+    a C integer type.
+    """
     ...
 
 def long_as_ulong_mask(io: object) -> int:
@@ -70,5 +112,65 @@ def long_as_ulonglong_mask(io: object) -> int:
     -----
     Wraps on overflow and does not raise — trusted-caller. See
     :doc:`/user_guide/safety`.
+    """
+    ...
+
+def long_as_double(pylong: object) -> float:
+    """Return the C ``double`` of an integer (``PyLong_AsDouble``).
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``float(x)`` (Tier A 1.04x); hands
+    Cython a C integer type.
+    """
+    ...
+
+def long_as_long(pylong: object) -> int:
+    """Return the C ``long`` of an integer (``PyLong_AsLong``).
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.33x); hands Cython
+    a C integer type.
+    """
+    ...
+
+def long_as_ssize(pylong: object) -> int:
+    """Return the ``Py_ssize_t`` of an integer (``PyLong_AsSsize_t``).
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.20x); hands Cython
+    a C integer type.
+    """
+    ...
+
+def long_from_double(v: float) -> object:
+    """Return a Python int from a C ``double`` (``PyLong_FromDouble``).
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.11x); hands Cython
+    a C integer type.
+    """
+    ...
+
+def long_from_long(v: int) -> object:
+    """Return a Python int from a C ``long`` (``PyLong_FromLong``).
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.03x); hands Cython
+    a C integer type.
+    """
+    ...
+
+def long_from_ssize(v: int) -> object:
+    """Return a Python int from a ``Py_ssize_t`` (``PyLong_FromSsize_t``).
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.11x); hands Cython
+    a C integer type.
     """
     ...

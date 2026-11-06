@@ -35,9 +35,6 @@ jobs:
           python-version: "3.15"
           allow-prereleases: true
 
-      - name: Install UUID native dependency
-        run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends libssl-dev
-
       - name: Install build + docs deps
         run: |
           pip install setuptools wheel Cython picobuild

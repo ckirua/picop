@@ -27,10 +27,11 @@ cythonized_extensions = cythonize(
             [
                 "src/picop/uuid/_uuid.pyx",
                 "src/picop/uuid/uuid.c",
+                "src/picop/uuid/entropy.c",
             ],
             include_dirs=["src/picop/uuid"],
             extra_compile_args=_compile_args,
-            libraries=["crypto"],
+            libraries=["bcrypt"] if os.name == "nt" else [],
             language="c",
         ),
         Extension(

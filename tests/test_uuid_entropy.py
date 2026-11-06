@@ -17,14 +17,17 @@ from picop.uuid import _uuid_native
 UUID_DIR = Path(_uuid_native.__file__).parent
 
 
-def _compile(tmp_path: Path, source: str, *defines: str) -> Path:
+def _compile(tmp_path: Path, source: str, *defines: str,
+             entropy_source: Path | None = None) -> Path:
     harness = tmp_path / "harness.c"
     harness.write_text(source)
     executable = tmp_path / "harness"
     compiler = shlex.split(os.environ.get("CC") or sysconfig.get_config_var("CC") or "cc")
     subprocess.run(
         [*compiler, "-std=c11", "-I", str(UUID_DIR), *defines, str(harness),
-         str(UUID_DIR / "uuid.c"), "-lcrypto", "-pthread", "-o", str(executable)],
+         str(UUID_DIR / "uuid.c"),
+         str(entropy_source or UUID_DIR / "entropy.c"),
+         "-pthread", "-o", str(executable)],
         check=True, capture_output=True, text=True, timeout=30,
     )
     return executable
@@ -88,15 +91,35 @@ else:
     assert result.returncode == 0, result.stderr
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="BCrypt path is exercised by the import tests")
+def test_entropy_provider_reads_os_bytes(tmp_path: Path) -> None:
+    exe = _compile(tmp_path, r'''
+#include <stddef.h>
+#include "uuid.h"
+int main(void) {
+    unsigned char buffer[256];
+    unsigned nonzero = 0;
+    for (unsigned i = 0; i < 256; ++i) buffer[i] = 0;
+    if (!c_uuid_entropy(buffer, 256)) return 1;
+    for (unsigned i = 0; i < 256; ++i) if (buffer[i]) ++nonzero;
+    return nonzero > 128 ? 0 : 2;
+}
+''')
+    subprocess.run([str(exe)], check=True, timeout=10)
+
+
 def test_entropy_failure_does_not_report_success_or_copy_output(tmp_path: Path) -> None:
-    shim = tmp_path / "rand_shim.h"
-    shim.write_text("int failing_rand(unsigned char *, int);\n#define RAND_bytes failing_rand\n")
+    failing_entropy = tmp_path / "failing_entropy.c"
+    failing_entropy.write_text("""
+#include <stddef.h>
+int c_uuid_entropy(unsigned char *buffer, size_t nbytes) {
+    (void)buffer; (void)nbytes;
+    return 0;
+}
+""")
     exe = _compile(tmp_path, r'''
 #include <stdint.h>
 #include "uuid.h"
-int failing_rand(unsigned char *buffer, int length) {
-    (void)buffer; (void)length; return 0;
-}
 int main(void) {
     uint8_t output[UUID_SIZE];
     for (unsigned i = 0; i < UUID_SIZE; ++i) output[i] = 0xa5;
@@ -105,5 +128,5 @@ int main(void) {
     for (unsigned i = 0; i < UUID_SIZE; ++i) if (output[i] != 0xa5) return 4;
     return 0;
 }
-''', "-include", str(shim))
+''', entropy_source=failing_entropy)
     subprocess.run([str(exe)], check=True, timeout=10)

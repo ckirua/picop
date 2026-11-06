@@ -6,6 +6,7 @@
 #pragma once
 
 #include <limits.h>
+#include <stddef.h>
 #include <stdint.h>
 
 #define UUID_SIZE 16
@@ -25,8 +26,11 @@ _Static_assert(
 );
 _Static_assert(
     UUID_RANDOM_BUFFER_SIZE <= INT_MAX,
-    "UUID_RANDOM_BUFFER_SIZE must fit RAND_bytes' int length"
+    "UUID_RANDOM_BUFFER_SIZE must stay within int bounds for thread-local buffers"
 );
+
+/* Entropy provider (entropy.c): returns 1 on success, 0 on failure. */
+int c_uuid_entropy(unsigned char *buffer, size_t nbytes);
 
 /* Call once before generation; a nonzero result is a fork-hook error code. */
 int c_uuid_init(void);

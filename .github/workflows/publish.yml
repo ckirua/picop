@@ -29,7 +29,7 @@ jobs:
       - name: Install native build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install --yes --no-install-recommends build-essential libssl-dev
+          sudo apt-get install --yes --no-install-recommends build-essential
       - name: Build immutable sdist
         env:
           CPY_NATIVE: "0"
@@ -67,7 +67,7 @@ jobs:
           CPY_NATIVE: "0"
         run: |
           sudo apt-get update
-          sudo apt-get install --yes --no-install-recommends build-essential libssl-dev
+          sudo apt-get install --yes --no-install-recommends build-essential
           python -m venv .venv-validation
           PY="$PWD/.venv-validation/bin/python"
           "$PY" -m pip install --upgrade pytest setuptools

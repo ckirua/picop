@@ -27,7 +27,7 @@ jobs:
       - name: Install native build dependency
         run: |
           sudo apt-get update
-          sudo apt-get install --yes --no-install-recommends build-essential libssl-dev
+          sudo apt-get install --yes --no-install-recommends build-essential
       - name: Create isolated build environment
         run: |
           python -m venv .venv-uuid-freethreaded

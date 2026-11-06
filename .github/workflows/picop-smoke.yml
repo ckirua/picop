@@ -19,7 +19,7 @@ jobs:
           python-version: "3.15"
           allow-prereleases: true
       - name: Install native build dependencies
-        run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends build-essential libssl-dev
+        run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends build-essential
       - name: Build and check sdist
         env:
           CPY_NATIVE: "0"
@@ -56,7 +56,7 @@ jobs:
           CPY_NATIVE: "0"
         run: |
           sudo apt-get update
-          sudo apt-get install --yes --no-install-recommends build-essential libssl-dev
+          sudo apt-get install --yes --no-install-recommends build-essential
           python -m pip install --upgrade pytest setuptools
           python -m pip install artifact/*.tar.gz
       - name: Installed artifact behavior outside checkout

@@ -66,7 +66,7 @@ GIL.
 
 | Function | Hypothesis | Bench | Result | Decision | Iteration |
 |----------|------------|-------|--------|----------|-----------|
-| mutex helpers | barrel cimport helps free-threaded extensions | n/a (cimport, no harness) | compiles through the barrel in 3.14/3.15, GIL and `Py_GIL_DISABLED`; cross-thread lock state observed | APPROVED (cimport) | 1 |
+| mutex helpers | barrel cimport helps free-threaded extensions | n/a (cimport, no harness) | barrel cimport compiles and the lock asserts pass on 3.15 (GIL) and 3.15t locally; CI matrix covers 3.14/3.14t/3.15t | APPROVED (cimport) | 1 |
 | `PyLock` wrapper | expose the parked-lock object | — | interpreter-internal, no public contract | REJECTED | 1 |
 
 ## Bench notes

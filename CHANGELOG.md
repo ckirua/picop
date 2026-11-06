@@ -4,6 +4,11 @@
 
 ### Added
 
+- `cylock`: cimport-only `PyMutex` helpers (`mutex_init`, `mutex_lock`,
+  `mutex_unlock`, `mutex_is_locked`) for free-threaded extensions that need a
+  typed mutex outside `cython.critical_section`. No Python-visible surface; the
+  barrel cimport (`from picop cimport PyMutex, mutex_lock, …`) is exercised by the
+  out-of-tree smoke.
 - `docs/PERF_PARITY.md` and `scripts/perf_parity_report.py`: a machine-generated table
   of the public helpers that are **slower** than the plain-Python builtin in every Tier A
   case, plus the case-dependent ones, with the builtin to use instead.

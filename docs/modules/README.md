@@ -28,8 +28,9 @@ Gold exemplar: [`001_cytuple.md`](001_cytuple.md).
 | 59 | [059_cyframe.md](059_cyframe.md) | `cpython.frame` | v2 |
 | 60 | [060_cycode.md](060_cycode.md) | `cpython.code` | v2 |
 | 61 | [061_cytraceback.md](061_cytraceback.md) | `cpython.traceback` | v2 |
+| 63 | [063_cylock.md](063_cylock.md) | `cpython.lock` / `cpython.pylock` (`PyMutex`) | v2 |
 
 ## Absent
 
-Orders `014_`…`055_` live in this directory (all decided at 1.0); `062_cymonitoring.md` and `063_cylock.md` are index-only/decided Orders. See [`../README.md`](../README.md#status-complete--not-an-open-backlog) for phase-complete status — not an open promote backlog.
+Orders `014_`…`055_` live in this directory (all decided at 1.0); `062_cymonitoring.md` is an index-only/decided Order. See [`../README.md`](../README.md#status-complete--not-an-open-backlog) for phase-complete status — not an open promote backlog.
 

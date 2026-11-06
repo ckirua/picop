@@ -7,6 +7,7 @@ from picop cimport list_len, bytes_eq   # package barrel (__init__.pxd)
 from picop.cyerr cimport *              # submodule — see each .pxd
 # cyerr / cymem / cythread / cyatomic / cylongintrepr / cyref
 # cygetargs / cyceval / cypystate / cypylifecycle / cypyport / cyversion
+# cylock (PyMutex)
 ```
 
 Use `picop` for all Cython cimports. The `cypy` shims were removed in 3.0; rebuild downstream extensions after migrating imports.

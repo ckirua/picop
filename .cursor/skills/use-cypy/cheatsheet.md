@@ -34,7 +34,7 @@ See `examples/README.md` Orders 14–21, 23–27, 29–36, 39–46, 51, 53 (`pyb
 
 ## Cimport-only (Cython recipes, not Python)
 
-Orders 10–13, 22, 28, 38, 47–50, 52: `cyerr`, `cymem`, `cythread`, `cyatomic`, `cylongintrepr`, `cyref`, `cygetargs`, `cyceval`, `cypystate`, `cypylifecycle`, `cypyport`, `cyversion`.
+Orders 10–13, 22, 28, 38, 47–50, 52, 63: `cyerr`, `cymem`, `cythread`, `cyatomic`, `cylongintrepr`, `cyref`, `cygetargs`, `cyceval`, `cypystate`, `cypylifecycle`, `cypyport`, `cyversion`, `cylock`.
 
 Use `cimport` from `.pyx` only — see `examples/cython/README.md`. Prefer `from picop… cimport` (not `cypy`).
 

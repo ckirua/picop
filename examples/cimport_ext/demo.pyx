@@ -3,6 +3,7 @@
 # Build: see README.md / scripts/smoke_barrel_cimport.sh
 
 from picop cimport UUID, bytes_eq, list_len, str_eq, uuid4_bytes
+from picop cimport mutex_is_locked as barrel_mutex_is_locked
 from picop.cybytes cimport bytes_len
 from picop.cybytes cimport bytes_concat, bytes_concat_and_del, bytes_resize
 from picop.cylist cimport list_get, list_get_checked
@@ -11,10 +12,12 @@ from picop.cyobject cimport obj_call
 from picop.uuid._uuid cimport UUID as DirectUUID, uuid_from_buf
 from picop.cymemoryview cimport memoryview_get_base, memoryview_from_memory
 from picop.cysentinel cimport sentinel_check, sentinel_check_exact, sentinel_new, sentinel_type
+from picop.cylock cimport PyMutex, mutex_init, mutex_is_locked, mutex_lock, mutex_unlock
 
 from cpython.object cimport PyObject
 from picop.cytraceback cimport tb_check, tb_lineno, tb_next_borrow
 import sys
+import time
 from picop.cycode cimport PyCodeObject
 from picop.cyframe cimport (
     frame_back,
@@ -86,6 +89,34 @@ cpdef bint check_sentinels():
         and repr(marker) == "<marker>"
         and sentinel_type() is type(marker)
     )
+
+
+cpdef bint check_locks():
+    cdef PyMutex mu
+    mutex_init(&mu)
+    if mutex_is_locked(&mu):
+        return False
+    with nogil:
+        mutex_lock(&mu)
+        locked = barrel_mutex_is_locked(&mu)
+        mutex_unlock(&mu)
+    return locked and not mutex_is_locked(&mu)
+
+
+cdef PyMutex shared_lock
+
+
+cpdef bint shared_is_locked():
+    return mutex_is_locked(&shared_lock)
+
+
+cpdef void hold_shared(double seconds):
+    # Held across a sleep so another thread can observe the locked state.
+    with nogil:
+        mutex_lock(&shared_lock)
+    time.sleep(seconds)
+    with nogil:
+        mutex_unlock(&shared_lock)
 
 
 cpdef bint check_frames(object caller):

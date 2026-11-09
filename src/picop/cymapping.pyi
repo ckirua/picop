@@ -20,13 +20,7 @@ def map_eq(a: object, b: object) -> bool:
     ...
 
 def map_has_key(o: object, key: object) -> bool:
-    """Return True if mapping ``o`` has ``key``.
-
-    Notes
-    -----
-    Slower than the plain-Python equivalent ``lambda o, k: k in o`` (Tier A 1.52x);
-    the typed Cython call site.
-    """
+    """Return True if mapping ``o`` has ``key``."""
     ...
 
 def map_del(o: object, key: object) -> int:
@@ -91,11 +85,5 @@ def map_setitem_cstr(o: object, key: bytes, v: object) -> int:
     ...
 
 def map_len(o: object) -> int:
-    """Return the size of mapping ``o`` (``PyMapping_Length``).
-
-    Notes
-    -----
-    Slower than the plain-Python equivalent ``len(x)`` (Tier A 1.48x); the typed
-    Cython call site.
-    """
+    """Return the size of mapping ``o`` (``PyMapping_Length``)."""
     ...

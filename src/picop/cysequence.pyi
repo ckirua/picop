@@ -49,27 +49,21 @@ def seq_get(o: object, i: int) -> object:
     ...
 
 def seq_index(o: object, value: object) -> int:
-    """Return ``o.index(value)`` via ``PySequence_Index``."""
+    """Return ``o.index(value)`` via ``PySequence_Index``.
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``lambda o, v: o.index(v)`` (Tier A
+    1.04x); works on any sequence, not just ``list``.
+    """
     ...
 
 def seq_inplace_concat(o1: object, o2: object) -> object:
-    """Return ``o1 += o2`` result via ``PySequence_InPlaceConcat``.
-
-    Notes
-    -----
-    Slower than the plain-Python equivalent ``a += b`` (Tier A 1.02x); works on any
-    sequence, not just ``list``.
-    """
+    """Return ``o1 += o2`` result via ``PySequence_InPlaceConcat``."""
     ...
 
 def seq_inplace_repeat(o: object, count: int) -> object:
-    """Return ``o *= count`` result via ``PySequence_InPlaceRepeat``.
-
-    Notes
-    -----
-    Slower than the plain-Python equivalent ``a *= b`` (Tier A 1.06x); works on any
-    sequence, not just ``list``.
-    """
+    """Return ``o *= count`` result via ``PySequence_InPlaceRepeat``."""
     ...
 
 def seq_list(o: object) -> list:
@@ -103,7 +97,7 @@ def seq_slice(o: object, i1: int, i2: int) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``x[a:b]`` (Tier A 1.16x); works on any
+    Slower than the plain-Python equivalent ``x[a:b]`` (Tier A 1.11x); works on any
     sequence, not just ``list``.
     """
     ...
@@ -113,31 +107,25 @@ def seq_tuple(o: object) -> tuple:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``tuple(x)`` (Tier A 1.08x); works on
+    Slower than the plain-Python equivalent ``tuple(x)`` (Tier A 1.07x); works on
     any sequence, not just ``list``.
     """
     ...
 
 def seq_count(o: object, value: object) -> int:
-    """Return the number of occurrences of ``value`` in sequence ``o`` (``PySequence_Count``)."""
+    """Return the number of occurrences of ``value`` in sequence ``o`` (``PySequence_Count``).
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``lambda o, v: o.count(v)`` (Tier A
+    1.23x); works on any sequence, not just ``list``.
+    """
     ...
 
 def seq_len(o: object) -> int:
-    """Return the length of sequence ``o`` (``PySequence_Length``).
-
-    Notes
-    -----
-    Slower than the plain-Python equivalent ``len(x)`` (Tier A 1.15x); works on any
-    sequence, not just ``list``.
-    """
+    """Return the length of sequence ``o`` (``PySequence_Length``)."""
     ...
 
 def seq_size(o: object) -> int:
-    """Return the size of sequence ``o`` (``PySequence_Size``, alias of ``PySequence_Length``).
-
-    Notes
-    -----
-    Slower than the plain-Python equivalent ``len(x)`` (Tier A 1.15x); works on any
-    sequence, not just ``list``.
-    """
+    """Return the size of sequence ``o`` (``PySequence_Size``, alias of ``PySequence_Length``)."""
     ...

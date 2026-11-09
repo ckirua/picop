@@ -140,7 +140,10 @@ def main() -> int:
         print("\ndrift that needs a doc update:")
         for line in problems:
             print("  " + line)
-        print("regenerate with: python scripts/perf_parity_report.py --update-doc --sync-stubs")
+        print(
+            "regenerate from the measured dumps: python scripts/perf_parity_report.py "
+            f"--from-json parity/{reference}.json --update-doc --sync-stubs"
+        )
         return 1
     print("docs/PERF_PARITY.md matches the measured ratios")
     return 0 if not failures else 1

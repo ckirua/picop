@@ -15,15 +15,15 @@ def calliter_check(op: object) -> bool:
     ...
 
 def calliter_new(callable_: object, sentinel: object) -> object:
-    """Return a call iterator for ``callable_`` stopping at ``sentinel`` (``PyCallIter_New``).
-
-    Notes
-    -----
-    Slower than the plain-Python equivalent ``iter(x)`` (Tier A 1.09x); the typed
-    Cython call site.
-    """
+    """Return a call iterator for ``callable_`` stopping at ``sentinel`` (``PyCallIter_New``)."""
     ...
 
 def seqiter_new(seq: object) -> object:
-    """Return a sequence iterator for ``seq`` (``PySequence_GetIterator``)."""
+    """Return a sequence iterator for ``seq`` (``PySequence_GetIterator``).
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``iter(x)`` (Tier A 1.26x); the typed
+    Cython call site.
+    """
     ...

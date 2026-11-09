@@ -68,6 +68,9 @@ def ctxvar_reset(var: object, token: object) -> int:
 
     Notes
     -----
+    Slower than the plain-Python equivalent ``var.reset(token)`` (Tier A 1.03x);
+    context-variable token plumbing.
+
     Returns ``0`` on success; errors raise — do not use the status as a bool.
     """
     ...

@@ -55,5 +55,11 @@ jobs:
           pattern: parity-*
           path: parity/
           merge-multiple: true
+      - name: Keep the merged dumps for doc regeneration
+        uses: actions/upload-artifact@v4
+        with:
+          name: parity-dumps
+          path: parity/
+          retention-days: 14
       - name: Check docs/PERF_PARITY.md against the measured ratios
         run: python scripts/perf_parity_drift.py --dir parity

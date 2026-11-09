@@ -35,6 +35,7 @@ time.sleep(0.1)
 assert demo.shared_is_locked(), "mutex state not visible across threads"
 holder.join()
 assert not demo.shared_is_locked()
+assert demo.check_lock_contention(), "mutex-protected counter lost updates"
 
 def _frame_probe():
     values = [1, 2]

@@ -19,6 +19,7 @@ from libc.stddef cimport size_t
 from libc.stdint cimport uint64_t
 from picop.cytraceback cimport tb_check, tb_lineno, tb_next_borrow
 import sys
+import threading
 import time
 from picop.cycode cimport PyCodeObject
 from picop.cyframe cimport (
@@ -199,6 +200,34 @@ cpdef void hold_shared(double seconds):
     time.sleep(seconds)
     with nogil:
         mutex_unlock(&shared_lock)
+
+
+cdef PyMutex contention_lock
+cdef long contention_count = 0
+
+
+cpdef void contention_bump(int iterations):
+    # The increment is deliberately plain C: without the mutex it is a lost-update
+    # race on a free-threaded build.
+    for _ in range(iterations):
+        with nogil:
+            mutex_lock(&contention_lock)
+        contention_count += 1
+        with nogil:
+            mutex_unlock(&contention_lock)
+
+
+cpdef bint check_lock_contention():
+    mutex_init(&contention_lock)
+    contention_count = 0
+    cdef int workers = 8
+    cdef int per_worker = 5000
+    pool = [threading.Thread(target=contention_bump, args=(per_worker,)) for _ in range(workers)]
+    for worker in pool:
+        worker.start()
+    for worker in pool:
+        worker.join()
+    return contention_count == workers * per_worker
 
 
 cpdef bint check_frames(object caller):

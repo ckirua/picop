@@ -65,6 +65,22 @@ docs = [
 testpaths = ["tests"]
 addopts = "-q"
 
+[tool.cibuildwheel]
+# Prebuilt wheels for the supported CPython range, GIL and free-threaded.
+# cp315 needs the cpython-prerelease enable until 3.15 is ABI stable.
+build = ["cp314-*", "cp314t-*", "cp315-*", "cp315t-*"]
+archs = ["auto64"]
+build-verbosity = 1
+test-command = "pytest {project}/tests -q"
+test-requires = ["pytest"]
+
+[tool.cibuildwheel.linux]
+manylinux-x86_64-image = "manylinux_2_28"
+musllinux-x86_64-image = "musllinux_1_2"
+
+[tool.cibuildwheel.macos]
+archs = ["universal2"]
+
 [tool.setuptools]
 include-package-data = true
 

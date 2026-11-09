@@ -4,6 +4,12 @@
 
 ### Added
 
+- **Free-threading coverage:** `tests/test_freethreading_stress.py` races 12 threads
+  against the borrowed-result helpers (`dict_get_ref`, `dict_setdefault`,
+  `dict_setdefault_ref`, `cell_get`, `list_get`, `list_get_checked`) and fails on any
+  torn or lost update; the barrel smoke now runs an 8-thread `PyMutex` contention
+  check (`demo.check_lock_contention()`), so `cylock` is proven under real contention
+  instead of a single-threaded lock/unlock.
 - **Build/infra:** `picop` now builds prebuilt wheels. `[tool.cibuildwheel]` in
   `pyproject.toml` targets CPython 3.14/3.15 and the free-threaded `cp314t`/`cp315t`
   tags on manylinux, macOS (universal2) and Windows, and runs the test suite inside

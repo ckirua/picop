@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import os
 import sysconfig
 
 from Cython.Build import cythonize
@@ -29,9 +30,10 @@ def main() -> None:
         sources=[
             str(UUID_SOURCE_ROOT / "_uuid.pyx"),
             str(UUID_SOURCE_ROOT / "uuid.c"),
+            str(UUID_SOURCE_ROOT / "entropy.c"),
         ],
         include_dirs=[str(UUID_SOURCE_ROOT)],
-        libraries=["crypto"],
+        libraries=["bcrypt"] if os.name == "nt" else [],
         extra_compile_args=[
             "-std=c11", "-O3", "-Wno-unused-function", "-Wno-unused-variable",
         ],

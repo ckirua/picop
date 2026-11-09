@@ -1,7 +1,9 @@
 /*
  * Thread-local entropy buffering adapted from asyncpg's UUID generator. This
  * implementation replaces the original process-global atomic buffer with
- * private per-thread storage and uses OpenSSL as cypy's entropy source.
+ * private per-thread storage and draws entropy from the operating system's own
+ * CSPRNG (BCrypt on Windows, /dev/urandom elsewhere), so the extension links
+ * no third-party library.
  * asyncpg provenance for cypy.uuid is recorded in the repository NOTICE;
  * applicable Apache terms are in LICENSES/Apache-2.0.txt.
  */
@@ -15,8 +17,6 @@
 #ifndef _WIN32
 #include <pthread.h>
 #endif
-
-#include <openssl/rand.h>
 
 alignas(64) static _Thread_local unsigned char
     random_buffer[UUID_RANDOM_BUFFER_SIZE];
@@ -59,7 +59,7 @@ c_uuid4(uint8_t uuid[UUID_SIZE])
     size_t pos = random_buffer_pos;
 
     if (pos == UUID_RANDOM_BUFFER_SIZE) {
-        if (RAND_bytes(random_buffer, (int)UUID_RANDOM_BUFFER_SIZE) != 1) {
+        if (!c_uuid_entropy(random_buffer, UUID_RANDOM_BUFFER_SIZE)) {
             return 0;
         }
         pos = 0;

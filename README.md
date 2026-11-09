@@ -35,7 +35,7 @@ PyPI distribution name and import package are both **`picop`**.
 pip install "picop==3.3.0"
 ```
 
-Build deps (`setuptools`, `wheel`, `Cython>=3.3.0`, `picobuild`) are pulled via `pyproject.toml` `[build-system]`. Source installs need a C toolchain and OpenSSL headers (`libssl-dev` on Debian/Ubuntu). Compile extensions separately for each interpreter ABI; regular and free-threaded binaries are not interchangeable.
+Build deps (`setuptools`, `wheel`, `Cython>=3.3.0`, `picobuild`) are pulled via `pyproject.toml` `[build-system]`. Source installs need a C toolchain only — UUID entropy comes from the operating system (BCrypt on Windows, `/dev/urandom` elsewhere), so no third-party library is linked. Compile extensions separately for each interpreter ABI; regular and free-threaded binaries are not interchangeable.
 
 ### From git (users)
 

@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- **Build/infra:** the UUID entropy source no longer links OpenSSL. `c_uuid4` fills
+  its thread-local buffer from the operating system CSPRNG (`BCryptGenRandom` on
+  Windows, `/dev/urandom` elsewhere) through `src/picop/uuid/entropy.c`, so a source
+  install needs a C toolchain only. `libssl-dev` is dropped from the CI workflows and
+  the README install note. No public surface changes.
+
 ## [3.3.0] — 2026-11-06 — PyMutex cimport helpers and perf-parity gates
 
 ### Added

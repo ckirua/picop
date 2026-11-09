@@ -229,6 +229,12 @@ from .cygenobject cimport (
     gen_new,
     gen_new_with_qualname,
 )
+from .cyhash cimport (
+    hash_buffer,
+    hash_buffer_raw,
+    hash_generic,
+    hash_pointer,
+)
 from .cycellobject cimport (
     cell_check,
     cell_eq,

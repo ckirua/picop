@@ -87,6 +87,7 @@ These win on most cases and lose on a narrow band. Keep them; know the crossover
 |---|---|---|
 | `deque_eq` | 0.59x (`identity`) | 1.08x (`eq n=64`) |
 | `complex_real_as_double` | 0.64x (`Z.real`) | 1.56x (`int 7`) |
+| `hash_buffer` | 0.40x (`array.array('B') n=6`) | 3.03x (`memoryview n=256 (cached)`) |
 
 ## Why not a runtime warning
 

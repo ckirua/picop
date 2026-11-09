@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import array
 import builtins
 
 import pytest
@@ -43,6 +44,7 @@ from picop import (
     frame_lineno,
     frame_var,
     frame_var_cstr,
+    hash_buffer,
     memoryview_itemsize,
     memoryview_nbytes,
     memoryview_ndim,
@@ -328,3 +330,33 @@ def test_buffer_inspection_matches_memoryview_metadata() -> None:
     view = memoryview(readonly)
     assert (memoryview_nbytes(view), memoryview_itemsize(view), memoryview_ndim(view)) == (3, 1, 1)
     assert memoryview_readonly(view) is True
+
+
+def test_hash_buffer_matches_builtin_for_every_exporter() -> None:
+    data = bytes(range(256))
+    view = memoryview(data)
+    mutable = bytearray(b"picop hash helpers")
+    packed = array.array("B", b"abcdef")
+
+    assert hash_buffer(data) == hash(data)
+    assert hash_buffer(view) == hash(bytes(view))
+    assert hash_buffer(mutable) == hash(bytes(mutable))
+    assert hash_buffer(packed) == hash(bytes(packed))
+    assert hash_buffer(view, 64, 128) == hash(bytes(view[64:128]))
+    assert hash_buffer(mutable, 6, -2) == hash(b"hash helpers")
+    assert hash_buffer(view, 0, -1) == hash(data)
+    assert hash_buffer(view, 4, 4) == 0
+    assert hash_buffer(b"") == 0
+
+
+def test_hash_buffer_range_bounds_and_non_buffers() -> None:
+    view = memoryview(b"abcdef")
+    for start, end in ((-1, 2), (2, 1), (0, 7), (6, 7)):
+        with pytest.raises(ValueError):
+            hash_buffer(view, start, end)
+    with pytest.raises(TypeError):
+        hash_buffer(42)
+    with pytest.raises(TypeError):
+        hash_buffer("not a buffer")
+    with pytest.raises(BufferError):
+        hash_buffer(memoryview(bytes(range(100)))[::2])

@@ -1,6 +1,6 @@
 # Module trackers
 
-One `NNN_cy{name}.md` per area — **`NNN` = QUEUE Order** (zero-padded, `001`…`060`).
+One `NNN_cy{name}.md` per area — **`NNN` = QUEUE Order** (zero-padded, `001`…`064`).
 **Process docs are one level up:** [`../README.md`](../README.md), [`../PIPELINE.md`](../PIPELINE.md), [`../TEMPLATE.md`](../TEMPLATE.md).
 
 Gold exemplar: [`001_cytuple.md`](001_cytuple.md).
@@ -29,6 +29,7 @@ Gold exemplar: [`001_cytuple.md`](001_cytuple.md).
 | 60 | [060_cycode.md](060_cycode.md) | `cpython.code` | v2 |
 | 61 | [061_cytraceback.md](061_cytraceback.md) | `cpython.traceback` | v2 |
 | 63 | [063_cylock.md](063_cylock.md) | `cpython.lock` / `cpython.pylock` (`PyMutex`) | v2 |
+| 64 | [064_cyhash.md](064_cyhash.md) | `cpython/pyhash.h` | v2 |
 
 ## Absent
 

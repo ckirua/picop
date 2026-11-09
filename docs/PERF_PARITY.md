@@ -17,6 +17,10 @@ A public helper that loses in **every** measured Tier A case must:
 row without the docstring note fails, and a docstring note without a table row fails.
 Helpers that lose only on some inputs are in the second table instead.
 
+`.github/workflows/perf-parity.yml` re-measures the whole matrix (3.14, 3.15, 3.14t,
+3.15t) every week and fails if the always-slower set drifts from this table, so the
+list cannot go stale between releases.
+
 **Never remove them for being slower.** The loss is the cpdef wrapper cost at the Python
 boundary, and it disappears inside Cython, where the call is inlined and the arguments
 are already typed. Several also return things builtins do not: `set_discard` reports

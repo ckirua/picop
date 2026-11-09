@@ -7,7 +7,6 @@ from cpython.exc cimport (
     PyErr_ExceptionMatches,
     PyErr_Fetch,
     PyErr_GetRaisedException,
-    PyErr_NoMemory,
     PyErr_Occurred,
     PyErr_Restore,
     PyErr_SetNone,
@@ -16,6 +15,11 @@ from cpython.exc cimport (
     PyErr_SetString,
 )
 from cpython.object cimport PyObject
+
+cdef extern from "Python.h":
+    # ``PyErr_NoMemory`` sets MemoryError and returns NULL (a convenience
+    # sentinel for ``return PyErr_NoMemory()`` in C call sites).
+    PyObject *PyErr_NoMemory() noexcept
 
 
 cdef inline void err_clear() noexcept:
@@ -43,8 +47,9 @@ cdef inline void err_set_none(object exc) noexcept:
     PyErr_SetNone(exc)
 
 
-cdef inline PyObject *err_no_memory() noexcept:
-    return PyErr_NoMemory()
+cdef inline void err_no_memory() noexcept:
+    # Sets MemoryError in the thread error indicator; the C API returns NULL.
+    PyErr_NoMemory()
 
 
 cdef inline void err_fetch(PyObject **ptype, PyObject **pvalue, PyObject **ptraceback) noexcept:

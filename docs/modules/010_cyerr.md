@@ -24,7 +24,7 @@ GIL-held error-indicator helpers for nogil→gil boundaries in extensions.
 | err_set_string | cypy | cdef | cimport | `PyErr_SetString` |
 | err_set_object | cypy | cdef | cimport | `PyErr_SetObject` sibling |
 | err_set_none | cypy | cdef | cimport | `PyErr_SetNone` sibling |
-| err_no_memory | cypy | cdef | cimport | `PyErr_NoMemory` |
+| err_no_memory | cypy | cdef | cimport | `PyErr_NoMemory` — sets MemoryError and returns NULL; wrapper is `void` (3.3.1) |
 | err_fetch / err_restore | cypy | cdef | cimport | legacy triple; deprecated by CPython since 3.12 |
 | err_get_raised / err_set_raised | picop | cdef | cimport | preferred Python ≥3.14 lifecycle; new-ref get / stealing set |
 
@@ -40,7 +40,7 @@ GIL-held error-indicator helpers for nogil→gil boundaries in extensions.
 | Field | Value |
 |-------|--------|
 | Iteration | 1 |
-| Last pass | 2026-07-21 — Phase 4 Tier B n/a |
+| Last pass | 2026-11-09 — barrel smoke (`examples/cimport_ext/demo.pyx`) exercises err set/fetch/restore/NoMemory on 3.15 and 3.15t |
 | Next action | — |
 
 ## Decision log

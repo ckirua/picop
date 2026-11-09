@@ -6,8 +6,9 @@ on:
     paths:
       - "doc/**"
       - "src/picop/**"
-      - "docs/PIPELINE.md"
+      - "docs/**"
       - "scripts/check_pyi_docstrings.py"
+      - "scripts/grade_trackers.py"
       - "pyproject.toml"
       - "setup.py"
       - "CHANGELOG.md"
@@ -42,6 +43,9 @@ jobs:
 
       - name: Check public .pyi docstrings
         run: python scripts/check_pyi_docstrings.py
+
+      - name: Grade module trackers
+        run: python scripts/grade_trackers.py
 
       - name: Build Sphinx HTML
         run: sphinx-build -b html doc/ doc/_build/html

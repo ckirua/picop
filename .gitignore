@@ -215,3 +215,6 @@ __marimo__/
 
 # local eq grind logs
 .eq_loop_logs/
+
+# scratch notes / drafts
+tmp/

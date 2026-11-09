@@ -16,6 +16,10 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
+# Interpreter for preflight checks and version bumps. Override with PYTHON=...
+# (plain `python3` may lack picop/Cython in the active environment).
+PYTHON="${PYTHON:-python3}"
+
 ABOUT="src/picop/__about__.py"
 CHANGELOG="CHANGELOG.md"
 DRY_RUN=0
@@ -58,12 +62,12 @@ done
 [[ -z "$VERSION" || -z "$BUMP" ]] || die "pass either VERSION or --patch/--minor/--major, not both"
 
 current_version() {
-  python3 -c "import pathlib,re; t=pathlib.Path('$ABOUT').read_text(); m=re.search(r'__version__\\s*=\\s*\"([^\"]+)\"', t); assert m, 'no __version__'; print(m.group(1))"
+  "$PYTHON" -c "import pathlib,re; t=pathlib.Path('$ABOUT').read_text(); m=re.search(r'__version__\\s*=\\s*\"([^\"]+)\"', t); assert m, 'no __version__'; print(m.group(1))"
 }
 
 bump_version() {
   local cur="$1" kind="$2"
-  python3 -c "
+  "$PYTHON" -c "
 import re
 import sys
 cur, kind = sys.argv[1], sys.argv[2]
@@ -128,8 +132,8 @@ fi
 
 if [[ "$SKIP_CHECKS" -eq 0 ]]; then
   info "preflight checks"
-  python3 scripts/check_exports.py
-  python3 scripts/grade_trackers.py
+  "$PYTHON" scripts/check_exports.py
+  "$PYTHON" scripts/grade_trackers.py
 else
   info "skipping preflight checks"
 fi
@@ -146,7 +150,7 @@ info "bump $ABOUT"
 if [[ "$DRY_RUN" -eq 1 ]]; then
   echo "dry-run: set __version__ = \"$VERSION\""
 else
-  python3 -c "
+  "$PYTHON" -c "
 from pathlib import Path
 import re
 p = Path('$ABOUT')
@@ -161,7 +165,7 @@ info "update $CHANGELOG"
 if [[ "$DRY_RUN" -eq 1 ]]; then
   echo "dry-run: promote Unreleased / insert ## [$VERSION] — $TODAY — $TITLE"
 else
-  VERSION="$VERSION" TODAY="$TODAY" TITLE="$TITLE" python3 -c "
+  VERSION="$VERSION" TODAY="$TODAY" TITLE="$TITLE" "$PYTHON" -c "
 from pathlib import Path
 import os, re
 p = Path('$CHANGELOG')
@@ -192,7 +196,7 @@ if [[ "$DRY_RUN" -eq 1 ]]; then
 else
   for f in "${pin_files[@]}"; do
     [[ -f "$f" ]] || continue
-    python3 -c "
+    "$PYTHON" -c "
 from pathlib import Path
 p = Path('$f')
 t = p.read_text()
@@ -236,7 +240,7 @@ if [[ -n "$NOTES_FILE" ]]; then
   cp "$NOTES_FILE" "$NOTES_TMP"
 else
   # Prefer CHANGELOG section body when present
-  python3 -c "
+  "$PYTHON" -c "
 from pathlib import Path
 import re
 text = Path('$CHANGELOG').read_text()

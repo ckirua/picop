@@ -55,9 +55,5 @@ jobs:
           pattern: parity-*
           path: parity/
           merge-multiple: true
-      - name: Install build dependencies
-        run: python -m pip install setuptools wheel "Cython>=3.3.0" picobuild pyperf
-      - name: Install picop
-        run: python -m pip install -e . --no-build-isolation
       - name: Check docs/PERF_PARITY.md against the measured ratios
         run: python scripts/perf_parity_drift.py --dir parity

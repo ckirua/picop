@@ -6,13 +6,7 @@ untrusted data is unsafe — same class as stdlib ``marshal.loads``. See
 """
 
 def marshal_dumps(value: object, version: int = 4) -> object:
-    """Serialize ``value`` via ``PyMarshal_WriteObjectToString``.
-
-    Notes
-    -----
-    Slower than the plain-Python equivalent ``marshal.dumps`` (Tier A 1.05x); the
-    typed Cython call site.
-    """
+    """Serialize ``value`` via ``PyMarshal_WriteObjectToString``."""
     ...
 
 def marshal_loads(data: bytes) -> object:

@@ -27,7 +27,7 @@ def float_as_double(pyfloat: object) -> float:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``float(x)`` (Tier A 1.37–1.42x); hands
+    Slower than the plain-Python equivalent ``float(x)`` (Tier A 1.30–1.40x); hands
     Cython a C ``double``.
     """
     ...
@@ -37,7 +37,7 @@ def float_from_double(v: float) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``float(x)`` (Tier A 1.20x); hands
+    Slower than the plain-Python equivalent ``float(x)`` (Tier A 1.34x); hands
     Cython a C ``double``.
     """
     ...

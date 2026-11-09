@@ -9,6 +9,10 @@ def deque_eq(a: object, b: object) -> bool:
 
     Notes
     -----
+    Mixed Tier A parity: 0.59x (identity), 0.90x (eq empty), 0.92x (eq nested),
+    0.92x (ne small), 0.93x (eq small), 0.98x (ne n=64), 1.08x (eq n=64); the typed
+    Cython call site.
+
     Identity short-circuit plus richcompare — same semantics as
     ``deque.__eq__``.
     """

@@ -72,7 +72,7 @@ def mod_import_object(name: object) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``__import__(name)`` (Tier A 2.01x);
+    Slower than the plain-Python equivalent ``__import__(name)`` (Tier A 1.96x);
     module plumbing for embedding code.
     """
     ...

@@ -37,9 +37,6 @@ def frozendict_new(iterable: object) -> object:
 
     Notes
     -----
-    Mixed Tier A parity: 0.53x (from frozendict), 1.03x (from dict (4 items)); the
-    3.15 ``frozendict`` bridge.
-
     ``None`` is not iterable — use ``frozendict_empty()`` for the
     no-iterable path. Passing an existing frozendict returns **the same
     object** with an incremented reference, not a copy. Raises

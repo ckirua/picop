@@ -14,11 +14,5 @@ def iter_eq(a: object, b: object) -> bool:
     ...
 
 def iter_next(o: object) -> object:
-    """Return the next item of iterator ``o`` (``PyIter_Next``); ``None`` when exhausted.
-
-    Notes
-    -----
-    Slower than the plain-Python equivalent ``next`` (Tier A 1.04x); iterator-
-    protocol bridge.
-    """
+    """Return the next item of iterator ``o`` (``PyIter_Next``); ``None`` when exhausted."""
     ...

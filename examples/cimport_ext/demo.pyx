@@ -2,6 +2,16 @@
 # Out-of-tree smoke: package-barrel + submodule cimport against an installed picop.
 # Build: see README.md / scripts/smoke_barrel_cimport.sh
 
+from picop cimport (
+    PyMonitoringState,
+    monitoring_scope,
+    monitoring_exit_scope,
+    monitoring_active,
+    monitoring_is_instrumented,
+    fire_line,
+    fire_py_return,
+    PY_MONITORING_EVENT_LINE,
+)
 from picop cimport UUID, bytes_eq, list_len, str_eq, uuid4_bytes
 from picop cimport mutex_is_locked as barrel_mutex_is_locked
 from picop.cybytes cimport bytes_len
@@ -513,3 +523,18 @@ cpdef bint check_hashing():
     assert generic == hash_pointer(<PyObject *>target), "PyObject_GenericHash is the identity hash"
     assert generic != -1
     return True
+
+cpdef tuple check_monitoring(object code):
+    cdef PyMonitoringState states[19]
+    cdef unsigned long long version = 0
+    cdef int active
+    cdef int fired_line
+    cdef int fired_return
+    cdef int instrumented
+    monitoring_scope(states, <uint64_t *>&version)
+    active = monitoring_active(states, PY_MONITORING_EVENT_LINE)
+    fired_line = fire_line(states, <PyObject *>code, 0, 1)
+    fired_return = fire_py_return(states, <PyObject *>code, 0, <PyObject *>None)
+    monitoring_exit_scope()
+    instrumented = monitoring_is_instrumented(PY_MONITORING_EVENT_LINE)
+    return (active, fired_line, fired_return, instrumented)

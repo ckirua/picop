@@ -87,7 +87,7 @@ from picop.cydict cimport dict_get, dict_len
 from picop.cybytes cimport bytes_len, bytes_contains, bytes_eq
 ```
 
-Or `cimport picop` / package `__init__.pxd` for wider cimport-only plumbing (`cyerr`, `cymem`, `cythread`, `cyatomic`, `cylock`, …) — **not** as pure-Python replacements.
+Or `cimport picop` / package `__init__.pxd` for wider cimport-only plumbing (`cyerr`, `cymem`, `cythread`, `cyatomic`, `cylock`, `cymonitoring`, …) — **not** as pure-Python replacements.
 
 ## Footguns
 

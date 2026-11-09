@@ -86,6 +86,7 @@ for f in examples/py*.py examples/wrap_ansi.py; do python "$f" || exit 1; done
 | 59 | `cyframe` | smoke | [`pyframe.py`](pyframe.py) |
 | 60 | `cycode` | smoke | [`pycode.py`](pycode.py) |
 | 61 | `cytraceback` | smoke | [`pytraceback.py`](pytraceback.py) |
+| 62 | `cymonitoring` | cython-recipe | see [`cython/monitoring_scopes.md`](cython/monitoring_scopes.md) |
 | 63 | `cylock` | cython-recipe | [`cython/free_threading_locks.md`](cython/free_threading_locks.md) |
 | 64 | `cyhash` | smoke | [`pyhash.py`](pyhash.py) |
 
@@ -97,6 +98,7 @@ for f in examples/py*.py examples/wrap_ansi.py; do python "$f" || exit 1; done
 | [`cython/borrow_vs_owned.md`](cython/borrow_vs_owned.md) | `dget`/`lget` ownership (DX-05) |
 | [`cython/frozendict_vs_dict.md`](cython/frozendict_vs_dict.md) | frozendict is not a dict; typed access + copy semantics |
 | [`cython/sentinel_markers.md`](cython/sentinel_markers.md) | `sentinel` checks, marker construction, and Python 3.14 behavior |
+| [`cython/monitoring_scopes.md`](cython/monitoring_scopes.md) | `cymonitoring` scopes, event gates, and fire helpers |
 | [`cython/free_threading_locks.md`](cython/free_threading_locks.md) | typed `PyMutex` locks vs `cython.critical_section` |
 
 | Order | Module | Why not Python example |

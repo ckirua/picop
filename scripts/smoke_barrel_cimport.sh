@@ -47,6 +47,35 @@ def _frame_probe():
 
 assert _frame_probe()
 assert demo.check_code()
+monitoring = sys.monitoring
+tool_id = 4
+code = demo.check_monitoring.__code__
+seen = []
+
+def monitoring_callback(*args):
+    if args[0] is code:
+        seen.append(args)
+
+monitoring.use_tool_id(tool_id, "picop smoke")
+monitoring.register_callback(tool_id, monitoring.events.LINE, monitoring_callback)
+monitoring.register_callback(tool_id, monitoring.events.PY_RETURN, monitoring_callback)
+events = monitoring.events.LINE | monitoring.events.PY_RETURN
+monitoring.set_events(tool_id, events)
+try:
+    active, fired_line, fired_return, instrumented = demo.check_monitoring(code)
+    assert active, "monitoring scope did not observe active LINE tool"
+    assert fired_line == 0 and fired_return == 0
+    assert instrumented
+    assert len(seen) == 2, seen
+finally:
+    monitoring.set_events(tool_id, 0)
+    monitoring.free_tool_id(tool_id)
+
+active, fired_line, fired_return, instrumented = demo.check_monitoring(code)
+assert active == 0, active
+assert len(seen) == 2, seen
+print("cymonitoring scope and fire callbacks ok")
+
 assert demo.check_traceback()
 assert demo.check_direct_uuid()
 assert demo.check_memoryview_ownership()

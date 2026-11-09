@@ -5,6 +5,8 @@ One `NNN_cy{name}.md` per area — **`NNN` = QUEUE Order** (zero-padded, `001`�
 
 Gold exemplar: [`001_cytuple.md`](001_cytuple.md).
 
+**Tracker grades:** 64 modules / 64 trackers grade A (`grades: A=64 B=0 C=0 total=64`).
+
 ## Present
 
 | Order | Tracker | Maps to | Format |
@@ -28,10 +30,11 @@ Gold exemplar: [`001_cytuple.md`](001_cytuple.md).
 | 59 | [059_cyframe.md](059_cyframe.md) | `cpython.frame` | v2 |
 | 60 | [060_cycode.md](060_cycode.md) | `cpython.code` | v2 |
 | 61 | [061_cytraceback.md](061_cytraceback.md) | `cpython.traceback` | v2 |
+| 62 | [062_cymonitoring.md](062_cymonitoring.md) | `cpython/monitoring.h` (PEP 670), cimport-only | v2 |
 | 63 | [063_cylock.md](063_cylock.md) | `cpython.lock` / `cpython.pylock` (`PyMutex`) | v2 |
 | 64 | [064_cyhash.md](064_cyhash.md) | `cpython/pyhash.h` | v2 |
 
 ## Absent
 
-Orders `014_`…`055_` live in this directory (all decided at 1.0); `062_cymonitoring.md` is an index-only/decided Order. See [`../README.md`](../README.md#status-complete--not-an-open-backlog) for phase-complete status — not an open promote backlog.
+Orders `014_`…`055_` live in this directory (all decided at 1.0); no orders are absent. See [`../README.md`](../README.md#status-complete--not-an-open-backlog) for phase-complete status — not an open promote backlog.
 

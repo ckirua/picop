@@ -15,6 +15,8 @@ from picop.cysentinel cimport sentinel_check, sentinel_check_exact, sentinel_new
 from picop.cylock cimport PyMutex, mutex_init, mutex_is_locked, mutex_lock, mutex_unlock
 
 from cpython.object cimport PyObject
+from libc.stddef cimport size_t
+from libc.stdint cimport uint64_t
 from picop.cytraceback cimport tb_check, tb_lineno, tb_next_borrow
 import sys
 import time
@@ -34,6 +36,86 @@ from picop.cycode cimport (
     code_name,
     code_num_free,
 )
+from picop.cyatomic cimport (
+    atomic_cas_weak_relaxed,
+    atomic_fetch_add_relaxed,
+    atomic_init,
+    atomic_load_acquire,
+    atomic_size_t,
+    atomic_store_release,
+    atomic_uint64_fetch_add_relaxed,
+    atomic_uint64_load_acquire,
+    atomic_uint64_init,
+    atomic_uint64_store_release,
+    atomic_uint64_t,
+)
+from picop.cyceval cimport eval_init_threads, eval_threads_initialized
+from picop.cyerr cimport (
+    err_clear,
+    err_exception_matches,
+    err_fetch,
+    err_get_raised,
+    err_no_memory,
+    err_occurred,
+    err_restore,
+    err_set_string,
+)
+from picop.cygetargs cimport (
+    PyArg_ParseTuple,
+    PyArg_ParseTupleAndKeywords,
+    PyArg_UnpackTuple,
+)
+from picop.cylongintrepr cimport (
+    PyLong_BASE,
+    PyLong_MASK,
+    PyLong_SHIFT,
+    digit,
+    longrepr_digits,
+    longrepr_new,
+    py_long,
+)
+from picop.cymem cimport (
+    mem_calloc,
+    mem_free,
+    mem_malloc,
+    mem_raw_free,
+    mem_raw_malloc,
+    mem_realloc,
+    obj_calloc,
+    obj_free,
+    obj_malloc,
+    obj_realloc,
+)
+from picop.cypylifecycle cimport life_get_version, life_is_initialized
+from picop.cypystate cimport (
+    PyGILState_STATE,
+    PyThreadState,
+    pystate_get,
+    pystate_get_dict,
+    pystate_gil_ensure,
+    pystate_gil_release,
+)
+from picop.cyref cimport (
+    ref_decref,
+    ref_incref,
+    ref_is_uniquely_referenced,
+    ref_refcnt,
+    ref_xdecref,
+)
+from picop.cypyport cimport PY_SSIZE_T_MAX, int64_t
+from picop.cythread cimport (
+    NOWAIT_LOCK,
+    PY_LOCK_ACQUIRED,
+    PyThread_type_lock,
+    eval_restore_thread,
+    eval_save_thread,
+    thread_acquire,
+    thread_allocate_lock,
+    thread_free_lock,
+    thread_get_ident,
+    thread_release,
+)
+from picop.cyversion cimport PY_MINOR_VERSION, PY_VERSION_HEX
 import gc
 import weakref
 
@@ -215,3 +297,173 @@ cpdef bint check_memoryview_ownership():
     gc.collect()
     assert ref() is None
     return True
+
+
+cpdef bint check_errors():
+    err_set_string(ValueError, "picop smoke")
+    cdef bint occurred = err_occurred()
+    cdef bint matches = err_exception_matches(ValueError)
+    err_clear()
+
+    err_set_string(ValueError, "round trip")
+    cdef PyObject *ptype = NULL
+    cdef PyObject *pvalue = NULL
+    cdef PyObject *ptraceback = NULL
+    err_fetch(&ptype, &pvalue, &ptraceback)
+    cdef bint fetched = ptype is not NULL and pvalue is not NULL
+    err_restore(ptype, pvalue, ptraceback)
+    cdef bint restored = err_occurred()
+    err_clear()
+
+    err_set_string(ValueError, "raised")
+    cdef object raised = <object>err_get_raised()
+    err_clear()
+
+    err_no_memory()
+    cdef bint nomem_set = err_occurred()
+    err_clear()
+
+    return (
+        occurred
+        and matches
+        and not err_occurred()
+        and fetched
+        and restored
+        and isinstance(raised, ValueError)
+        and nomem_set
+    )
+
+
+cpdef bint check_memory():
+    cdef void *block = mem_malloc(8)
+    cdef void *zeroed = mem_calloc(4, 2)
+    cdef void *raw = mem_raw_malloc(16)
+    cdef void *obj = obj_calloc(2, 4)
+    block = mem_realloc(block, 32)
+    obj = obj_realloc(obj, 16)
+    mem_free(block)
+    mem_free(zeroed)
+    mem_raw_free(raw)
+    obj_free(obj)
+    return block != NULL and zeroed != NULL and raw != NULL and obj != NULL
+
+
+cpdef bint check_thread_locks():
+    cdef PyThread_type_lock lock = thread_allocate_lock()
+    if lock == NULL:
+        return False
+    cdef int acquired = thread_acquire(lock, NOWAIT_LOCK)
+    thread_release(lock)
+    cdef long ident = thread_get_ident()
+    cdef PyThreadState *saved = eval_save_thread()
+    eval_restore_thread(saved)
+    thread_free_lock(lock)
+    return acquired == PY_LOCK_ACQUIRED and ident != 0 and thread_get_ident() == ident
+
+
+cpdef bint check_atomics():
+    cdef atomic_size_t counter
+    cdef atomic_uint64_t big
+    cdef size_t expected
+    cdef size_t loaded
+    cdef size_t final
+    cdef uint64_t loaded_big
+    cdef bint swapped
+
+    with nogil:
+        atomic_init(&counter, 1)
+        atomic_store_release(&counter, 7)
+        loaded = atomic_load_acquire(&counter)
+        atomic_fetch_add_relaxed(&counter, 3)
+        expected = 10
+        swapped = atomic_cas_weak_relaxed(&counter, &expected, 20)
+        final = atomic_load_acquire(&counter)
+        atomic_uint64_init(&big, 0)
+        atomic_uint64_store_release(&big, 18446744073709551615ULL)
+        loaded_big = atomic_uint64_load_acquire(&big)
+        loaded_big = atomic_uint64_fetch_add_relaxed(&big, 1ULL)
+
+    return (
+        loaded == 7
+        and swapped
+        and final == 20
+        and loaded_big == 18446744073709551615ULL
+    )
+
+
+cpdef bint check_long_repr():
+    cdef object value = (1 << PyLong_SHIFT) | 0x1234
+    cdef digit *digits = longrepr_digits(value)
+    if digits[0] != (0x1234 & PyLong_MASK) or digits[1] != 1:
+        return False
+
+    cdef py_long built = longrepr_new(2)
+    digits = longrepr_digits(built)
+    digits[0] = 5
+    digits[1] = 1
+    return <object>built == PyLong_BASE + 5
+
+
+cpdef bint check_refs():
+    cdef object value = [1, 2]
+    cdef Py_ssize_t before = ref_refcnt(value)
+    ref_incref(value)
+    ref_decref(value)
+    ref_xdecref(NULL)
+    return ref_refcnt(value) == before and ref_is_uniquely_referenced(value)
+
+
+cpdef bint check_arg_unpack(object args, object kwargs):
+    cdef PyObject *first = NULL
+    cdef PyObject *second = NULL
+    cdef int ok = PyArg_UnpackTuple(args, "pair", 2, 2, &first, &second)
+
+    cdef int number = 0
+    cdef char *keywords[2]
+    keywords[0] = "n"
+    keywords[1] = NULL
+    cdef int kw_ok = PyArg_ParseTupleAndKeywords((), kwargs, "i", keywords, &number)
+
+    cdef int parsed = 0
+    PyArg_ParseTuple((7,), "i", &parsed)
+
+    cdef bint bad_rejected = False
+    try:
+        PyArg_ParseTuple(("x",), "i", &parsed)
+    except TypeError:
+        bad_rejected = True
+
+    return (
+        ok == 1
+        and <object>first == 1
+        and <object>second == 2
+        and kw_ok == 1
+        and number == 3
+        and parsed == 7
+        and bad_rejected
+    )
+
+
+cpdef bint check_ceval():
+    eval_init_threads()
+    return eval_threads_initialized()
+
+
+cpdef bint check_pystate():
+    cdef PyThreadState *tstate = pystate_get()
+    cdef object state_dict = pystate_get_dict()
+    state_dict["picop_smoke"] = 7
+    cdef PyGILState_STATE gil = pystate_gil_ensure()
+    pystate_gil_release(gil)
+    return tstate is not NULL and state_dict is not None and state_dict["picop_smoke"] == 7
+
+
+cpdef bint check_lifecycle():
+    cdef bytes version = life_get_version()
+    cdef str short = sys.version.split(" ")[0]
+    return life_is_initialized() and version.decode().startswith(short)
+
+
+cpdef bint check_port_and_version():
+    cdef int64_t max_ssize = PY_SSIZE_T_MAX
+    return PY_VERSION_HEX >= 0x030E0000 and PY_MINOR_VERSION >= 14 and max_ssize > 0

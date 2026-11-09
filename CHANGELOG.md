@@ -20,6 +20,23 @@
   Windows, `/dev/urandom` elsewhere) through `src/picop/uuid/entropy.c`, so a source
   install needs a C toolchain only. `libssl-dev` is dropped from the CI workflows and
   the README install note. No public surface changes.
+- **cimport coverage:** `examples/cimport_ext/demo.pyx` now exercises every
+  cimport-only module — `cyerr`, `cymem`, `cythread`, `cyatomic`, `cyref`,
+  `cygetargs`, `cyceval`, `cypystate`, `cypylifecycle`, `cypyport`, `cyversion`,
+  `cylongintrepr` (plus the existing `cylock`, `cycode`, `cyframe`,
+  `cytraceback`, `cymemoryview`, UUID checks) — and `scripts/smoke_barrel_cimport.sh`
+  asserts each result on the smoke matrix.
+- **CI gates:** `picop-docs.yml` now runs `scripts/grade_trackers.py`, and
+  `scripts/release.sh` takes its interpreter from `PYTHON` instead of hard-coding
+  `python3` (the preflight checks failed when the active interpreter had no picop).
+  `tmp/` is ignored.
+
+### Fixed
+
+- **`cyerr.err_no_memory()`** is now `void`. `PyErr_NoMemory` raises `MemoryError`
+  and returns NULL, so the old `PyObject *` wrapper returned NULL and Cython turned
+  that into an unraisable exception in every caller. Use the helper for its side
+  effect, then check `err_occurred()`.
 
 ## [3.3.0] — 2026-11-06 — PyMutex cimport helpers and perf-parity gates
 

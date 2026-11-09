@@ -2,8 +2,19 @@
 
 ## [Unreleased]
 
+### Added
+
+- **Build/infra:** `picop` now builds prebuilt wheels. `[tool.cibuildwheel]` in
+  `pyproject.toml` targets CPython 3.14/3.15 and the free-threaded `cp314t`/`cp315t`
+  tags on manylinux, macOS (universal2) and Windows, and runs the test suite inside
+  each build container. `publish.yml` uploads those wheels with the sdist on every
+  `picop-v*` tag; `wheels.yml` builds the Linux x86_64 subset on every push to `main`
+  and every pull request as a compile check.
+
 ### Changed
 
+- **Build/infra:** `setup.py` uses MSVC-compatible flags on Windows (`-O2 -utf-8`)
+  instead of the GCC-only `-Wno-*` warnings, so the wheel builds compile with `cl.exe`.
 - **Build/infra:** the UUID entropy source no longer links OpenSSL. `c_uuid4` fills
   its thread-local buffer from the operating system CSPRNG (`BCryptGenRandom` on
   Windows, `/dev/urandom` elsewhere) through `src/picop/uuid/entropy.c`, so a source

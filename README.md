@@ -68,6 +68,13 @@ python -m build          # sdist + wheel under dist/
 # package_data ships .pxd / .pyi / py.typed / headers for cimport + typing
 ```
 
+Prebuilt wheels are published with each release tag: cibuildwheel (config in
+`pyproject.toml`, `[tool.cibuildwheel]`) builds manylinux, macOS universal2, and
+Windows wheels for `cp314`/`cp315` and the free-threaded `cp314t`/`cp315t` tags, and
+`publish.yml` uploads them alongside the sdist. `wheels.yml` runs the Linux x86_64
+subset on every push to `main` and every pull request, so a broken extension build
+fails before a release is cut.
+
 Optional typecheck smoke (after install):
 
 ```bash

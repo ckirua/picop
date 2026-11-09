@@ -1,0 +1,33 @@
+# Wheel build check: proves the Cython/C extensions build as a manylinux wheel on
+# every supported interpreter (GIL and free-threaded) before a release is cut.
+# Release wheels are built and uploaded by publish.yml.
+name: picop wheels
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  # cp315 wheels are built against the 3.15 release candidate until it is ABI stable.
+  CIBW_ENABLE: cpython-prerelease
+  CIBW_BUILD: "cp314-*linux_x86_64 cp314t-*linux_x86_64 cp315-*linux_x86_64 cp315t-*linux_x86_64"
+  CPY_NATIVE: "0"
+
+jobs:
+  build:
+    name: Wheel build check (linux x86_64)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v4.3.5
+      - uses: actions/upload-artifact@v4
+        with:
+          name: picop-wheels-check
+          path: ./wheelhouse/*.whl
+          if-no-files-found: error
+          retention-days: 7

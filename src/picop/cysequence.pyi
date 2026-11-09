@@ -57,13 +57,19 @@ def seq_inplace_concat(o1: object, o2: object) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``a += b`` (Tier A 1.03x); works on any
+    Slower than the plain-Python equivalent ``a += b`` (Tier A 1.02x); works on any
     sequence, not just ``list``.
     """
     ...
 
 def seq_inplace_repeat(o: object, count: int) -> object:
-    """Return ``o *= count`` result via ``PySequence_InPlaceRepeat``."""
+    """Return ``o *= count`` result via ``PySequence_InPlaceRepeat``.
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``a *= b`` (Tier A 1.06x); works on any
+    sequence, not just ``list``.
+    """
     ...
 
 def seq_list(o: object) -> list:
@@ -97,7 +103,7 @@ def seq_slice(o: object, i1: int, i2: int) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``x[a:b]`` (Tier A 1.17x); works on any
+    Slower than the plain-Python equivalent ``x[a:b]`` (Tier A 1.16x); works on any
     sequence, not just ``list``.
     """
     ...
@@ -107,7 +113,7 @@ def seq_tuple(o: object) -> tuple:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``tuple(x)`` (Tier A 1.11x); works on
+    Slower than the plain-Python equivalent ``tuple(x)`` (Tier A 1.08x); works on
     any sequence, not just ``list``.
     """
     ...
@@ -121,7 +127,7 @@ def seq_len(o: object) -> int:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``len(x)`` (Tier A 1.16x); works on any
+    Slower than the plain-Python equivalent ``len(x)`` (Tier A 1.15x); works on any
     sequence, not just ``list``.
     """
     ...

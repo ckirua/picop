@@ -11,9 +11,6 @@ def uutf8_bytes(s: str) -> bytes:
 
     Notes
     -----
-    Mixed Tier A parity: 0.94x (short), 0.96x (non-ascii), 0.99x (n=4k), 1.02x
-    (n=64); interning on the typed Cython path.
-
     Owning copy — safe to keep past the lifetime of ``s``. Prefer this over
     borrowed ``uutf8`` (cimport-only) when you need a durable value.
     """
@@ -24,7 +21,7 @@ def uintern(s: str) -> str:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``sys.intern(s)`` (Tier A 1.08–1.09x);
+    Slower than the plain-Python equivalent ``sys.intern(s)`` (Tier A 1.05–1.08x);
     interning on the typed Cython path.
     """
     ...

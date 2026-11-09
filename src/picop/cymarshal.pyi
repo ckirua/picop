@@ -10,7 +10,7 @@ def marshal_dumps(value: object, version: int = 4) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``marshal.dumps`` (Tier A 1.03x); the
+    Slower than the plain-Python equivalent ``marshal.dumps`` (Tier A 1.05x); the
     typed Cython call site.
     """
     ...

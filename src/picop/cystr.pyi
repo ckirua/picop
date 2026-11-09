@@ -59,10 +59,6 @@ def str_contains(haystack: str, needle: str) -> bool:
 
     Notes
     -----
-    Mixed Tier A parity: 0.61x (hit short), 0.65x (non-ascii), 1.04x (hit mid),
-    1.05x (hit 4k), 1.06x (miss short); ``PyUnicode_GET_LENGTH`` on a known compact
-    ``str``.
-
     Uses 1BYTE ``memchr``/``memmem`` or ``Find`` depending on kind.
     """
     ...
@@ -72,7 +68,7 @@ def str_endswith(s: str, suffix: str) -> bool:
 
     Notes
     -----
-    Mixed Tier A parity: 0.92x (hit), 1.17x (miss); ``PyUnicode_GET_LENGTH`` on a
+    Mixed Tier A parity: 0.87x (hit), 1.04x (miss); ``PyUnicode_GET_LENGTH`` on a
     known compact ``str``.
 
     Uses 1BYTE ``memcmp`` or Tailmatch depending on kind.
@@ -136,7 +132,7 @@ def str_startswith(s: str, prefix: str) -> bool:
 
     Notes
     -----
-    Mixed Tier A parity: 0.93x (hit), 1.14x (miss); ``PyUnicode_GET_LENGTH`` on a
+    Mixed Tier A parity: 0.97x (hit), 1.10x (miss); ``PyUnicode_GET_LENGTH`` on a
     known compact ``str``.
 
     Uses 1BYTE ``memcmp`` or Tailmatch depending on kind.
@@ -183,7 +179,7 @@ def str_len(s: str) -> int:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``len(x)`` (Tier A 1.09x);
+    Slower than the plain-Python equivalent ``len(x)`` (Tier A 1.04x);
     ``PyUnicode_GET_LENGTH`` on a known compact ``str``.
     """
     ...

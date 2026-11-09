@@ -19,7 +19,7 @@ def calliter_new(callable_: object, sentinel: object) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``iter(x)`` (Tier A 1.03x); the typed
+    Slower than the plain-Python equivalent ``iter(x)`` (Tier A 1.09x); the typed
     Cython call site.
     """
     ...

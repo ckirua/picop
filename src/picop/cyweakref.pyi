@@ -21,7 +21,13 @@ def weakref_new_ref(ob: object, callback: object = None) -> object:
     ...
 
 def weakref_new_proxy(ob: object, callback: object = None) -> object:
-    """Return a weak proxy via ``PyWeakref_NewProxy``."""
+    """Return a weak proxy via ``PyWeakref_NewProxy``.
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``weakref.proxy(x)`` (Tier A 1.04x);
+    weak-reference creation from C.
+    """
     ...
 
 def weakref_get_object(ref: object) -> object:

@@ -18,5 +18,11 @@ def type_eq(a: object, b: object) -> bool:
     ...
 
 def type_is_subtype(a: object, b: object) -> bool:
-    """Return True if ``a`` is a subtype of ``b`` (``PyType_IsSubtype``)."""
+    """Return True if ``a`` is a subtype of ``b`` (``PyType_IsSubtype``).
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``issubclass(a, b)`` (Tier A
+    1.07–1.09x); the typed Cython call site.
+    """
     ...

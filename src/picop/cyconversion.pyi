@@ -28,9 +28,6 @@ def conv_cstr_to_double(s: bytes) -> float:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``float(x)`` (Tier A 1.34x); the typed
-    Cython call site.
-
     ``s`` must be ``bytes`` with no surrounding whitespace. Alias of
     ``conv_string_to_double`` (prefer ``*_cstr`` naming). See
     :doc:`/user_guide/safety`.

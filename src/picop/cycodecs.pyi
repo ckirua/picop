@@ -46,6 +46,9 @@ def codec_incremental_encoder(encoding: bytes, errors: bytes | None = None) -> o
 
     Notes
     -----
+    Slower than the plain-Python equivalent ``_inc_enc`` (Tier A 1.02x);
+    codec/error-handler bridge for extension authors.
+
     ``encoding`` / ``errors`` must be ``bytes`` when provided, not ``str``.
     """
     ...
@@ -55,6 +58,9 @@ def codec_incremental_decoder(encoding: bytes, errors: bytes | None = None) -> o
 
     Notes
     -----
+    Slower than the plain-Python equivalent ``codecs.incremental_decoder(enc)``
+    (Tier A 1.03x); codec/error-handler bridge for extension authors.
+
     ``encoding`` / ``errors`` must be ``bytes`` when provided, not ``str``.
     """
     ...
@@ -102,7 +108,7 @@ def codec_strict_errors(exc: object) -> object:
     Notes
     -----
     Slower than the plain-Python equivalent ``codecs.lookup(enc).decode(b,
-    'strict')`` (Tier A 4.13x); codec/error-handler bridge for extension authors.
+    'strict')`` (Tier A 4.12x); codec/error-handler bridge for extension authors.
     """
     ...
 
@@ -111,13 +117,19 @@ def codec_ignore_errors(exc: object) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``codecs.ignore_errors`` (Tier A 1.19x);
+    Slower than the plain-Python equivalent ``codecs.ignore_errors`` (Tier A 1.20x);
     codec/error-handler bridge for extension authors.
     """
     ...
 
 def codec_replace_errors(exc: object) -> object:
-    """Replace error handler (``PyCodec_ReplaceErrors``)."""
+    """Replace error handler (``PyCodec_ReplaceErrors``).
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``codecs.replace_errors`` (Tier A
+    1.03x); codec/error-handler bridge for extension authors.
+    """
     ...
 
 def codec_xmlcharrefreplace_errors(exc: object) -> object:
@@ -125,11 +137,23 @@ def codec_xmlcharrefreplace_errors(exc: object) -> object:
     ...
 
 def codec_backslashreplace_errors(exc: object) -> object:
-    """Backslash replace handler."""
+    """Backslash replace handler.
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``codecs.backslashreplace_errors`` (Tier
+    A 1.03x); codec/error-handler bridge for extension authors.
+    """
     ...
 
 def codec_namereplace_errors(exc: object) -> object:
-    """Name replace handler."""
+    """Name replace handler.
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``codecs.namereplace_errors`` (Tier A
+    1.03x); codec/error-handler bridge for extension authors.
+    """
     ...
 
 def codec_decode(o: object, encoding: bytes, errors: bytes | None = None) -> object:
@@ -138,7 +162,7 @@ def codec_decode(o: object, encoding: bytes, errors: bytes | None = None) -> obj
     Notes
     -----
     Slower than the plain-Python equivalent ``lambda b, e, err: b.decode(e.decode(),
-    (err or b'strict').decode())`` (Tier A 1.31x); codec/error-handler bridge for
+    (err or b'strict').decode())`` (Tier A 1.39x); codec/error-handler bridge for
     extension authors.
     """
     ...
@@ -149,7 +173,7 @@ def codec_encode(o: object, encoding: bytes, errors: bytes | None = None) -> obj
     Notes
     -----
     Slower than the plain-Python equivalent ``lambda s, e, err: s.encode(e.decode(),
-    (err or b'strict').decode())`` (Tier A 1.12x); codec/error-handler bridge for
+    (err or b'strict').decode())`` (Tier A 1.20x); codec/error-handler bridge for
     extension authors.
     """
     ...

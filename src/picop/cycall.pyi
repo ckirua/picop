@@ -18,11 +18,5 @@ def call_onearg(callable: object, arg: object) -> object:
 
 
 def call_twoargs(callable: object, arg0: object, arg1: object) -> object:
-    """Call ``callable(arg0, arg1)`` through CPython vectorcall.
-
-    Notes
-    -----
-    Slower than the plain-Python equivalent ``py_twoargs`` (Tier A 1.07x); the typed
-    Cython call site.
-    """
+    """Call ``callable(arg0, arg1)`` through CPython vectorcall."""
     ...

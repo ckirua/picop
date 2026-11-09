@@ -203,23 +203,23 @@ cpdef void hold_shared(double seconds):
 
 
 cdef PyMutex contention_lock
-cdef long contention_count = 0
+cdef list contention_counter = [0]
 
 
 cpdef void contention_bump(int iterations):
-    # The increment is deliberately plain C: without the mutex it is a lost-update
-    # race on a free-threaded build.
+    # ``counter[0] += 1`` is a read-modify-write: without the mutex it is a
+    # lost-update race on a free-threaded build.
     for _ in range(iterations):
         with nogil:
             mutex_lock(&contention_lock)
-        contention_count += 1
+        contention_counter[0] += 1
         with nogil:
             mutex_unlock(&contention_lock)
 
 
 cpdef bint check_lock_contention():
     mutex_init(&contention_lock)
-    contention_count = 0
+    contention_counter[0] = 0
     cdef int workers = 8
     cdef int per_worker = 5000
     pool = [threading.Thread(target=contention_bump, args=(per_worker,)) for _ in range(workers)]
@@ -227,7 +227,7 @@ cpdef bint check_lock_contention():
         worker.start()
     for worker in pool:
         worker.join()
-    return contention_count == workers * per_worker
+    return contention_counter[0] == workers * per_worker
 
 
 cpdef bint check_frames(object caller):

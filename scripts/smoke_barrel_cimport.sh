@@ -6,6 +6,10 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 EXT="${ROOT}/examples/cimport_ext"
 
 PYTHON="${PYTHON:-python3.15}"
+# Resolve relative interpreter paths against the repo, since the build runs inside the extension dir.
+if [[ "${PYTHON}" != /* ]]; then
+  PYTHON="${ROOT}/${PYTHON}"
+fi
 "$PYTHON" -c "import picop; print('picop', picop.__version__)"
 
 cd "${EXT}"

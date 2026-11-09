@@ -21,8 +21,9 @@ Run locally after regenerating:
 
 Three contradictions are failures: an always-slower row whose helper averages
 ``<= 0.90x`` in every dump, a mixed row whose worst case is no longer above
-``1.25x`` (or whose best case now is), and a helper averaging ``>= 1.25x`` in
-every dump that no table lists.
+``1.02x`` (it has no losing case left) or whose best case is now ``>= 1.25x``
+(it loses everywhere), and a helper averaging ``>= 1.25x`` in every dump that no
+table lists.
 """
 
 from __future__ import annotations
@@ -42,6 +43,7 @@ ROW_RE = re.compile(r"^\|\s*`([A-Za-z_][A-Za-z0-9_]*)`\s*\|\s*[^|]+\|\s*([0-9.]+
 MIXED_ROW_RE = re.compile(r"^\|\s*`([A-Za-z_][A-Za-z0-9_]*)`\s*\|\s*([0-9.]+)x[^|]*\|\s*([0-9.]+)x")
 STALE_BELOW = 0.90
 NEW_ABOVE = 1.25
+MIXED_KEEP = 1.02
 INFO_DRIFT = 0.20
 GIL_TO_FREE = 0.30
 
@@ -139,10 +141,10 @@ def main() -> int:
             best, worst = mixed[name]
             worst_now = dump_worst(name)
             best_now = dump_best(name)
-            if worst_now and max(worst_now) <= NEW_ABOVE:
+            if worst_now and max(worst_now) <= MIXED_KEEP:
                 problems.append(
                     f"`{name}` is documented as mixed (worst {worst:.2f}x) but no dump has a "
-                    f"case above {NEW_ABOVE:.2f}x (worst {min(worst_now):.2f}-{max(worst_now):.2f}x)"
+                    f"case above {MIXED_KEEP:.2f}x (worst {min(worst_now):.2f}-{max(worst_now):.2f}x)"
                 )
             elif best_now and min(best_now) >= NEW_ABOVE:
                 problems.append(

@@ -53,7 +53,7 @@ def ensure_ext(stem: str) -> object:
         build([stem])
         # Fresh import after build
         for key in list(sys.modules):
-            if key == f"{stem}_tb" or key.str_startswith(f"{stem}_tb."):
+            if key == f"{stem}_tb" or key.startswith(f"{stem}_tb."):
                 del sys.modules[key]
         return __import__(f"{stem}_tb")
 

@@ -93,6 +93,21 @@ def test_dict_setdefault_promotes_one_shared_object() -> None:
     assert isinstance(results[0], list)
 
 
+def test_hash_buffer_agrees_across_threads() -> None:
+    from picop import hash_buffer
+
+    view = memoryview(bytes(range(256)) * 8)
+    expected_full = hash(bytes(view))
+    expected_range = hash(bytes(view[64:128]))
+
+    def work(index: int) -> list[int]:
+        return [hash_buffer(view) for _ in range(ITERATIONS)]
+
+    results = _run(work)
+    assert all(value == expected_full for value in results), "buffer hash diverged across threads"
+    assert hash_buffer(view, 64, 128) == expected_range, "range hash disagrees with a slice copy"
+
+
 def test_cell_get_reads_intact_values_under_concurrent_set() -> None:
     from picop import cell_get, cell_set
 

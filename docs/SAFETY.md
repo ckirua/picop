@@ -58,6 +58,9 @@ That does not remove trusted-caller preconditions:
   borrowed outputs** from `dict_next`/`dnext`, not just the call to `PyDict_Next`.
 - Escaping array/list/buffer/memoryview pointers require an owning object and
   external lifetime/mutation synchronization. No lock remains held after return.
+  `hash_buffer_raw(ptr, length)` and `hash_pointer(ptr)` are the trusted-caller
+  versions of `hash_buffer`: the pointer must stay readable for the whole call, and
+  `hash_pointer` is an identity hash, not the object's own `__hash__`.
 - Noexcept memoryview metadata helpers require a valid, unreleased view. Stable
   acquired exports prevent resize/release, not concurrent writes by arbitrary
   exporters; synchronize content mutations separately.

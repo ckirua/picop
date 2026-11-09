@@ -44,6 +44,7 @@ Submodules
    cyfunction
    cygc
    cygenobject
+   cyhash
    cyiterator
    cyiterobject
    cylist

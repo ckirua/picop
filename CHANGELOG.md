@@ -15,6 +15,11 @@
   week, and `scripts/perf_parity_drift.py` fails the job when those measurements
   contradict `docs/PERF_PARITY.md`. The tables here and the parity notes in the `.pyi`
   stubs are regenerated from one fresh pass.
+- **`cyhash` (Order 064):** add public `hash_buffer(data, start=0, end=-1)` plus
+  cimport-only `hash_buffer_raw`, `hash_pointer`, and `hash_generic`. Tier A measures
+  0.40–0.78x on `bytearray`, `array.array`, and buffer ranges, where the only pure-Python
+  route is `hash(bytes(data))`; the builtin stays cheaper for `bytes` and `memoryview`,
+  which cache the hash on the object.
 - **Build/infra:** `picop` now builds prebuilt wheels. `[tool.cibuildwheel]` in
   `pyproject.toml` targets CPython 3.14/3.15 and the free-threaded `cp314t`/`cp315t`
   tags on manylinux, macOS (universal2) and Windows, and runs the test suite inside

@@ -254,6 +254,7 @@ REASON_BY_MODULE = {
     "cyfrozendict": "the 3.15 ``frozendict`` bridge",
     "cyiterator": "iterator-protocol bridge",
     "cymemoryview": "memoryview attribute bridge",
+    "cyhash": "re-hashes the buffer every call, while ``bytes``/``memoryview`` cache theirs",
 }
 
 

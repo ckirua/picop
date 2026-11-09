@@ -117,6 +117,7 @@ from picop.cythread cimport (
     thread_release,
 )
 from picop.cyversion cimport PY_MINOR_VERSION, PY_VERSION_HEX
+from picop.cyhash cimport hash_buffer, hash_buffer_raw, hash_generic, hash_pointer
 import gc
 import weakref
 
@@ -496,3 +497,19 @@ cpdef bint check_lifecycle():
 cpdef bint check_port_and_version():
     cdef int64_t max_ssize = PY_SSIZE_T_MAX
     return PY_VERSION_HEX >= 0x030E0000 and PY_MINOR_VERSION >= 14 and max_ssize > 0
+
+
+cpdef bint check_hashing():
+    cdef bytes payload = b"cyhash barrel smoke"
+    cdef bytearray mutable = bytearray(payload)
+    cdef memoryview view = memoryview(payload)
+    assert hash_buffer(view) == hash(payload)
+    assert hash_buffer(mutable) == hash(payload)
+    assert hash_buffer(view, 5, 12) == hash(payload[5:12])
+    cdef Py_hash_t raw = hash_buffer_raw(<const char *>payload, <Py_ssize_t>len(payload))
+    assert raw == hash(payload)
+    cdef object target = payload
+    cdef Py_hash_t generic = hash_generic(target)
+    assert generic == hash_pointer(<PyObject *>target), "PyObject_GenericHash is the identity hash"
+    assert generic != -1
+    return True

@@ -255,6 +255,7 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 | `gen_check` | tierB | Tier A+B compare labels present |
 | `gen_check_exact` | tierA | Tier A `session.compare` present |
 | `gen_eq` | tierB | Tier A+B compare labels present |
+| `hash_buffer` | tierA | Tier A `session.compare` present |
 | `int_eq` | tierB | Tier A+B compare labels present |
 | `iter_check` | tierB | Tier A+B compare labels present |
 | `iter_eq` | tierB | Tier A+B compare labels present |

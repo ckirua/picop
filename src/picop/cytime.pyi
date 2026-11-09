@@ -6,17 +6,17 @@ carry a parity note in the stub. See :doc:`/user_guide/quickstart`.
 """
 
 def time_monotonic() -> float:
-    """Return monotonic seconds via ``PyTime_Monotonic``.
-
-    Notes
-    -----
-    Slower than the plain-Python equivalent ``time.monotonic`` (Tier A 1.03x); the
-    typed Cython call site.
-    """
+    """Return monotonic seconds via ``PyTime_Monotonic``."""
     ...
 
 def time_perf_counter() -> float:
-    """Return perf-counter seconds via ``PyTime_PerfCounter``."""
+    """Return perf-counter seconds via ``PyTime_PerfCounter``.
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``time.perf_counter`` (Tier A 1.02x);
+    the typed Cython call site.
+    """
     ...
 
 def time_wall() -> float:
@@ -24,7 +24,7 @@ def time_wall() -> float:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``time.time`` (Tier A 1.04x); the typed
+    Slower than the plain-Python equivalent ``time.time`` (Tier A 1.07x); the typed
     Cython call site.
     """
     ...

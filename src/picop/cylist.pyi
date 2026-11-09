@@ -156,6 +156,9 @@ def list_sort(l: list) -> int:
 
     Notes
     -----
+    Slower than the plain-Python equivalent ``lst.sort()`` (Tier A 1.05x); unchecked
+    ``PyList`` mutation on a known list.
+
     Returns ``0`` on success and ``-1`` on error; errors raise. Do not use the
     status int as a bool.
     """

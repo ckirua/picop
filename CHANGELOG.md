@@ -10,6 +10,11 @@
   torn or lost update; the barrel smoke now runs an 8-thread `PyMutex` contention
   check (`demo.check_lock_contention()`), so `cylock` is proven under real contention
   instead of a single-threaded lock/unlock.
+- **CI:** `.github/workflows/perf-parity.yml` re-measures every public helper against
+  its plain-Python builtin on CPython 3.14, 3.15 and both free-threaded builds each
+  week, and `scripts/perf_parity_drift.py` fails the job when those measurements
+  contradict `docs/PERF_PARITY.md`. The tables here and the parity notes in the `.pyi`
+  stubs are regenerated from one fresh pass.
 - **Build/infra:** `picop` now builds prebuilt wheels. `[tool.cibuildwheel]` in
   `pyproject.toml` targets CPython 3.14/3.15 and the free-threaded `cp314t`/`cp315t`
   tags on manylinux, macOS (universal2) and Windows, and runs the test suite inside

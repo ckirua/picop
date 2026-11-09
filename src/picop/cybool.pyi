@@ -17,7 +17,7 @@ def bool_from_long(v: int) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``bool(x)`` (Tier A 1.03–1.08x); returns
+    Slower than the plain-Python equivalent ``bool(x)`` (Tier A 1.07–1.12x); returns
     the C ``bool`` for a Cython ``int``.
     """
     ...

@@ -97,13 +97,19 @@ def seq_slice(o: object, i1: int, i2: int) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``x[a:b]`` (Tier A 1.18x); works on any
+    Slower than the plain-Python equivalent ``x[a:b]`` (Tier A 1.17x); works on any
     sequence, not just ``list``.
     """
     ...
 
 def seq_tuple(o: object) -> tuple:
-    """Return ``tuple(o)`` via ``PySequence_Tuple``."""
+    """Return ``tuple(o)`` via ``PySequence_Tuple``.
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``tuple(x)`` (Tier A 1.11x); works on
+    any sequence, not just ``list``.
+    """
     ...
 
 def seq_count(o: object, value: object) -> int:
@@ -115,7 +121,7 @@ def seq_len(o: object) -> int:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``len(x)`` (Tier A 1.21x); works on any
+    Slower than the plain-Python equivalent ``len(x)`` (Tier A 1.16x); works on any
     sequence, not just ``list``.
     """
     ...
@@ -125,7 +131,7 @@ def seq_size(o: object) -> int:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``len(x)`` (Tier A 1.22x); works on any
+    Slower than the plain-Python equivalent ``len(x)`` (Tier A 1.15x); works on any
     sequence, not just ``list``.
     """
     ...

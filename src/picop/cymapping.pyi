@@ -89,7 +89,7 @@ def map_len(o: object) -> int:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``len(x)`` (Tier A 1.09x); the typed
+    Slower than the plain-Python equivalent ``len(x)`` (Tier A 1.03x); the typed
     Cython call site.
     """
     ...

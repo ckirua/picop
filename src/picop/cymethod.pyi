@@ -32,11 +32,5 @@ def method_get_self(meth: object) -> object | None:
     ...
 
 def method_new(func: object, self: object) -> object:
-    """Return a bound method for ``func`` and ``self`` (``PyMethod_New``).
-
-    Notes
-    -----
-    Slower than the plain-Python equivalent ``types.MethodType`` (Tier A 1.23x); the
-    typed Cython call site.
-    """
+    """Return a bound method for ``func`` and ``self`` (``PyMethod_New``)."""
     ...

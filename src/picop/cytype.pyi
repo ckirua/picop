@@ -23,6 +23,6 @@ def type_is_subtype(a: object, b: object) -> bool:
     Notes
     -----
     Slower than the plain-Python equivalent ``issubclass(a, b)`` (Tier A
-    1.10–1.14x); the typed Cython call site.
+    1.07–1.09x); the typed Cython call site.
     """
     ...

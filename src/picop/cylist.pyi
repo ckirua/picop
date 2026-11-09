@@ -13,6 +13,9 @@ def list_append(l: list, value: object) -> int:
 
     Notes
     -----
+    Slower than the plain-Python equivalent ``lst.append(x)`` (Tier A 1.02x);
+    unchecked ``PyList`` mutation on a known list.
+
     Returns ``0`` on success and ``-1`` on error; errors raise. Do not use the
     status int as a bool.
     """
@@ -121,6 +124,9 @@ def list_set_item(l: list, i: int, value: object) -> int:
 
     Notes
     -----
+    Slower than the plain-Python equivalent ``lst[i] = value`` (Tier A 1.03x);
+    unchecked ``PyList`` mutation on a known list.
+
     INCREFs ``value`` then steals the new reference into the list slot. Returns
     ``0`` on success and ``-1`` on error; errors raise. Do not use the status
     int as a bool.
@@ -156,6 +162,9 @@ def list_sort(l: list) -> int:
 
     Notes
     -----
+    Slower than the plain-Python equivalent ``lst.sort()`` (Tier A 1.05x); unchecked
+    ``PyList`` mutation on a known list.
+
     Returns ``0`` on success and ``-1`` on error; errors raise. Do not use the
     status int as a bool.
     """

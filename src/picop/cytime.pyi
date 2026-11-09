@@ -16,7 +16,13 @@ def time_monotonic() -> float:
     ...
 
 def time_perf_counter() -> float:
-    """Return perf-counter seconds via ``PyTime_PerfCounter``."""
+    """Return perf-counter seconds via ``PyTime_PerfCounter``.
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``time.perf_counter`` (Tier A 1.03x);
+    the typed Cython call site.
+    """
     ...
 
 def time_wall() -> float:
@@ -24,7 +30,7 @@ def time_wall() -> float:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``time.time`` (Tier A 1.04x); the typed
+    Slower than the plain-Python equivalent ``time.time`` (Tier A 1.06x); the typed
     Cython call site.
     """
     ...

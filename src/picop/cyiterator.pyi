@@ -18,7 +18,7 @@ def iter_next(o: object) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``next`` (Tier A 1.05x); iterator-
+    Slower than the plain-Python equivalent ``next`` (Tier A 1.04x); iterator-
     protocol bridge.
     """
     ...

@@ -1,0 +1,59 @@
+# Weekly Tier A re-measurement of every public helper against its plain-Python
+# builtin. Four interpreters (3.14, 3.15 and both free-threaded builds) run the
+# bench suite; the compare job checks docs/PERF_PARITY.md against what was measured.
+name: picop perf parity
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CPY_NATIVE: "0"
+
+jobs:
+  bench:
+    name: Tier A benches (${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.14", "3.15", "3.14t", "3.15t"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          allow-prereleases: true
+      - name: Install build dependencies
+        run: python -m pip install setuptools wheel "Cython>=3.3.0" picobuild pyperf
+      - name: Install picop
+        run: python -m pip install -e . --no-build-isolation
+      - name: Collect Tier A parity data
+        run: python scripts/perf_parity_report.py --json > parity-${{ matrix.python-version }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: parity-${{ matrix.python-version }}
+          path: parity-${{ matrix.python-version }}.json
+          if-no-files-found: error
+
+  compare:
+    name: Parity drift check
+    needs: bench
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.15"
+          allow-prereleases: true
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: parity-*
+          path: parity/
+          merge-multiple: true
+      - name: Check docs/PERF_PARITY.md against the measured ratios
+        run: python scripts/perf_parity_drift.py --dir parity

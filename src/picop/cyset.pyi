@@ -13,9 +13,6 @@ def set_add(s: set, value: object) -> int:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``s.add(v)`` (Tier A 1.14x); unchecked
-    set mutation.
-
     Returns ``0`` on success; errors raise. Do not use the status int as a
     bool.
     """
@@ -42,7 +39,7 @@ def set_clear(s: set) -> int:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``s.clear()`` (Tier A 1.04x); unchecked
+    Slower than the plain-Python equivalent ``s.clear()`` (Tier A 1.13x); unchecked
     set mutation.
 
     Returns ``0`` on success; errors raise. Do not use the status int as a
@@ -63,7 +60,7 @@ def set_discard(s: set, value: object) -> int:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``s.discard(v)`` (Tier A 1.02–1.06x);
+    Slower than the plain-Python equivalent ``s.discard(v)`` (Tier A 1.08–1.10x);
     unchecked set mutation.
 
     Returns ``1`` if removed, ``0`` if absent (no ``KeyError``). Errors raise.
@@ -88,13 +85,7 @@ def frozenset_empty() -> frozenset:
     ...
 
 def frozenset_new(iterable: object) -> frozenset:
-    """Return a new frozenset from ``iterable`` via ``PyFrozenSet_New``.
-
-    Notes
-    -----
-    Slower than the plain-Python equivalent ``frozenset(it)`` (Tier A 1.20x);
-    unchecked set mutation.
-    """
+    """Return a new frozenset from ``iterable`` via ``PyFrozenSet_New``."""
     ...
 
 def frozenset_eq(a: frozenset, b: frozenset) -> bool:
@@ -128,7 +119,7 @@ def set_update(s: set, iterable: object) -> int:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``s.update(it)`` (Tier A 1.04x);
+    Slower than the plain-Python equivalent ``s.update(it)`` (Tier A 1.03x);
     unchecked set mutation.
 
     Returns ``0`` on success; errors raise. Do not use the status int as a
@@ -141,7 +132,7 @@ def set_pop(s: set) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``s.pop()`` (Tier A 1.11x); unchecked
+    Slower than the plain-Python equivalent ``s.pop()`` (Tier A 1.04x); unchecked
     set mutation.
     """
     ...

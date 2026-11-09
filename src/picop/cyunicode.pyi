@@ -21,7 +21,7 @@ def uintern(s: str) -> str:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``sys.intern(s)`` (Tier A 1.08–1.12x);
+    Slower than the plain-Python equivalent ``sys.intern(s)`` (Tier A 1.05–1.08x);
     interning on the typed Cython path.
     """
     ...

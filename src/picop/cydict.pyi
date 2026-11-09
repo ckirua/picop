@@ -135,13 +135,7 @@ def dict_setdefault(d: dict, key: str, default: object = None) -> object:
     ...
 
 def dict_setdefault_ref(d: dict, key: object, default: object = None) -> object:
-    """Return ``setdefault`` via strong-ref ``PyDict_SetDefaultRef``.
-
-    Notes
-    -----
-    Slower than the plain-Python equivalent ``d.setdefault(key, default)`` (Tier A
-    1.18x); unchecked ``PyDict`` mutation on a known dict.
-    """
+    """Return ``setdefault`` via strong-ref ``PyDict_SetDefaultRef``."""
     ...
 
 def dict_size(d: object) -> int:

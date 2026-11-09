@@ -37,7 +37,7 @@ def frozendict_new(iterable: object) -> object:
 
     Notes
     -----
-    Mixed Tier A parity: 0.54x (from frozendict), 1.04x (from dict (4 items)); the
+    Mixed Tier A parity: 0.53x (from frozendict), 1.03x (from dict (4 items)); the
     3.15 ``frozendict`` bridge.
 
     ``None`` is not iterable — use ``frozendict_empty()`` for the

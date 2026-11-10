@@ -40,8 +40,9 @@ def cfunction_check(o: object) -> bool:
 
     Notes
     -----
-    Matches builtins such as ``len`` and C-method descriptors; ``method_check``
-    only matches Python bound methods.
+    Matches builtin functions and bound C methods such as ``[].append``;
+    unbound descriptors such as ``str.join`` are not ``PyCFunction`` objects. A
+    ``PyCMethod`` passes here but not in ``cfunction_check_exact``.
     """
     ...
 
@@ -54,8 +55,9 @@ def cmethod_check(o: object) -> bool:
 
     Notes
     -----
-    A ``PyCMethod`` is a C function carrying the defining class — the object you
-    get from ``type.__dict__`` lookups of slot-backed methods.
+    A ``PyCMethod`` is a ``PyCFunction`` carrying the defining class, built by
+    ``PyCMethod_New``; unbound descriptors such as ``str.join`` are not
+    ``PyCFunction`` objects at all.
     """
     ...
 
@@ -64,12 +66,13 @@ def cmethod_check_exact(o: object) -> bool:
     ...
 
 def cfunction_get_self(func: object) -> object | None:
-    """Return the class a C function is bound to, or ``None``.
+    """Return the object a C function is bound to (its ``__self__``), or ``None``.
 
     Notes
     -----
-    ``PyCFunction_GetSelf``. Plain builtins and static methods have no ``self``
-    and return ``None``; a non-C-function argument raises ``SystemError``.
+    ``PyCFunction_GetSelf`` hands back the borrowed ``m_self``: builtin
+    functions report the ``builtins`` module and ``METH_STATIC`` functions
+    report ``None``. A non-C-function argument raises ``SystemError``.
     """
     ...
 

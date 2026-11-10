@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [3.4.0] — 2026-11-10 — Buffer hashing and PEP 670 monitoring scopes
 
 ### Added
 

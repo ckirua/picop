@@ -57,6 +57,12 @@
   and returns NULL, so the old `PyObject *` wrapper returned NULL and Cython turned
   that into an unraisable exception in every caller. Use the helper for its side
   effect, then check `err_occurred()`.
+- **UUID buffer asserts under MSVC:** `src/picop/uuid/uuid.h` uses a portable
+  `_Static_assert` fallback (negative-size typedef), because MSVC ignores
+  `-std=c11` and its default C mode rejects `_Static_assert`; `setup.py` no longer
+  passes `-std=c11` on Windows. `tests/test_uuid_entropy.py` raises its C-compile
+  subprocess timeout from 30 s to 120 s so the cross-arch wheel test on macOS
+  runners does not fail on a cold clang start.
 
 ## [3.3.0] — 2026-11-06 — PyMutex cimport helpers and perf-parity gates
 

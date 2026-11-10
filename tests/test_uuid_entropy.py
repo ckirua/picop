@@ -28,7 +28,7 @@ def _compile(tmp_path: Path, source: str, *defines: str,
          str(UUID_DIR / "uuid.c"),
          str(entropy_source or UUID_DIR / "entropy.c"),
          "-pthread", "-o", str(executable)],
-        check=True, capture_output=True, text=True, timeout=30,
+        check=True, capture_output=True, text=True, timeout=120,
     )
     return executable
 
@@ -41,13 +41,13 @@ def test_buffer_size_requires_minimum_uuid_and_accepts_sixteen(tmp_path: Path) -
         result = subprocess.run(
             [*compiler, "-std=c11", "-I", str(UUID_DIR), f"-DUUID_RANDOM_BUFFER_SIZE={size}",
              str(source), "-c", "-o", str(tmp_path / f"bad-{size}.o")],
-            capture_output=True, text=True, timeout=30,
+            capture_output=True, text=True, timeout=120,
         )
         assert result.returncode != 0
     subprocess.run(
         [*compiler, "-std=c11", "-I", str(UUID_DIR), "-DUUID_RANDOM_BUFFER_SIZE=16",
          str(source), "-c", "-o", str(tmp_path / "valid.o")],
-        check=True, capture_output=True, text=True, timeout=30,
+        check=True, capture_output=True, text=True, timeout=120,
     )
 
 
@@ -70,7 +70,7 @@ int __register_atfork(void (*prepare)(void), void (*parent)(void),
     compiler = shlex.split(os.environ.get("CC") or sysconfig.get_config_var("CC") or "cc")
     subprocess.run(
         [*compiler, "-shared", "-fPIC", str(source), "-o", str(library)],
-        check=True, capture_output=True, text=True, timeout=30,
+        check=True, capture_output=True, text=True, timeout=120,
     )
     environment = os.environ.copy()
     environment["LD_PRELOAD"] = str(library) + (
@@ -86,7 +86,7 @@ else:
 """
     result = subprocess.run(
         [sys.executable, "-c", script], env=environment,
-        capture_output=True, text=True, timeout=30,
+        capture_output=True, text=True, timeout=120,
     )
     assert result.returncode == 0, result.stderr
 

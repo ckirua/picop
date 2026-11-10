@@ -15,16 +15,27 @@
 #define UUID_RANDOM_BUFFER_SIZE 65536
 #endif
 
-_Static_assert(
+/* MSVC ignores `-std=c11` and its default C mode has no `_Static_assert`, so
+   fall back to a negative-size typedef when the compiler does not advertise C11. */
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !defined(_MSC_VER)
+#define PICOP_STATIC_ASSERT(condition, message) _Static_assert(condition, message)
+#else
+#define PICOP_STATIC_ASSERT_NAME_(line) picop_static_assert_line_##line
+#define PICOP_STATIC_ASSERT_NAME(line) PICOP_STATIC_ASSERT_NAME_(line)
+#define PICOP_STATIC_ASSERT(condition, message) \
+    typedef char PICOP_STATIC_ASSERT_NAME(__LINE__)[(condition) ? 1 : -1]
+#endif
+
+PICOP_STATIC_ASSERT(
     UUID_RANDOM_BUFFER_SIZE >= UUID_SIZE,
     "UUID_RANDOM_BUFFER_SIZE must hold at least one UUID"
 );
 
-_Static_assert(
+PICOP_STATIC_ASSERT(
     UUID_RANDOM_BUFFER_SIZE % UUID_SIZE == 0,
     "UUID_RANDOM_BUFFER_SIZE must be a multiple of 16"
 );
-_Static_assert(
+PICOP_STATIC_ASSERT(
     UUID_RANDOM_BUFFER_SIZE <= INT_MAX,
     "UUID_RANDOM_BUFFER_SIZE must stay within int bounds for thread-local buffers"
 );

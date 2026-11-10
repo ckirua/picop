@@ -18,9 +18,9 @@ from cpython.unicode cimport (
 from libc.stddef cimport size_t
 from libc.string cimport memchr, memcmp
 
-cdef extern from "string.h":
-    void* memmem(const void *haystack, size_t haystacklen,
-                 const void *needle, size_t needlelen) nogil
+cdef extern from "cybytes_shim.h":
+    void* cy_memmem(const void *haystack, size_t haystacklen,
+                    const void *needle, size_t needlelen) nogil
 
 cdef extern from *:
     ctypedef unsigned int Py_UCS4
@@ -182,7 +182,7 @@ cdef inline bint contains(str haystack, str needle) noexcept:
                 return hp[0] == np[0]
             return memchr(hp, <unsigned char>np[0], hlen) is not NULL
         if nlen == 2:
-            return memmem(hp, <size_t>hlen, np, 2) is not NULL
+            return cy_memmem(hp, <size_t>hlen, np, 2) is not NULL
     return PyUnicode_Find(haystack, needle, 0, hlen, 1) >= 0
 
 

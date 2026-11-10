@@ -8,9 +8,9 @@ from cpython.object cimport PyObject
 from libc.stddef cimport size_t
 from libc.string cimport memchr, memcmp
 
-cdef extern from "string.h":
-    void* memmem(const void *haystack, size_t haystacklen,
-                 const void *needle, size_t needlelen) nogil
+cdef extern from "cybytes_shim.h":
+    void* cy_memmem(const void *haystack, size_t haystacklen,
+                    const void *needle, size_t needlelen) nogil
 
 cdef extern from "Python.h":
     char* PyBytes_AS_STRING(object op) noexcept
@@ -72,7 +72,7 @@ cdef inline bint bcontains(bytes haystack, bytes needle) noexcept:
     cdef char *np = PyBytes_AS_STRING(needle)
     if nlen == 1:
         return memchr(hp, <unsigned char>np[0], <size_t>hlen) is not NULL
-    return memmem(hp, <size_t>hlen, np, <size_t>nlen) is not NULL
+    return cy_memmem(hp, <size_t>hlen, np, <size_t>nlen) is not NULL
 
 
 cdef inline bint beq(bytes a, bytes b) noexcept:

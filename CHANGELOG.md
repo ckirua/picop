@@ -5,6 +5,10 @@
 ### Added
 
 - **`cywarnings` (Order 065):** expose CPython warning dispatch (`warn_ex`, `warn_explicit`) and warnings-module lookup, preserving active filters and exceptions.
+- **`cypicklebuf` (Order 066):** add PickleBuffer construction, release, exact-type
+  check, type accessor, and cimport-only raw buffer pointer access. The borrowed pointer
+  is tied to the owner's unreleased lifetime; no GetObj or CheckExact exists in the
+  CPython 3.15 header.
 - **`cyfunction` (Order 067):** public `func_new_with_qualname`,
   `func_get_kw_defaults`, `func_set_kw_defaults`, `func_get_annotations`,
   `func_set_annotations`, and cimport-only `func_get_code_unchecked`,
@@ -47,10 +51,6 @@
   0.40–0.78x on `bytearray`, `array.array`, and buffer ranges, where the only pure-Python
   route is `hash(bytes(data))`; the builtin stays cheaper for `bytes` and `memoryview`,
   which cache the hash on the object.
-- **`cypicklebuf` (Order 066):** add PickleBuffer construction, release, exact-type
-  check, type accessor, and cimport-only raw buffer pointer access. The borrowed pointer
-  is tied to the owner's unreleased lifetime; no GetObj or CheckExact exists in the
-  CPython 3.15 header.
 - **Build/infra:** `picop` now builds prebuilt wheels. `[tool.cibuildwheel]` in
   `pyproject.toml` targets CPython 3.14/3.15 and the free-threaded `cp314t`/`cp315t`
   tags on manylinux, macOS (universal2) and Windows, and runs the test suite inside

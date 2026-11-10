@@ -80,7 +80,9 @@ assert demo.check_traceback()
 assert demo.check_direct_uuid()
 assert demo.check_memoryview_ownership()
 assert demo.check_hashing()
-assert demo.check_pickle_buffer()
+if sys.version_info >= (3, 15):
+    # PyPickleBuffer_* accessors only exist in CPython 3.15+.
+    assert demo.check_pickle_buffer()
 assert demo.check_errors()
 assert demo.check_memory()
 assert demo.check_thread_locks()

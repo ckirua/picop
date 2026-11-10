@@ -64,6 +64,7 @@ Full callable/public surface of `cpython/picklebufobject.h` in CPython 3.15. `Py
 - Tier B harness: [`bench/tier_b/cypicklebuf.py`](../../bench/tier_b/cypicklebuf.py) (`bench/tier_b/cypicklebuf_tb.pyx`)
 - Gate: [`docs/README.md`](../README.md) (mean ratio ≤ 0.95); plain memoryview construction is faster because it does not allocate PickleBuffer's pickle-protocol wrapper. Direct pickle serialization is much slower.
 - Environment: CPython 3.15.0rc2, Linux x86_64, GIL build; Tier A N=10,000, RUNS=5; Tier B N=2,000,000 × 5 runs.
+- Free-threading: `cypicklebuf.pyx` declares `freethreading_compatible=True`; verified on CPython 3.15.0rc2 free-threaded, where `tests/test_freethreading.py` keeps the GIL disabled after importing `picop.cypicklebuf`.
 
 ## Bench results
 

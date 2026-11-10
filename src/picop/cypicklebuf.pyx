@@ -1,4 +1,5 @@
-# cython: language_level=3
+# cython: freethreading_compatible=True
+# cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
 
 from cpython.buffer cimport Py_buffer
 from cpython.object cimport PyObject, PyTypeObject

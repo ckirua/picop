@@ -21,11 +21,11 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 
 | Metric | Count |
 |--------|------:|
-| Public barrel helpers | 508 |
-| `tierA` | 350 |
+| Public barrel helpers | 512 |
+| `tierA` | 351 |
 | `tierB` | 142 |
 | `pending` | 0 |
-| `n/a` | 16 |
+| `n/a` | 19 |
 
 ## Checklist
 

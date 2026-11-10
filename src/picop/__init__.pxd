@@ -274,6 +274,8 @@ from .cycellobject cimport (
 )
 from .cydescr cimport (
     descr_is_data,
+    descr_name,
+    descr_objclass,
 )
 from .cycodecs cimport (
     codec_register,
@@ -1243,6 +1245,8 @@ __all__: tuple[str, ...] = (
     "cell_get_unchecked",
     "cell_set_unchecked",
     "descr_is_data",
+    "descr_name",
+    "descr_objclass",
     "codec_register",
     "codec_known",
     "codec_encode",

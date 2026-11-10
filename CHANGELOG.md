@@ -26,6 +26,7 @@
   `cfunction_check_exact` does not; `cfunction_get_self` promotes the borrowed
   `m_self` inside a critical section and preserves CPython's `SystemError` for
   non-C-function arguments. Tier A 0.43–0.90x, Tier B 7/7 wins (mean 0.19x).
+- **`cydescr` (Order 069):** add checked `descr_name` and `descr_objclass` descriptor metadata accessors. CPython descriptor constructors and member access remain cimport-only because their raw tables/addresses require caller-managed lifetime and safety; unsafe `PyWrapper_New` is not exported.
 
 ### Fixed
 

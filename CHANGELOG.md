@@ -27,6 +27,12 @@
   `m_self` inside a critical section and preserves CPython's `SystemError` for
   non-C-function arguments. Tier A 0.43–0.90x, Tier B 7/7 wins (mean 0.19x).
 
+### Fixed
+
+- **`cyhash` wheel builds on Windows:** `hash_buffer` advanced the exported buffer with
+  `void *` arithmetic, which MSVC rejects (`error C2036: 'const void *': unknown size`);
+  the offset is now applied through `const char *`. GCC/clang behaviour is unchanged.
+
 ## [3.4.0] — 2026-11-10 — Buffer hashing and PEP 670 monitoring scopes
 
 ### Added

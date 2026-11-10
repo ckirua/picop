@@ -25,7 +25,8 @@ cdef inline Py_hash_t hbobject(object data, Py_ssize_t start, Py_ssize_t end):
             end = buf.len
         if start < 0 or end > buf.len or end < start:
             raise ValueError("hash_buffer() range out of bounds")
-        return Py_HashBuffer(<const void *>buf.buf + start, end - start)
+        # MSVC rejects arithmetic on ``void *``; advance through ``char *``.
+        return Py_HashBuffer(<const char *>buf.buf + start, end - start)
     finally:
         PyBuffer_Release(&buf)
 

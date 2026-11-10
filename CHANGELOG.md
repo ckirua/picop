@@ -15,6 +15,10 @@
   week, and `scripts/perf_parity_drift.py` fails the job when those measurements
   contradict `docs/PERF_PARITY.md`. The tables here and the parity notes in the `.pyi`
   stubs are regenerated from one fresh pass.
+- **`cymonitoring` (Order 062):** cimport-only PEP 670 helpers:
+  `monitoring_scope`, `monitoring_exit_scope`, `monitoring_active`,
+  `monitoring_is_instrumented`, and the 17 `fire_*` helpers, plus the 18
+  `PY_MONITORING_EVENT_*` constants and `PyMonitoringState`.
 - **`cyhash` (Order 064):** add public `hash_buffer(data, start=0, end=-1)` plus
   cimport-only `hash_buffer_raw`, `hash_pointer`, and `hash_generic`. Tier A measures
   0.40–0.78x on `bytearray`, `array.array`, and buffer ranges, where the only pure-Python

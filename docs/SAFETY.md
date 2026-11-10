@@ -96,6 +96,34 @@ never owns it and never reads its contents.
   no error code.
 - `mutex_init` zeroes the struct; zero is CPython's unlocked state.
 
+## `cymonitoring` (cimport-only)
+
+`PyMonitoringState *` is interpreter-populated storage that the caller owns on the
+stack. Cython does not zero `cdef PyMonitoringState states[19]` — an unentered
+array measured 12 of 19 `active` bytes non-zero.
+
+Measured on CPython 3.15.0rc2 (`-O3`), with the array pre-filled to a sentinel:
+
+- `event_types` is **positional**, not id-keyed: `state_array[i]` is populated for
+  `event_types[i]`, for `i` in `range(length)`. Passing `[LINE, PY_RETURN]` with
+  `length == 2` wrote slots 0 and 1, not slots 5 and 2. `monitoring_scope` always
+  passes `0..17` in id order, which is why slot `i` can be read as event `i`.
+- `length` is not bounded and out-of-range ids are not rejected: with 100 ids
+  `EnterScope` still returned 0, and an id of 255 left its slot untouched rather
+  than raising. Keep the table in id order and never index past
+  `PICOP_MONITORING_STATE_SLOTS` (19).
+- The `version` argument is a memo. When `*version` already equals the
+  interpreter's monitoring version, `EnterScope` returns 0 **without populating the
+  array** — measured with a fresh array, `version = 0`, and no tool ever enabled.
+  `monitoring_active` then reads stack garbage: correctness is unaffected (nothing
+  is instrumented), but the caller-side gate stops saving anything. If that matters,
+  `memset(states, 0, sizeof(states))` before the first scope.
+- Slot 18 (`PY_MONITORING_EVENT_BRANCH`, deprecated in 3.14) is never written; it
+  keeps whatever was on the stack.
+- `active` is a tool bitmask (`1 << tool_id`), not a bool.
+- Monitoring callbacks are Python objects and can raise; `fire_*` then returns `-1`
+  and propagates the exception.
+
 ## `marshal_loads`
 
 Untrusted data is **unsafe** — same class as stdlib `marshal.loads`. Only deserialize marshal payloads from a trusted source.

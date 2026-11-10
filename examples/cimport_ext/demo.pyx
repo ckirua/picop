@@ -28,8 +28,14 @@ from picop.cylock cimport PyMutex, mutex_init, mutex_is_locked, mutex_lock, mute
 
 from cpython.object cimport PyObject
 from libc.stddef cimport size_t
+from cpython.buffer cimport Py_buffer
 from libc.stdint cimport uint64_t
 from picop.cytraceback cimport tb_check, tb_lineno, tb_next_borrow
+from picop.cypicklebuf cimport (
+    pickle_buffer_from_object,
+    pickle_buffer_get_buffer,
+    pickle_buffer_release,
+)
 import sys
 import threading
 import time
@@ -578,3 +584,16 @@ cpdef bint check_warnings():
         warnings.simplefilter("ignore", RuntimeWarning)
         assert warn_ex(RuntimeWarning, "smoke") == 0
     return warnings_module() is warnings
+
+cpdef bint check_pickle_buffer():
+    cdef object payload = bytearray(b"pickle buffer smoke")
+    cdef object wrapped = pickle_buffer_from_object(payload)
+    cdef const Py_buffer *view = pickle_buffer_get_buffer(wrapped)
+    if view == NULL or view.len != len(payload):
+        return False
+    pickle_buffer_release(wrapped)
+    try:
+        pickle_buffer_get_buffer(wrapped)
+    except ValueError:
+        return True
+    return False

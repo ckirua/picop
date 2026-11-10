@@ -21,11 +21,11 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 
 | Metric | Count |
 |--------|------:|
-| Public barrel helpers | 508 |
-| `tierA` | 350 |
+| Public barrel helpers | 512 |
+| `tierA` | 351 |
 | `tierB` | 142 |
 | `pending` | 0 |
-| `n/a` | 16 |
+| `n/a` | 19 |
 
 ## Checklist
 
@@ -423,6 +423,10 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 | `obj_size` | tierA | Tier A `session.compare` present |
 | `obj_str` | tierA | Tier A `session.compare` present |
 | `obj_type` | tierB | Tier A+B compare labels present |
+| `pickle_buffer_check` | n/a (3.15-only exact-type predicate; no stable public baseline) | API probe only |
+| `pickle_buffer_from_object` | tierA | Tier A compare labels present |
+| `pickle_buffer_release` | n/a (ownership-invalidating operation; no fair non-mutating baseline) | API probe only |
+| `pickle_buffer_type` | n/a (type object accessor; no comparable operation) | API probe only |
 | `range_eq` | tierB | Tier A+B compare labels present |
 | `sentinel_check` | tierB | Tier A+B compare labels present |
 | `sentinel_check_exact` | tierB | Tier A+B compare labels present |

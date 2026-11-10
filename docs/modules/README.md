@@ -5,7 +5,7 @@ One `NNN_cy{name}.md` per area â€” **`NNN` = QUEUE Order** (zero-padded, `001`â€
 
 Gold exemplar: [`001_cytuple.md`](001_cytuple.md).
 
-**Tracker grades:** 65 modules / 65 trackers grade A (`grades: A=65 B=0 C=0 total=65`).
+**Tracker grades:** 66 modules / 66 trackers grade A (`grades: A=66 B=0 C=0 total=66`).
 
 ## Present
 
@@ -34,6 +34,8 @@ Gold exemplar: [`001_cytuple.md`](001_cytuple.md).
 | 63 | [063_cylock.md](063_cylock.md) | `cpython.lock` / `cpython.pylock` (`PyMutex`) | v2 |
 | 64 | [064_cyhash.md](064_cyhash.md) | `cpython/pyhash.h` | v2 |
 | 65 | [065_cywarnings.md](065_cywarnings.md) | `Python.h` warning APIs | v2 |
+
+| 66 | [066_cypicklebuf.md](066_cypicklebuf.md) | `cpython/picklebufobject.h` (3.15+) | v2 |
 
 ## Absent
 

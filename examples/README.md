@@ -90,6 +90,7 @@ for f in examples/py*.py examples/wrap_ansi.py; do python "$f" || exit 1; done
 | 63 | `cylock` | cython-recipe | [`cython/free_threading_locks.md`](cython/free_threading_locks.md) |
 | 64 | `cyhash` | smoke | [`pyhash.py`](pyhash.py) |
 | 65 | `cywarnings` | smoke | cimport smoke in [`cimport_ext/demo.pyx`](cimport_ext/demo.pyx) |
+| 66 | `cypicklebuf` | smoke | [`pypicklebuf.py`](pypicklebuf.py) |
 
 ## Cython recipes
 

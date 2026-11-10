@@ -5,6 +5,10 @@
 ### Added
 
 - **`cywarnings` (Order 065):** expose CPython warning dispatch (`warn_ex`, `warn_explicit`) and warnings-module lookup, preserving active filters and exceptions.
+- **`cypicklebuf` (Order 066):** add PickleBuffer construction, release, exact-type
+  check, type accessor, and cimport-only raw buffer pointer access. The borrowed pointer
+  is tied to the owner's unreleased lifetime; no GetObj or CheckExact exists in the
+  CPython 3.15 header.
 - **`cyfunction` (Order 067):** public `func_new_with_qualname`,
   `func_get_kw_defaults`, `func_set_kw_defaults`, `func_get_annotations`,
   `func_set_annotations`, and cimport-only `func_get_code_unchecked`,

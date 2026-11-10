@@ -10,13 +10,12 @@ def test_warning_default_filter():
         assert warn_ex(RuntimeWarning, "probe") is False
 
 def test_warning_ignore_and_error():
-    with warnings.catch_warnings():
+    with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("ignore")
-        assert warnings.filters[0][0] == "ignore"
         assert warn_ex(RuntimeWarning, "ignored") is False
+        assert not caught
     with warnings.catch_warnings():
         warnings.simplefilter("error")
-        assert warnings.filters[0][0] == "error"
         with pytest.raises(RuntimeWarning, match="raised"):
             warn_ex(RuntimeWarning, "raised")
 

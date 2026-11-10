@@ -1,11 +1,11 @@
 # Module trackers
 
-One `NNN_cy{name}.md` per area — **`NNN` = QUEUE Order** (zero-padded, `001`…`064`).
+One `NNN_cy{name}.md` per area — **`NNN` = QUEUE Order** (zero-padded, `001`…`065`).
 **Process docs are one level up:** [`../README.md`](../README.md), [`../PIPELINE.md`](../PIPELINE.md), [`../TEMPLATE.md`](../TEMPLATE.md).
 
 Gold exemplar: [`001_cytuple.md`](001_cytuple.md).
 
-**Tracker grades:** 64 modules / 64 trackers grade A (`grades: A=64 B=0 C=0 total=64`).
+**Tracker grades:** 65 modules / 65 trackers grade A (`grades: A=65 B=0 C=0 total=65`).
 
 ## Present
 
@@ -33,6 +33,7 @@ Gold exemplar: [`001_cytuple.md`](001_cytuple.md).
 | 62 | [062_cymonitoring.md](062_cymonitoring.md) | `cpython/monitoring.h` (PEP 670), cimport-only | v2 |
 | 63 | [063_cylock.md](063_cylock.md) | `cpython.lock` / `cpython.pylock` (`PyMutex`) | v2 |
 | 64 | [064_cyhash.md](064_cyhash.md) | `cpython/pyhash.h` | v2 |
+| 65 | [065_cywarnings.md](065_cywarnings.md) | `Python.h` warning APIs | v2 |
 
 ## Absent
 

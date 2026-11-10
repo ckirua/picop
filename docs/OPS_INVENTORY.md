@@ -536,3 +536,6 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 | `weakref_get_object` | tierA | Tier A `session.compare` present |
 | `weakref_new_proxy` | tierA | Tier A `session.compare` present |
 | `weakref_new_ref` | tierA | Tier A `session.compare` present |
+| `warn_ex` | tierA | Tier A `session.compare` present |
+| `warn_explicit` | n/a (explicit warning filter and registry state) | explicit skip |
+| `warnings_module` | n/a (module lookup is not a stable hot-path benchmark) | explicit skip |

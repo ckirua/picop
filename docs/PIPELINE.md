@@ -103,7 +103,7 @@ Thin `Check` / `Size` wrappers may share one short note; hot paths and builders 
 | Exports | `__init__.py` / `__init__.pxd` / `__all__` match decisions |
 | QUEUE + PR | State updated; PR includes depth highlights |
 
-Exemplar trackers: [`modules/001_cytuple.md`](modules/001_cytuple.md), [`modules/002_cybytes.md`](modules/002_cybytes.md).
+Exemplars: [`modules/001_cytuple.md`](modules/001_cytuple.md), [`modules/002_cybytes.md`](modules/002_cybytes.md); current warnings API evidence: [`modules/065_cywarnings.md`](modules/065_cywarnings.md).
 
 ### Public docstring style (`.pyi`)
 

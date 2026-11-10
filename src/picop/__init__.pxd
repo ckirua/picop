@@ -258,6 +258,7 @@ from .cyhash cimport (
     hash_generic,
     hash_pointer,
 )
+from .cywarnings cimport warn_ex, warn_explicit, warnings_module
 from .cycellobject cimport (
     cell_check,
     cell_eq,

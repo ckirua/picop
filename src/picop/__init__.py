@@ -301,6 +301,7 @@ from .cyweakref import (
     weakref_new_proxy,
     weakref_get_object,
 )
+from .cywarnings import warn_ex, warn_explicit, warnings_module
 from .cyconversion import (
     conv_cstr_to_double,
     conv_stricmp,
@@ -729,4 +730,7 @@ __all__: tuple[str, ...] = (
     "bool_check",
     "bool_eq",
     "bool_from_long",
+    "warn_ex",
+    "warn_explicit",
+    "warnings_module",
 )

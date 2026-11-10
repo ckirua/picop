@@ -4,6 +4,7 @@
 
 ### Added
 
+- **`cywarnings` (Order 065):** expose CPython warning dispatch (`warn_ex`, `warn_explicit`) and warnings-module lookup, preserving active filters and exceptions.
 - **`cyfunction` (Order 067):** public `func_new_with_qualname`,
   `func_get_kw_defaults`, `func_set_kw_defaults`, `func_get_annotations`,
   `func_set_annotations`, and cimport-only `func_get_code_unchecked`,

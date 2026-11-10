@@ -130,6 +130,7 @@ from picop.cythread cimport (
 )
 from picop.cyversion cimport PY_MINOR_VERSION, PY_VERSION_HEX
 from picop.cyhash cimport hash_buffer, hash_buffer_raw, hash_generic, hash_pointer
+from picop.cywarnings cimport warn_ex, warnings_module
 import gc
 import weakref
 
@@ -570,3 +571,10 @@ cpdef tuple check_monitoring(object code):
     monitoring_exit_scope()
     instrumented = monitoring_is_instrumented(PY_MONITORING_EVENT_LINE)
     return (active, fired_line, fired_return, instrumented)
+
+cpdef bint check_warnings():
+    import warnings
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)
+        assert warn_ex(RuntimeWarning, "smoke") == 0
+    return warnings_module() is warnings

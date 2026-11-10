@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [3.5.0] — 2026-11-10 — Warning dispatch, PickleBuffer helpers, and C-function accessors
 
 ### Added
 

@@ -24,7 +24,7 @@ cythonized_extensions = cythonize(
             "picop.uuid._uuid_native",
             ["src/picop/uuid/_uuid_native.c"],
             include_dirs=["src/picop/uuid"],
-            # MSVC does not understand `-std=c11`; uuid.h asserts portably.
+            # GCC needs -std=c11; MSVC gets /std:c11 from _compile_args.
             extra_compile_args=(["-std=c11"] if os.name != "nt" else []) + _compile_args,
             language="c",
         ),

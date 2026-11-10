@@ -69,6 +69,10 @@
 - **Windows build flags:** `setup.py` passes `/std:c11` to MSVC (the `cyatomic`
   shim needs `<stdatomic.h>` and `_Atomic`, which MSVC only enables in C11 mode)
   and no longer sends the GCC-only `-std=c11` to `cl.exe`.
+- **Portable bytes search:** the `cybytearray` containment helper used glibc-only
+  `memmem()`, which MSVC and MinGW do not provide (link error: 1 unresolved
+  external). It now uses `cy_memmem()` from `src/picop/cybytes_shim.h`, a
+  `memchr` + `memcmp` scan with the same semantics.
 
 ## [3.3.0] — 2026-11-06 — PyMutex cimport helpers and perf-parity gates
 

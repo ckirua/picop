@@ -8,9 +8,9 @@ from cpython.object cimport PyObject
 from libc.stddef cimport size_t
 from libc.string cimport memchr, memcmp
 
-cdef extern from "string.h":
-    void* memmem(const void *haystack, size_t haystacklen,
-                 const void *needle, size_t needlelen) nogil
+cdef extern from "cybytes_shim.h":
+    void* cy_memmem(const void *haystack, size_t haystacklen,
+                    const void *needle, size_t needlelen) nogil
 
 
 cdef extern from "Python.h":
@@ -111,7 +111,7 @@ cdef inline bint bacontains(bytearray haystack, bytes needle) noexcept:
         hp = PyByteArray_AS_STRING(haystack)
         if nlen == 1:
             return memchr(hp, <unsigned char>np[0], <size_t>hlen) is not NULL
-        return memmem(hp, <size_t>hlen, np, <size_t>nlen) is not NULL
+        return cy_memmem(hp, <size_t>hlen, np, <size_t>nlen) is not NULL
 
 
 # Wave 4 N1/N5 preferred names (0.3: soft letter/bare are cdef-only)

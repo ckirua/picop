@@ -18,7 +18,7 @@
 #include <pthread.h>
 #endif
 
-alignas(64) static _Thread_local unsigned char
+_Alignas(64) static _Thread_local unsigned char
     random_buffer[UUID_RANDOM_BUFFER_SIZE];
 static _Thread_local size_t random_buffer_pos = UUID_RANDOM_BUFFER_SIZE;
 

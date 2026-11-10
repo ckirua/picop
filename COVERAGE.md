@@ -90,6 +90,7 @@ As of **`1.0.0`**:
 | `cyframe` | public + cimport | Frame readers: `frame_*`; `frame_new` and `frame_is_entry_frame` are cimport-only |
 | `cycode` | public + cimport | Code-object readers: 15 `code_*` helpers public; `code_num_free` and `code_addr2_location` cimport-only |
 | `cyhash` | public + cimport | `hash_buffer` public; `hash_buffer_raw`, `hash_pointer`, and `hash_generic` cimport-only |
+| `cywarnings` | public + cimport | Warning helpers use CPython filters and explicit source locations; `warnings_module` retrieves the module |
 | `cytraceback` | public + cimport | Traceback readers: `tb_check`, `tb_next`, `tb_frame`, `tb_lineno`, `tb_lasti`, `tb_depth`; `tb_next_borrow` is cimport-only |
 | `cysentinel` | public (CPython 3.15+; 3.14 checks answer `False`, constructors/type access raise `NotImplementedError`) | `sentinel_check`, `sentinel_check_exact`, `sentinel_new`, `sentinel_type` |
 | `cymonitoring` | **cimport only** | PEP 670 (`cpython/monitoring.h`): `monitoring_scope`, `monitoring_exit_scope`, `monitoring_active`, `monitoring_is_instrumented`, 17 `fire_*` helpers, and 18 `PY_MONITORING_EVENT_*` ids; `sys.monitoring` owns registration. Exercised by `examples/cimport_ext/demo.pyx` / `scripts/smoke_barrel_cimport.sh`. |

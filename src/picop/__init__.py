@@ -430,6 +430,12 @@ from .cytraceback import (
     tb_next,
 )
 from .cyhash import hash_buffer
+from .cypicklebuf import (
+    pickle_buffer_check,
+    pickle_buffer_from_object,
+    pickle_buffer_release,
+    pickle_buffer_type,
+)
 from .cyfloat import (
     float_as_double,
     float_check,
@@ -724,6 +730,10 @@ __all__: tuple[str, ...] = (
     "memoryview_from_object",
     "buf_check",
     "buf_eq",
+    "pickle_buffer_check",
+    "pickle_buffer_from_object",
+    "pickle_buffer_release",
+    "pickle_buffer_type",
     "slice_check",
     "slice_eq",
     "slice_new",

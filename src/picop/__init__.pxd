@@ -259,6 +259,9 @@ from .cyhash cimport (
     hash_pointer,
 )
 from .cywarnings cimport warn_ex, warn_explicit, warnings_module
+from .cypicklebuf cimport (
+    pickle_buffer_get_buffer,
+)
 from .cycellobject cimport (
     cell_check,
     cell_eq,

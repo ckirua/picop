@@ -80,3 +80,6 @@ Copy [`TEMPLATE.md`](TEMPLATE.md). Gold exemplar: [`modules/001_cytuple.md`](mod
 ## Module index
 
 Trackers: [`modules/`](modules/) (present + absent). See that folder’s [`README.md`](modules/README.md) for the file list.
+Order 066 adds `cypicklebuf` for CPython 3.15 `PickleBuffer` handling; see
+[`modules/066_cypicklebuf.md`](modules/066_cypicklebuf.md) for header inventory,
+ownership rules, probes, and benchmark evidence.

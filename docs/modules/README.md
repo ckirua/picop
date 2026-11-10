@@ -35,6 +35,8 @@ Gold exemplar: [`001_cytuple.md`](001_cytuple.md).
 | 64 | [064_cyhash.md](064_cyhash.md) | `cpython/pyhash.h` | v2 |
 | 65 | [065_cywarnings.md](065_cywarnings.md) | `Python.h` warning APIs | v2 |
 
+| 66 | [066_cypicklebuf.md](066_cypicklebuf.md) | `cpython/picklebufobject.h` (3.15+) | v2 |
+
 ## Absent
 
 Orders `014_`…`055_` live in this directory (all decided at 1.0); no orders are absent. See [`../README.md`](../README.md#status-complete--not-an-open-backlog) for phase-complete status — not an open promote backlog.

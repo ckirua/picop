@@ -131,6 +131,7 @@ from .cyfunction import (
     func_check,
     func_eq,
     func_new,
+    func_new_with_qualname,
     func_get_code,
     func_get_globals,
     func_get_module,
@@ -138,6 +139,10 @@ from .cyfunction import (
     func_set_defaults,
     func_get_closure,
     func_set_closure,
+    func_get_kw_defaults,
+    func_set_kw_defaults,
+    func_get_annotations,
+    func_set_annotations,
 )
 from .cymethod import (
     method_check,
@@ -145,6 +150,13 @@ from .cymethod import (
     method_new,
     method_get_function,
     method_get_self,
+    cfunction_check,
+    cfunction_check_exact,
+    cfunction_get_self,
+    cmethod_check,
+    cmethod_check_exact,
+    classmethod_new,
+    staticmethod_new,
 )
 from .cymodule import (
     mod_check,

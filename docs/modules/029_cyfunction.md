@@ -16,10 +16,17 @@ Function-object checks and field accessors beat attribute lookup from Python.
 
 ## Inventory
 
-| Symbol | Export | Notes |
-|--------|--------|-------|
-| func_check / new / get_* / set_* | public | getters INCREF borrowed |
-| func_eq / funceq | public | identity eq (`object.__eq__`); soft `funceq`; not `hot` |
+Full `cpython/function` surface, including the unchecked macros kept cimport-only.
+
+| Symbol | Layer | Kind | Export | Notes |
+|--------|-------|------|--------|-------|
+| `PyFunction_Check` | C-API | macro | `func_check` | exact type check; the function type is not subclassable |
+| `PyFunction_New` | C-API | function | `func_new` | validates `code` / `globals` before construction |
+| `PyFunction_NewWithQualName` | C-API | function | `func_new_with_qualname` | the compiler path for nested defs — `__qualname__` correct from the start |
+| `PyFunction_GetCode` / `GetGlobals` / `GetModule` / `GetDefaults` / `GetClosure` / `GetKwDefaults` / `GetAnnotations` | C-API | function | public getters | borrowed `PyObject *` promoted to an owned reference under `cython.critical_section` |
+| `PyFunction_SetDefaults` / `SetClosure` / `SetKwDefaults` / `SetAnnotations` | C-API | function | public setters | status int, `0` on success; errors raise — never read the status as a bool |
+| `PyFunction_GET_CODE` / `GET_GLOBALS` / `GET_MODULE` / `GET_DEFAULTS` / `GET_CLOSURE` / `GET_KW_DEFAULTS` / `GET_ANNOTATIONS` | C-API | macro | cimport-only `*_unchecked` | no type check, borrowed field refs; trusted caller only |
+| `func_eq` / `funceq` | cypy | helper | public / soft alias | identity equality (`object.__eq__` for functions); not on `hot` |
 
 ## Workflow status
 
@@ -28,22 +35,32 @@ Function-object checks and field accessors beat attribute lookup from Python.
 | func_check / get_code / globals / defaults | APPROVED | **0.40–0.63x** |
 | func_new / set_* | APPROVED (API) | construction / mutation completeness |
 | func_eq / funceq | APPROVED | identity equality (issue #40); not `hot` |
+| func_get_module / func_get_closure | APPROVED | Tier A wins in the Order 067 try-all pass |
+| func_get_kw_defaults / func_set_kw_defaults | APPROVED | Tier A **0.54x** / Tier B **0.36x**; keyword-only defaults had no accessor before |
+| func_get_annotations / func_set_annotations | APPROVED | Tier A **0.41–0.44x**; `None` when unset (distinct from the lazily created `__annotations__` dict) |
+| func_new_with_qualname | APPROVED | Tier A **0.24x**, Tier B **0.48x** |
+| `PyFunction_GET_*` macros | APPROVED (cimport) | unchecked, borrowed field refs; deliberately not public |
+| `func_new` / `func_new_with_qualname` argument validation | APPROVED | `TypeError` instead of CPython's `SystemError` for a non-code / non-dict argument |
 
 ## Lifecycle
 
 | Field | Value |
 |-------|--------|
-| Iteration | 1 |
-| Last pass | 2026-07-22 — Tier B `*_eq` inventory|
+| Iteration | 2 |
+| Last pass | 2026-11-10 — Order 067: `func_get_kw_defaults` / `func_set_kw_defaults`, `func_get_annotations` / `func_set_annotations`, `func_new_with_qualname`, `func_new` argument validation; Tier A try-all + Tier B |
 | Next action | — |
 
 ## Decision log
 
-| Function | Result | Decision | Iteration |
-|----------|--------|----------|-----------|
-| check/getters | 0.40–0.63x | APPROVED | 1 |
-| new/set | API | APPROVED (API) | 1 |
-| func_eq / funceq | identity | APPROVED | 1 |
+| Function | Hypothesis | Bench | Result | Decision | Iteration |
+|----------|------------|-------|--------|----------|-----------|
+| check/getters | 0.40–0.63x | Tier A | pass | APPROVED | 1 |
+| new/set | API | — | API | APPROVED (API) | 1 |
+| func_eq / funceq | identity | Tier A + Tier B | 0.54x / 0.41–0.50x | APPROVED | 1 |
+| kw-defaults + annotations accessors | keyword-only defaults and annotations are unreachable without attribute lookup in Cython | Tier A try-all + Tier B | 10/10 faster, mean **0.47x**; Tier B 9/9, mean **0.27x** | APPROVED | 2 |
+| `func_new_with_qualname` | the qualname-aware constructor beats constructing then patching | Tier A + Tier B | 0.24x / 0.48x | APPROVED | 2 |
+| `func_new` validation | CPython's unchecked C entry points surface `SystemError` for bad arguments | probe: `func_new(1, {})` | `SystemError` before, `TypeError` after | APPROVED | 2 |
+| `PyFunction_GET_*` macros | public unchecked getters invite misuse on non-functions | probe: `func_get_code(len)` raises `SystemError` | kept cimport-only | APPROVED (cimport) | 2 |
 
 ## Bench notes
 
@@ -59,6 +76,43 @@ Function-object checks and field accessors beat attribute lookup from Python.
 | func_get_defaults | | 0.49x | pass |
 
 Summary: 5/5 gate · mean **0.49x**.
+
+### Order 067 pass (Tier A try-all)
+
+Harness: [`bench/cyfunction_bench.py`](../../bench/cyfunction_bench.py) · CPython 3.14 · Linux x86_64 · GIL build · `N=80_000` × `runs=5`
+
+| operation | case | picop mean±σ | p99 | baseline mean±σ | p99 | ratio | p99× | verdict |
+|---|---|---:|---:|---:|---:|---:|---:|---|
+| func_check | function | 2.37±0.13ms | 2.59ms | 5.06±0.11ms | 5.16ms | **0.47x** | 0.50x | pass |
+| func_check | builtin | 2.93±1.29ms | 5.11ms | 7.04±1.06ms | 8.47ms | **0.42x** | 0.60x | pass |
+| func_get_code | `__code__` | 2.62±0.00ms | 2.62ms | 5.24±0.68ms | 6.39ms | **0.50x** | 0.41x | pass |
+| func_get_globals | `__globals__` | 2.69±0.02ms | 2.72ms | 3.74±0.71ms | 4.95ms | **0.72x** | 0.55x | pass |
+| func_get_defaults | `__defaults__` | 2.61±0.00ms | 2.61ms | 5.02±0.05ms | 5.06ms | **0.52x** | 0.52x | pass |
+| func_get_kw_defaults | `__kwdefaults__` | 2.97±0.75ms | 4.24ms | 5.51±0.54ms | 6.36ms | **0.54x** | 0.67x | pass |
+| func_set_kw_defaults | dict swap | 2.97±0.02ms | 3.00ms | 7.30±1.51ms | 9.86ms | **0.41x** | 0.30x | pass |
+| func_get_annotations | unset | 2.62±0.03ms | 2.65ms | 6.46±0.64ms | 7.54ms | **0.41x** | 0.35x | pass |
+| func_get_annotations | set dict | 2.98±0.02ms | 3.00ms | 6.81±0.62ms | 7.69ms | **0.44x** | 0.39x | pass |
+| func_new_with_qualname | code + globals + qualname | 7.01±0.09ms | 7.12ms | 28.68±1.33ms | 30.62ms | **0.24x** | 0.23x | pass |
+
+Summary: 10/10 picop faster · mean **0.47x** · median 0.45x.
+
+### Order 067 pass (Tier B)
+
+Harness: [`bench/tier_b/cyfunction.py`](../../bench/tier_b/cyfunction.py) · `cyfunction_tb.pyx` · `CPY_TIERB_N=2_000_000` × `runs=5`
+
+| operation | case | cypy mean±σ | p99 | cy-base mean±σ | ratio | p99× | note |
+|-----------|------|-------------|-----|----------------|-------|------|------|
+| func_check | def | 2.68±0.04ms | 2.72ms | 20.98±0.36ms | **0.13x** | 0.13x | cypy faster |
+| func_get_code | def | 9.96±0.44ms | 10.67ms | 34.21±0.68ms | **0.29x** | 0.30x | cypy faster |
+| func_get_code | def (unchecked macro) | 5.53±0.10ms | 5.68ms | 34.01±0.50ms | **0.16x** | 0.16x | macro baseline |
+| func_get_kw_defaults | def | 11.80±0.13ms | 11.99ms | 33.17±0.55ms | **0.36x** | 0.35x | cypy faster |
+| func_get_kw_defaults | def (unchecked macro) | 4.16±0.15ms | 4.34ms | 32.99±0.54ms | **0.13x** | 0.13x | macro baseline |
+| func_get_annotations | def | 9.91±0.26ms | 10.31ms | 30.81±0.34ms | **0.32x** | 0.33x | cypy faster |
+| func_get_annotations | def (unchecked macro) | 5.42±0.08ms | 5.55ms | 30.59±0.25ms | **0.18x** | 0.18x | macro baseline |
+| func_set_kw_defaults | dict | 15.72±0.14ms | 15.87ms | 43.30±0.29ms | **0.36x** | 0.36x | cypy faster |
+| func_new_with_qualname | code + globals + qualname | 103.68±0.35ms | 103.90ms | 215.86±1.14ms | **0.48x** | 0.48x | cypy faster |
+
+Summary: 9/9 picop faster · mean **0.27x** · median 0.29x.
 
 ### Tier B (Cython baseline)
 
@@ -96,6 +150,12 @@ Ratio = cypy `cdef` loop / typed Cython baseline `==` loop (opaque + sink). **In
 - **`func_eq`:** **0.41–0.50x** win — identity (`is`) vs Cython `==` on functions.
 
 ## Experiment conclusions
+
+**Order 067 — ownership, ABI, and the qualname constructor.** Every `PyFunction_Get*` accessor returns a *borrowed* pointer; the public getters promote it to an owned reference under `cython.critical_section` so the returned object survives the call under free-threaded builds. `func_get_annotations` returns `None` when the annotation slot is uninitialised, which is *not* the same as `f.__annotations__` — attribute access lazily creates an empty dict, so a caller that branches on `None` gets the C-level state, not a synthesised one. `PyFunction_Set*` returns `0`/`-1`; the wrappers raise on `-1`, so the status must never be read as a boolean. `func_new` and `func_new_with_qualname` now reject a non-code object or a non-dict globals before entering `PyFunction_New`: without that guard CPython's unchecked internals surface `SystemError: bad argument to internal function` (measured: `func_new(1, {})`), which is indistinguishable from a real internal fault. `func_new_with_qualname` is the compiler's own path for nested defs and is 0.24x Tier A against building the function and patching `__qualname__`.
+
+**Cython-compiled code objects.** Wrapping a `__code__` produced by a Cython `.pyx` module in `func_new` is unsafe: the call aborts with `Fatal Python error: _TAIL_CALL_CACHE: Executing a cache` because Cython code objects carry frame-cache assumptions that a plain `PyFunction` does not set up. Pure-Python code (`compile(...)` / a `.py` function) is fine — the barrel demo in `examples/cimport_ext/demo.pyx` builds its sample with `compile()` for exactly this reason.
+
+**Why and scale.** Tier A try-all is 10/10 faster (mean 0.47x); the weakest case is `func_get_globals` at 0.72x, still well inside the 0.95 gate. Tier B is informational and stronger (mean 0.27x): the unchecked macro variants show how much of the checked-getter cost is the type guard plus the critical-section round trip rather than the field read itself.
 
 **Tier B `*_eq` inventory:** see section **Tier B — `*_eq` (inventory)** table. **0.41–0.50x** win — identity (`is`) vs Cython `==` on functions.
 

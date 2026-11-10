@@ -3,12 +3,15 @@
 # Borrowed getters are promoted to owning Cython locals under the function lock.
 
 from cpython.object cimport PyObject
+from cpython.unicode cimport PyUnicode_Check
 import cython
 
 
 cdef extern from "Python.h":
     bint PyFunction_Check(object o) noexcept
+    bint PyCode_Check(object o) noexcept
     object PyFunction_New(object code, object globals)
+    object PyFunction_NewWithQualName(object code, object globals, object qualname)
     PyObject *PyFunction_GetCode(object op) except? NULL
     PyObject *PyFunction_GetGlobals(object op) except? NULL
     PyObject *PyFunction_GetModule(object op) except? NULL
@@ -16,6 +19,18 @@ cdef extern from "Python.h":
     int PyFunction_SetDefaults(object op, object defaults) except -1
     PyObject *PyFunction_GetClosure(object op) except? NULL
     int PyFunction_SetClosure(object op, object closure) except -1
+    PyObject *PyFunction_GetKwDefaults(object op) except? NULL
+    int PyFunction_SetKwDefaults(object op, object defaults) except -1
+    PyObject *PyFunction_GetAnnotations(object op) except? NULL
+    int PyFunction_SetAnnotations(object op, object annotations) except -1
+    # Unchecked macros: borrowed field refs, no type check, trusted caller.
+    PyObject *PyFunction_GET_CODE(object op) noexcept
+    PyObject *PyFunction_GET_GLOBALS(object op) noexcept
+    PyObject *PyFunction_GET_MODULE(object op) noexcept
+    PyObject *PyFunction_GET_DEFAULTS(object op) noexcept
+    PyObject *PyFunction_GET_KW_DEFAULTS(object op) noexcept
+    PyObject *PyFunction_GET_CLOSURE(object op) noexcept
+    PyObject *PyFunction_GET_ANNOTATIONS(object op) noexcept
 
 
 cdef inline object _borrowed_to_owned(PyObject *p):
@@ -39,7 +54,19 @@ cpdef inline bint func_eq(object a, object b) noexcept:
 
 
 cpdef inline object func_new(object code, object globals):
+    if not PyCode_Check(code) or globals is None:
+        raise TypeError("func_new() requires a code object and a globals dict")
     return PyFunction_New(code, globals)
+
+
+cpdef inline object func_new_with_qualname(object code, object globals, object qualname):
+    if not PyCode_Check(code) or globals is None:
+        raise TypeError("func_new_with_qualname() requires a code object and a globals dict")
+    if qualname is None:
+        qualname = ""
+    elif not PyUnicode_Check(qualname):
+        raise TypeError("func_new_with_qualname() qualname must be a str or None")
+    return PyFunction_NewWithQualName(code, globals, qualname)
 
 
 cpdef inline object func_get_code(object op):
@@ -94,3 +121,61 @@ cpdef inline object func_get_closure(object op):
 cpdef inline int func_set_closure(object op, object closure) except -1:
     with cython.critical_section(op):
         return PyFunction_SetClosure(op, closure)
+
+
+cpdef inline object func_get_kw_defaults(object op):
+    cdef PyObject *p
+    cdef object result
+    with cython.critical_section(op):
+        p = PyFunction_GetKwDefaults(op)
+        result = _borrowed_to_owned(p)
+    return result
+
+
+cpdef inline int func_set_kw_defaults(object op, object defaults) except -1:
+    with cython.critical_section(op):
+        return PyFunction_SetKwDefaults(op, defaults)
+
+
+cpdef inline object func_get_annotations(object op):
+    cdef PyObject *p
+    cdef object result
+    with cython.critical_section(op):
+        p = PyFunction_GetAnnotations(op)
+        result = _borrowed_to_owned(p)
+    return result
+
+
+cpdef inline int func_set_annotations(object op, object annotations) except -1:
+    with cython.critical_section(op):
+        return PyFunction_SetAnnotations(op, annotations)
+
+
+# Unchecked macro getters (cimport-only): no type check, borrowed field refs
+# promoted to owning refs. Caller must have a function object.
+cdef inline object func_get_code_unchecked(object op):
+    return _borrowed_to_owned(PyFunction_GET_CODE(op))
+
+
+cdef inline object func_get_globals_unchecked(object op):
+    return _borrowed_to_owned(PyFunction_GET_GLOBALS(op))
+
+
+cdef inline object func_get_module_unchecked(object op):
+    return _borrowed_to_owned(PyFunction_GET_MODULE(op))
+
+
+cdef inline object func_get_defaults_unchecked(object op):
+    return _borrowed_to_owned(PyFunction_GET_DEFAULTS(op))
+
+
+cdef inline object func_get_kw_defaults_unchecked(object op):
+    return _borrowed_to_owned(PyFunction_GET_KW_DEFAULTS(op))
+
+
+cdef inline object func_get_annotations_unchecked(object op):
+    return _borrowed_to_owned(PyFunction_GET_ANNOTATIONS(op))
+
+
+cdef inline object func_get_closure_unchecked(object op):
+    return _borrowed_to_owned(PyFunction_GET_CLOSURE(op))

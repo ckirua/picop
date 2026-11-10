@@ -21,11 +21,11 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 
 | Metric | Count |
 |--------|------:|
-| Public barrel helpers | 486 |
-| `tierA` | 340 |
-| `tierB` | 134 |
+| Public barrel helpers | 505 |
+| `tierA` | 349 |
+| `tierB` | 142 |
 | `pending` | 0 |
-| `n/a` | 12 |
+| `n/a` | 14 |
 
 ## Checklist
 
@@ -98,6 +98,12 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 | `cell_get` | tierA | Tier A `session.compare` present |
 | `cell_new` | tierA | Tier A `session.compare` present |
 | `cell_set` | tierA | Tier A `session.compare` present |
+| `cfunction_check` | tierB | Tier A+B compare labels present |
+| `cfunction_check_exact` | tierB | Tier A+B compare labels present |
+| `cfunction_get_self` | tierB | Tier A+B compare labels present |
+| `classmethod_new` | tierB | Tier A+B compare labels present |
+| `cmethod_check` | n/a (PyCMethod predicate) | no plain-Python equivalent; `PyCMethod` instances are rare in benchmarks |
+| `cmethod_check_exact` | n/a (PyCMethod predicate) | same as `cmethod_check` |
 | `code_addr2line` | tierA | Tier A `session.compare` present |
 | `code_argcount` | tierB | Tier A+B compare labels present |
 | `code_cellvars` | tierA | Tier A `session.compare` present |
@@ -240,14 +246,19 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 | `frozenset_new` | tierA | Tier A `session.compare` present |
 | `func_check` | tierB | Tier A+B compare labels present |
 | `func_eq` | tierB | Tier A+B compare labels present |
+| `func_get_annotations` | tierA | Tier A `session.compare` present |
 | `func_get_closure` | tierA | Tier A `session.compare` present |
 | `func_get_code` | tierA | Tier A `session.compare` present |
 | `func_get_defaults` | tierA | Tier A `session.compare` present |
 | `func_get_globals` | tierA | Tier A `session.compare` present |
+| `func_get_kw_defaults` | tierB | Tier A+B compare labels present |
 | `func_get_module` | tierA | Tier A `session.compare` present |
 | `func_new` | tierA | Tier A `session.compare` present |
+| `func_new_with_qualname` | tierB | Tier A+B compare labels present |
+| `func_set_annotations` | tierA | Tier A `session.compare` present |
 | `func_set_closure` | tierA | Tier A `session.compare` present |
 | `func_set_defaults` | tierA | Tier A `session.compare` present |
+| `func_set_kw_defaults` | tierB | Tier A+B compare labels present |
 | `gc_collect` | n/a (process-global GC) | explicit skip |
 | `gc_disable` | n/a (process-global GC) | explicit skip |
 | `gc_enable` | n/a (process-global GC) | explicit skip |
@@ -459,6 +470,7 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 | `slice_indices_ex` | tierA | Tier A `session.compare` present |
 | `slice_new` | tierA | Tier A `session.compare` present |
 | `slice_unpack` | tierA | Tier A `session.compare` present |
+| `staticmethod_new` | tierB | Tier A+B compare labels present |
 | `str_all_alnum_ascii` | tierA | Tier A `session.compare` present |
 | `str_all_alpha_ascii` | tierA | Tier A `session.compare` present |
 | `str_all_digits` | tierA | Tier A `session.compare` present |

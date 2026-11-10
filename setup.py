@@ -5,8 +5,9 @@ from picobuild import Extension, cythonize, find_packages, setup
 # Portable by default for redistributable wheels/sdists.
 # Set CPY_NATIVE=1 for local benches that want -march=native.
 # MSVC has no -Wno-* flags and no -march=native, so its args are kept minimal.
+# /std:c11 is required for <stdatomic.h> and _Atomic (cyatomic shim).
 if os.name == "nt":
-    _compile_args = ["-O2", "-utf-8"]
+    _compile_args = ["/std:c11", "-O2", "-utf-8"]
 else:
     _compile_args = [
         "-O3",

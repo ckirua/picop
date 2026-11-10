@@ -8,6 +8,9 @@
 #include "uuid.h"
 
 #ifdef _WIN32
+/* bcrypt.h's prototypes use ULONG/BCRYPT_* types that come from the Windows
+   base headers; MSVC rejects bcrypt.h on its own. */
+#include <windows.h>
 #include <bcrypt.h>
 #else
 #include <fcntl.h>

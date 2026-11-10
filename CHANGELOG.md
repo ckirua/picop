@@ -63,6 +63,12 @@
   passes `-std=c11` on Windows. `tests/test_uuid_entropy.py` raises its C-compile
   subprocess timeout from 30 s to 120 s so the cross-arch wheel test on macOS
   runners does not fail on a cold clang start.
+- **Windows entropy provider:** `src/picop/uuid/entropy.c` includes `<windows.h>`
+  before `<bcrypt.h>`; MSVC rejects `bcrypt.h` standalone (`ULONG`, `BCRYPT_HANDLE`
+  and friends come from the Windows base headers).
+- **Windows build flags:** `setup.py` passes `/std:c11` to MSVC (the `cyatomic`
+  shim needs `<stdatomic.h>` and `_Atomic`, which MSVC only enables in C11 mode)
+  and no longer sends the GCC-only `-std=c11` to `cl.exe`.
 
 ## [3.3.0] — 2026-11-06 — PyMutex cimport helpers and perf-parity gates
 

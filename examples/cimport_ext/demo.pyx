@@ -22,6 +22,8 @@ from picop.cyobject cimport obj_call
 from picop.uuid._uuid cimport UUID as DirectUUID, uuid_from_buf
 from picop.cymemoryview cimport memoryview_get_base, memoryview_from_memory
 from picop.cysentinel cimport sentinel_check, sentinel_check_exact, sentinel_new, sentinel_type
+from picop.cyfunction cimport func_check, func_get_code, func_new_with_qualname
+from picop.cymethod cimport cfunction_check, cfunction_get_self, classmethod_new, staticmethod_new
 from picop.cylock cimport PyMutex, mutex_init, mutex_is_locked, mutex_lock, mutex_unlock
 
 from cpython.object cimport PyObject
@@ -136,6 +138,21 @@ class _Exporter(bytearray):
     pass
 
 
+# Code objects compiled by Cython carry frame-cache assumptions and cannot be
+# re-wrapped into a plain PyFunction; build the demo function from CPython code.
+_DEMO_NS = {}
+exec(compile("def _demo_increment(value):\n    return value + 1", "<demo>", "exec"), _DEMO_NS)
+_DEMO_CODE = _DEMO_NS["_demo_increment"].__code__
+
+
+def _demo_source(cls_or_self, value):
+    return value + 1
+
+
+def _demo_one(value):
+    return value + 1
+
+
 cpdef bint check_barrel():
     return (
         bytes_eq(b"ab", b"ab")
@@ -182,6 +199,21 @@ cpdef bint check_sentinels():
         and sentinel_check_exact(marker)
         and repr(marker) == "<marker>"
         and sentinel_type() is type(marker)
+    )
+
+cpdef bint check_functions_and_methods():
+    made = func_new_with_qualname(_DEMO_CODE, globals(), "demo.increment")
+    holder = type("Holder", (), {"doubled": classmethod_new(_demo_source), "plain": staticmethod_new(_demo_one)})
+    return (
+        func_check(made)
+        and func_get_code(made) is _DEMO_CODE
+        and made(2) == 3
+        and made.__qualname__ == "demo.increment"
+        and cfunction_check(len)
+        and cfunction_get_self(len) is len.__self__
+        and not cfunction_check(made)
+        and holder.doubled(1) == 2
+        and holder().plain(1) == 2
     )
 
 

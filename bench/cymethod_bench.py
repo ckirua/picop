@@ -13,7 +13,17 @@ _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
 
-from picop import method_check, method_get_function, method_new, method_get_self
+from picop import (
+    cfunction_check,
+    cfunction_check_exact,
+    cfunction_get_self,
+    classmethod_new,
+    method_check,
+    method_get_function,
+    method_get_self,
+    method_new,
+    staticmethod_new,
+)
 
 from _bench_util import BenchSession
 
@@ -48,6 +58,50 @@ def main() -> None:
     session.compare("method_get_function", method_get_function, lambda m: m.__func__, meth, param="__func__")
     session.compare("method_get_self", method_get_self, lambda m: m.__self__, meth, param="__self__")
     session.compare("method_new", method_new, types.MethodType, Box.m, box, param="bind")
+
+    session.section("cfunction_check  [primary: builtin callable]")
+    session.compare(
+        "cfunction_check",
+        cfunction_check,
+        lambda o: isinstance(o, types.BuiltinFunctionType),
+        len,
+        param="builtin",
+    )
+    session.compare(
+        "cfunction_check",
+        cfunction_check,
+        lambda o: isinstance(o, types.BuiltinFunctionType),
+        meth,
+        param="bound method",
+    )
+    session.compare(
+        "cfunction_check_exact",
+        cfunction_check_exact,
+        lambda o: type(o) is types.BuiltinFunctionType,
+        len,
+        param="builtin",
+    )
+    session.compare(
+        "cfunction_get_self",
+        cfunction_get_self,
+        lambda o: o.__self__,
+        len,
+        param="builtins module",
+    )
+    session.compare(
+        "classmethod_new",
+        classmethod_new,
+        lambda f: classmethod(f),
+        Box.m,
+        param="wrap",
+    )
+    session.compare(
+        "staticmethod_new",
+        staticmethod_new,
+        lambda f: staticmethod(f),
+        Box.m,
+        param="wrap",
+    )
 
     session.summary()
 

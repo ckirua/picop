@@ -13,6 +13,12 @@ from picop import (
     call_noargs,
     call_onearg,
     call_twoargs,
+    cfunction_check,
+    cfunction_check_exact,
+    cfunction_get_self,
+    cmethod_check,
+    cmethod_check_exact,
+    classmethod_new,
     code_addr2line,
     code_argcount,
     code_cellvars,
@@ -44,6 +50,12 @@ from picop import (
     frame_lineno,
     frame_var,
     frame_var_cstr,
+    func_get_annotations,
+    func_get_kw_defaults,
+    func_new,
+    func_new_with_qualname,
+    func_set_annotations,
+    func_set_kw_defaults,
     hash_buffer,
     memoryview_itemsize,
     memoryview_nbytes,
@@ -54,6 +66,7 @@ from picop import (
     sentinel_check_exact,
     sentinel_new,
     sentinel_type,
+    staticmethod_new,
 )
 
 def test_code_readers() -> None:
@@ -360,3 +373,116 @@ def test_hash_buffer_range_bounds_and_non_buffers() -> None:
         hash_buffer("not a buffer")
     with pytest.raises(BufferError):
         hash_buffer(memoryview(bytes(range(100)))[::2])
+
+
+def test_func_new_with_qualname_builds_a_callable_with_qualname() -> None:
+    def source(value: int) -> int:
+        return value + 1
+
+    made = func_new_with_qualname(source.__code__, source.__globals__, "Outer.source")
+    assert made.__qualname__ == "Outer.source"
+    assert made(4) == 5
+    assert made.__code__ is source.__code__
+    assert made.__globals__ is source.__globals__
+
+    assert func_new_with_qualname(source.__code__, source.__globals__, None).__qualname__ == ""
+
+    with pytest.raises(TypeError):
+        func_new_with_qualname(1, source.__globals__, "x")
+    with pytest.raises(TypeError):
+        func_new_with_qualname(source.__code__, None, "x")
+    with pytest.raises(TypeError):
+        func_new_with_qualname(source.__code__, source.__globals__, 7)
+    with pytest.raises(TypeError):
+        func_new(1, source.__globals__)
+
+
+def test_func_kw_defaults_round_trip_and_reject_non_functions() -> None:
+    def target(first, second=1, *, third=2, fourth=3) -> int:
+        return first + second + third + fourth
+
+    assert func_get_kw_defaults(target) == {"third": 2, "fourth": 3}
+    assert func_set_kw_defaults(target, {"third": 20, "fourth": 30}) == 0
+    assert func_get_kw_defaults(target) == {"third": 20, "fourth": 30}
+    assert target(1) == 52
+
+    assert func_set_kw_defaults(target, None) == 0
+    assert func_get_kw_defaults(target) is None
+
+    with pytest.raises(SystemError):
+        func_get_kw_defaults(len)
+    with pytest.raises(SystemError):
+        func_set_kw_defaults(len, {"a": 1})
+    with pytest.raises(SystemError):
+        func_set_kw_defaults(target, (1, 2))
+
+
+def test_func_annotations_return_none_when_unset_and_round_trip_when_set() -> None:
+    def target(value):
+        return value
+
+    assert func_get_annotations(target) is None
+    assert func_set_annotations(target, {"value": int}) == 0
+    assert func_get_annotations(target) == {"value": int}
+    assert target.__annotations__ == {"value": int}
+
+    with pytest.raises(SystemError):
+        func_get_annotations(len)
+    with pytest.raises(SystemError):
+        func_set_annotations(len, {})
+    with pytest.raises(SystemError):
+        func_set_annotations(target, "not a dict")
+
+
+def test_cfunction_checks_accept_builtin_callables_only() -> None:
+    def plain():
+        return None
+
+    class Holder:
+        def method(self):
+            return None
+
+    bound = Holder().method
+
+    assert cfunction_check(len) is True
+    assert cfunction_check_exact(len) is True
+    assert cfunction_check(bound) is False
+    assert cfunction_check_exact(bound) is False
+    assert cfunction_check(plain) is False
+    assert cfunction_check(42) is False
+    assert cmethod_check(len) is False
+    assert cmethod_check_exact(len) is False
+    assert cmethod_check(bound) is False
+
+
+def test_cfunction_get_self_hands_back_the_owner() -> None:
+    items = []
+
+    assert cfunction_get_self(len) is builtins
+    assert cfunction_get_self(items.append) is items
+
+    class Holder:
+        def method(self):
+            return None
+
+    with pytest.raises(SystemError):
+        cfunction_get_self(Holder.method)
+    with pytest.raises(SystemError):
+        cfunction_get_self(lambda: None)
+
+
+def test_classmethod_new_and_staticmethod_new_bind_like_builtin_wrappers() -> None:
+    def bound_like(cls_or_self, value):
+        return value * 2
+
+    def standalone(value):
+        return value * 2
+
+    klass = type("Holder", (), {"doubled": classmethod_new(bound_like), "plain": staticmethod_new(standalone)})
+
+    assert klass.doubled(3) == 6
+    assert klass().doubled(3) == 6
+    assert isinstance(klass.__dict__["doubled"], classmethod)
+    assert isinstance(klass.__dict__["plain"], staticmethod)
+    assert klass.plain(4) == 8
+    assert klass().plain(4) == 8

@@ -16,6 +16,7 @@ Tier B = cypy `cdef` loop vs typed Cython baseline (opaque + sink).
 | `frame_*` | [`bench/tier_b/cyframe.py`](../bench/tier_b/cyframe.py) | `frame_check` 0.35–0.37x, `frame_lineno` 0.64–0.70x, `frame_code` 0.24–0.26x, `frame_back` 0.34x across default/depth passes |
 | `code_*` | [`bench/tier_b/cycode.py`](../bench/tier_b/cycode.py) | `code_check` / `code_name` / `code_firstlineno` / `code_argcount` Tier B (0.14–0.37x); other public code readers Tier A |
 | `tb_*` | [`bench/tier_b/cytraceback.py`](../bench/tier_b/cytraceback.py) | `tb_check` 0.48x, `tb_next` 0.29x, `tb_frame` 0.17x; `tb_lineno` 14.81x caveat (raw `-1` field); `tb_lasti` 0.99x, `tb_depth` 1.00x |
+| `cfunction_*` / `classmethod_new` / `staticmethod_new` / `func_*` metadata | [`bench/tier_b/cymethod.py`](../bench/tier_b/cymethod.py) · [`bench/tier_b/cyfunction.py`](../bench/tier_b/cyfunction.py) | `cfunction_check` 0.11–0.16x, `cfunction_get_self` 0.30–0.45x, `classmethod_new`/`staticmethod_new` 0.09x, `func_get_annotations` 0.18–0.32x, `func_get_kw_defaults` 0.13–0.36x, `func_set_kw_defaults` 0.36x, `func_new_with_qualname` 0.48x |
 
 See also [`EQ_INVENTORY_TIERB.md`](EQ_INVENTORY_TIERB.md).
 

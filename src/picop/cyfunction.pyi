@@ -54,3 +54,39 @@ def func_set_closure(op: object, closure: object) -> int:
     Returns ``0`` on success; errors raise — do not use the status as a bool.
     """
     ...
+
+def func_new_with_qualname(code: object, globals: object, qualname: object) -> object:
+    """Return a new function from ``code``, ``globals`` and ``qualname``.
+
+    Notes
+    -----
+    ``PyFunction_NewWithQualName`` — what the compiler uses for nested functions,
+    so ``__qualname__`` is correct from the start. ``globals`` must be a dict.
+    """
+    ...
+
+def func_get_kw_defaults(op: object) -> object | None:
+    """Return keyword-only defaults of ``op`` as a dict, or ``None``."""
+    ...
+
+def func_set_kw_defaults(op: object, defaults: object) -> int:
+    """Set keyword-only defaults on ``op`` (``None`` or dict).
+
+    Notes
+    -----
+    Returns ``0`` on success; errors raise — do not use the status as a bool.
+    """
+    ...
+
+def func_get_annotations(op: object) -> object | None:
+    """Return the annotations dict of ``op``, or ``None`` when unset."""
+    ...
+
+def func_set_annotations(op: object, annotations: object) -> int:
+    """Set annotations on ``op`` (``None`` or dict).
+
+    Notes
+    -----
+    Returns ``0`` on success; errors raise — do not use the status as a bool.
+    """
+    ...

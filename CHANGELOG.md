@@ -1,5 +1,27 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- **`cyfunction` (Order 067):** public `func_new_with_qualname`,
+  `func_get_kw_defaults`, `func_set_kw_defaults`, `func_get_annotations`,
+  `func_set_annotations`, and cimport-only `func_get_code_unchecked`,
+  `func_get_globals_unchecked`, `func_get_module_unchecked`,
+  `func_get_defaults_unchecked`, `func_get_kw_defaults_unchecked`,
+  `func_get_annotations_unchecked`, `func_get_closure_unchecked`. Tier A
+  measures 0.40–0.63x on the checked getters against `getattr`/`setattr` on the
+  function object.
+- **`cymethod` (Order 067):** public `cfunction_check`, `cfunction_check_exact`,
+  `cfunction_get_self`, `cmethod_check`, `cmethod_check_exact`, `classmethod_new`,
+  `staticmethod_new`, and cimport-only `cfunction_get_self_unchecked`,
+  `cfunction_get_flags_unchecked`, `cfunction_get_class_unchecked`,
+  `cfunction_get_function_unchecked`. `cfunction_check` is a `PyObject_TypeCheck`
+  so a `PyCMethod` (a subtype of `PyCFunction`) passes it while
+  `cfunction_check_exact` does not; `cfunction_get_self` promotes the borrowed
+  `m_self` inside a critical section and preserves CPython's `SystemError` for
+  non-C-function arguments. Tier A 0.43–0.90x, Tier B 7/7 wins (mean 0.19x).
+
 ## [3.4.0] — 2026-11-10 — Buffer hashing and PEP 670 monitoring scopes
 
 ### Added

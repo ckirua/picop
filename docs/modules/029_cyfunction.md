@@ -30,7 +30,7 @@ Full `cpython/function` surface, including the unchecked macros kept cimport-onl
 | `PyFunction_AddWatcher` | C-API | function | cimport `func_add_watcher` | registers a per-interpreter lifecycle callback; returns the handle, raises when the watcher table is full |
 | `PyFunction_ClearWatcher` | C-API | function | cimport `func_clear_watcher` | clears one handle; `ValueError` for an unknown or already-cleared id |
 | `PyFunction_WatchEvent` (`CREATE`, `DESTROY`, `MODIFY_CODE`, `MODIFY_DEFAULTS`, `MODIFY_KWDEFAULTS`) | C-API | enum | cimport constants | re-exported as a Cython enum so callbacks match the C signature exactly; `MODIFY_QUALNAME` is 3.15+ |
-| `PyFunction_WatchCallback` | C-API | function-pointer typedef | cimport type | `cdef int …(PyFunction_WatchEvent, PyFunctionObject *, PyObject *) except -1`; `-1` with an exception set aborts the mutation |
+| `PyFunction_WatchCallback` | C-API | function-pointer typedef | cimport type | `cdef int …(PyFunction_WatchEvent, PyFunctionObject *, PyObject *) except -1`; callback errors are reported as unraisable, not mutation vetoes |
 
 ## Workflow status
 

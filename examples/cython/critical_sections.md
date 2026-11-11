@@ -19,7 +19,7 @@ cdef struct Cache:
     long hits
 
 cpdef long bump(long iterations):
-    cdef Cache cache
+    cdef Cache cache = Cache()   # zero-initialises the struct
     cdef PicopCriticalSection cs
     cdef long i
     mutex_init(&cache.lock)
@@ -35,6 +35,8 @@ Rules:
 - `cdef PicopCriticalSection cs` is a stack buffer. It is opaque: the shim sizes it
   generously and never reads it, so a section may be entered and exited around any
   control flow, but one buffer must be paired `begin`/`end` before it is reused.
+- A `cdef` C struct on the stack is **not** zero-initialised by Cython. Write
+  `cdef Cache cache = Cache()` (or assign every field) before locking it.
 - Sections nest. `cs_begin(&outer, obj)` then `cs_begin(&inner, obj)` does **not**
   deadlock on the same object mutex — CPython suspends the outer protection and
   resumes it at `cs_end(&inner)`.

@@ -94,6 +94,7 @@ As of **`1.0.0`**:
 | `cytraceback` | public + cimport | Traceback readers: `tb_check`, `tb_next`, `tb_frame`, `tb_lineno`, `tb_lasti`, `tb_depth`; `tb_next_borrow` is cimport-only |
 | `cysentinel` | public (CPython 3.15+; 3.14 checks answer `False`, constructors/type access raise `NotImplementedError`) | `sentinel_check`, `sentinel_check_exact`, `sentinel_new`, `sentinel_type` |
 | `cymonitoring` | **cimport only** | PEP 670 (`cpython/monitoring.h`): `monitoring_scope`, `monitoring_exit_scope`, `monitoring_active`, `monitoring_is_instrumented`, 17 `fire_*` helpers, and 18 `PY_MONITORING_EVENT_*` ids; `sys.monitoring` owns registration. Exercised by `examples/cimport_ext/demo.pyx` / `scripts/smoke_barrel_cimport.sh`. |
+| `cycriticalsection` | **cimport only** | `critical_section.h`: `cs_begin`, `cs_begin_mutex`, `cs_end`, `cs2_begin`, `cs2_begin_mutex`, `cs2_end`, and `critical_sections_enabled()`; callers stack-allocate an opaque `PicopCriticalSection` buffer instead of CPython's private struct. Exercised by `examples/cimport_ext/demo.pyx` / `scripts/smoke_barrel_cimport.sh`. |
 | `cyinstance` | **none** | Classic-class ABI gone on 3.14 |
 
 ---

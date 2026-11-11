@@ -731,6 +731,17 @@ from .cylock cimport (
     mutex_lock,
     mutex_unlock,
 )
+from .cycriticalsection cimport (
+    PicopCriticalSection,
+    PicopCriticalSection2,
+    critical_sections_enabled,
+    cs_begin,
+    cs_begin_mutex,
+    cs_end,
+    cs2_begin,
+    cs2_begin_mutex,
+    cs2_end,
+)
 from .cymem cimport (
     mem_calloc,
     mem_free,

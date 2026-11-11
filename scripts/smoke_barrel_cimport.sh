@@ -87,6 +87,7 @@ if sys.version_info >= (3, 15):
 assert demo.check_errors()
 assert demo.check_memory()
 assert demo.check_thread_locks()
+assert demo.check_critical_sections()
 assert demo.check_atomics()
 assert demo.check_long_repr()
 assert demo.check_refs()

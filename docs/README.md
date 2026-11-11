@@ -17,8 +17,8 @@ Phases 1–6 and the **1.0 Core freeze** are done. Per-module evidence lives in 
 
 | Phase | Outcome |
 |-------|---------|
-| 1–2 | All 69 Orders indexed / decided |
-| 3 | Depth remaster — **67/67 trackers grade A** (`python scripts/grade_trackers.py`) |
+| 1–2 | All 70 Orders indexed / decided |
+| 3 | Depth remaster — **68/68 trackers grade A** (`python scripts/grade_trackers.py`) |
 | 4 | Tier B microbenches pasted / n/a |
 | 5 | Git install + examples + release path |
 | 6 | Usage examples for all Orders |
@@ -36,7 +36,7 @@ Ship / remaster via [`PIPELINE.md`](PIPELINE.md) + [`TEMPLATE.md`](TEMPLATE.md).
 | [`RELEASE.md`](RELEASE.md) | Version / tag / GitHub Release / PyPI (`picop`) checklist |
 | [`../CHANGELOG.md`](../CHANGELOG.md) | Release notes; Core freeze at 1.0; Protocols/Runtime post-1.0 policy |
 | [`TEMPLATE.md`](TEMPLATE.md) | v2 tracker template |
-| [`modules/`](modules/) | **Trackers** — one `NNN_cy{name}.md` per module (Orders `001`…`069`; Order 069 extends `036_cydescr.md`) |
+| [`modules/`](modules/) | **Trackers** — one `NNN_cy{name}.md` per module (Orders `001`…`070`; Order 069 extends `036_cydescr.md`) |
 | [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_INVENTORY_TIERB.md) · [`EQ_RUNTIME.md`](EQ_RUNTIME.md) · [`AGENT_LOOPS.md`](AGENT_LOOPS.md) | Grind `[eq/…]` issues via chat `/loop` or CLI agent in tmux |
 | [`OPS_INVENTORY.md`](OPS_INVENTORY.md) · [`OPS_INVENTORY_TIERB.md`](OPS_INVENTORY_TIERB.md) | Full public-barrel ops checklist (Tier A/B / pending / n/a); gate: `scripts/ops_inventory_coverage.py` |
 | [`PERF_PARITY.md`](PERF_PARITY.md) | Helpers that are **slower** than the builtin from pure Python, with the call to use instead; cross-checked against `.pyi` docstrings by the same gate |

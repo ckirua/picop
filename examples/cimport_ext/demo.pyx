@@ -25,6 +25,18 @@ from picop.cysentinel cimport sentinel_check, sentinel_check_exact, sentinel_new
 from picop.cyfunction cimport func_check, func_get_code, func_new_with_qualname
 from picop.cymethod cimport cfunction_check, cfunction_get_self, classmethod_new, staticmethod_new
 from picop.cylock cimport PyMutex, mutex_init, mutex_is_locked, mutex_lock, mutex_unlock
+from picop.cycriticalsection cimport (
+    PicopCriticalSection,
+    PicopCriticalSection2,
+    critical_sections_enabled,
+    cs_begin,
+    cs_begin_mutex,
+    cs_end,
+    cs2_begin,
+    cs2_begin_mutex,
+    cs2_end,
+)
+from picop cimport critical_sections_enabled as barrel_critical_sections_enabled
 from picop.cydescr cimport descr_name, descr_objclass
 
 from cpython.object cimport PyObject
@@ -517,6 +529,57 @@ cpdef bint check_thread_locks():
     eval_restore_thread(saved)
     thread_free_lock(lock)
     return acquired == PY_LOCK_ACQUIRED and ident != 0 and thread_get_ident() == ident
+
+
+cpdef bint check_critical_sections():
+    cdef dict counter = {}
+    cdef PyMutex mu
+    cdef PyMutex m1
+    cdef PyMutex m2
+    cdef PicopCriticalSection cs
+    cdef PicopCriticalSection inner
+    cdef PicopCriticalSection2 cs2
+    cdef int i
+
+    if critical_sections_enabled() != barrel_critical_sections_enabled():
+        return False
+
+    mutex_init(&mu)
+    for i in range(2000):
+        cs_begin_mutex(&cs, &mu)
+        counter["n"] = counter.get("n", 0) + 1
+        cs_end(&cs)
+    if counter["n"] != 2000:
+        return False
+
+    # Nested sections on the same object: CPython suspends the outer mutex
+    # instead of deadlocking on a second lock of the same PyMutex.
+    cdef dict obj = {"k": 1}
+    cs_begin(&cs, obj)
+    cs_begin(&inner, obj)
+    obj["k"] = obj["k"] + 1
+    cs_end(&inner)
+    cs_end(&cs)
+    if obj["k"] != 2:
+        return False
+
+    cdef dict a = {"x": 1}
+    cdef dict b = {"y": 2}
+    cs2_begin(&cs2, a, b)
+    a["x"] = a["x"] + b["y"]
+    cs2_end(&cs2)
+
+    mutex_init(&m1)
+    mutex_init(&m2)
+    cs2_begin_mutex(&cs2, &m1, &m2)
+    if critical_sections_enabled() and not (mutex_is_locked(&m1) and mutex_is_locked(&m2)):
+        return False
+    a["x"] = a["x"] + 1
+    b["y"] = b["y"] + 1
+    cs2_end(&cs2)
+    if critical_sections_enabled() and (mutex_is_locked(&m1) or mutex_is_locked(&m2)):
+        return False
+    return a["x"] == 4 and b["y"] == 3
 
 
 cpdef bint check_atomics():

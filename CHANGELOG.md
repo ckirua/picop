@@ -4,6 +4,7 @@
 
 ### Added
 - **`cysys` (Order 068):** add borrowed sys attribute and `-X` getters, CPython 3.15 required/optional attribute lookup, and cimport-only mutation/stream primitives.
+- **`cycriticalsection` (Order 070):** add cimport-only `cs_begin` / `cs_end` / `cs2_*` critical-section wrappers over caller-provided stack buffers plus a `critical_sections_enabled()` build query, for sections Cython's `with cython.critical_section(...)` syntax cannot express.
 
 
 ## [3.5.0] — 2026-11-10 — Warning dispatch, PickleBuffer helpers, and C-function accessors

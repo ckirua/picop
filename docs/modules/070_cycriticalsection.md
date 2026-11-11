@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|--------|
 | Status | present |
-| Maps to | `cpython/critical_section.h` (CPython 3.14/3.15) |
+| Maps to | `critical_section.h` (CPython 3.14/3.15) |
 | Sources | `src/picop/cycriticalsection.pxd`, `src/picop/cycriticalsection_shim.h` |
 | Surface | cimport only |
 | Tracker lifecycle | decided |
@@ -16,7 +16,7 @@ Critical sections are CPython's object-scoped synchronization mechanism for free
 
 ## Inventory
 
-Full surface of `cpython/critical_section.h` for CPython 3.14/3.15.
+Full surface of `critical_section.h` for CPython 3.14/3.15.
 
 | Symbol | Layer | Kind | Export | Notes |
 |--------|-------|------|--------|-------|
@@ -91,7 +91,7 @@ Critical sections are no-ops when the GIL is enabled; on free-threaded builds th
 
 ## Done when
 
-- [x] Full inventory vs mapped include (`cpython/critical_section.h`, CPython 3.14/3.15)
+- [x] Full inventory vs mapped include (`critical_section.h`, CPython 3.14/3.15)
 - [x] Every row has workflow status
 - [x] Lifecycle + next action filled
 - [x] APPROVED / APPROVED (cimport) rows have decision-log evidence

@@ -32,6 +32,34 @@ cdef extern from "Python.h":
     PyObject *PyFunction_GET_CLOSURE(object op) noexcept
     PyObject *PyFunction_GET_ANNOTATIONS(object op) noexcept
 
+    # Function watchers (CPython 3.12+): per-interpreter lifecycle callbacks.
+    # The callback is a C function pointer, so this surface is cimport-only.
+    # CPython hands the callback a *borrowed* reference to the function and, for
+    # MODIFY_* events, a borrowed reference to the value about to be stored; the
+    # callback may inspect but must not modify `func`. Exceptions returned with
+    # -1 are reported as unraisable; preserve any pending exception on entry.
+    # PyFunction_EVENT_MODIFY_QUALNAME is CPython 3.15+; guard its use.
+    ctypedef enum PyFunction_WatchEvent:
+        PyFunction_EVENT_CREATE
+        PyFunction_EVENT_DESTROY
+        PyFunction_EVENT_MODIFY_CODE
+        PyFunction_EVENT_MODIFY_DEFAULTS
+        PyFunction_EVENT_MODIFY_KWDEFAULTS
+        PyFunction_EVENT_MODIFY_QUALNAME
+    ctypedef struct PyFunctionObject:
+        pass
+    ctypedef int (*PyFunction_WatchCallback)(
+        PyFunction_WatchEvent event,
+        PyFunctionObject *func,
+        PyObject *new_value,
+    ) except -1
+    int PyFunction_AddWatcher(PyFunction_WatchCallback callback) except? -1
+    int PyFunction_ClearWatcher(int watcher_id) except? -1
+
+
+cdef extern from "cyfunction_shim.h":
+    int picop_func_event_modify_qualname() noexcept
+
 
 cdef inline object _borrowed_to_owned(PyObject *p):
     if p is NULL:
@@ -179,3 +207,21 @@ cdef inline object func_get_annotations_unchecked(object op):
 
 cdef inline object func_get_closure_unchecked(object op):
     return _borrowed_to_owned(PyFunction_GET_CLOSURE(op))
+
+
+# Function watchers (cimport-only). Registration is per-interpreter and global:
+# the callback sees every function created, destroyed, or modified while it is
+# registered. `func_add_watcher` returns the handle accepted by
+# `func_clear_watcher`; both raise on -1 (no handles left / unknown id).
+cdef inline int func_add_watcher(PyFunction_WatchCallback callback) except? -1:
+    return PyFunction_AddWatcher(callback)
+
+
+cdef inline int func_clear_watcher(int watcher_id) except? -1:
+    return PyFunction_ClearWatcher(watcher_id)
+
+
+cdef inline int func_event_modify_qualname() noexcept:
+    # -1 on CPython 3.14, the event id on 3.15+; lets callers branch at runtime
+    # instead of carrying a Cython compile-time conditional.
+    return picop_func_event_modify_qualname()

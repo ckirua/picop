@@ -93,6 +93,7 @@ for f in examples/py*.py examples/wrap_ansi.py; do python "$f" || exit 1; done
 | 66 | `cypicklebuf` | smoke | [`pypicklebuf.py`](pypicklebuf.py) |
 | 68 | `cysys` | smoke | [`pysys.py`](pysys.py) |
 | 70 | `cycriticalsection` | cython-recipe | [`cython/critical_sections.md`](cython/critical_sections.md) |
+| 71 | `cyfunction` watchers | cython-recipe | [`cython/function_watchers.md`](cython/function_watchers.md) |
 
 ## Cython recipes
 

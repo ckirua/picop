@@ -4,7 +4,7 @@
 |-------|--------|
 | Status | present |
 | Maps to | `cpython.function` |
-| Sources | `src/picop/cyfunction.pxd`, `.pyx`, `.pyi` |
+| Sources | `src/picop/cyfunction.pxd`, `.pyx`, `.pyi`, `src/picop/cyfunction_shim.h` |
 | Surface | public |
 | Tracker lifecycle | decided (tier A + depth) |
 | Format | v2 |
@@ -27,6 +27,10 @@ Full `cpython/function` surface, including the unchecked macros kept cimport-onl
 | `PyFunction_SetDefaults` / `SetClosure` / `SetKwDefaults` / `SetAnnotations` | C-API | function | public setters | status int, `0` on success; errors raise — never read the status as a bool |
 | `PyFunction_GET_CODE` / `GET_GLOBALS` / `GET_MODULE` / `GET_DEFAULTS` / `GET_CLOSURE` / `GET_KW_DEFAULTS` / `GET_ANNOTATIONS` | C-API | macro | cimport-only `*_unchecked` | no type check, borrowed field refs; trusted caller only |
 | `func_eq` / `funceq` | cypy | helper | public / soft alias | identity equality (`object.__eq__` for functions); not on `hot` |
+| `PyFunction_AddWatcher` | C-API | function | cimport `func_add_watcher` | registers a per-interpreter lifecycle callback; returns the handle, raises when the watcher table is full |
+| `PyFunction_ClearWatcher` | C-API | function | cimport `func_clear_watcher` | clears one handle; `ValueError` for an unknown or already-cleared id |
+| `PyFunction_WatchEvent` (`CREATE`, `DESTROY`, `MODIFY_CODE`, `MODIFY_DEFAULTS`, `MODIFY_KWDEFAULTS`) | C-API | enum | cimport constants | re-exported as a Cython enum so callbacks match the C signature exactly; `MODIFY_QUALNAME` is 3.15+ |
+| `PyFunction_WatchCallback` | C-API | function-pointer typedef | cimport type | `cdef int …(PyFunction_WatchEvent, PyFunctionObject *, PyObject *) except -1`; `-1` with an exception set aborts the mutation |
 
 ## Workflow status
 
@@ -41,13 +45,16 @@ Full `cpython/function` surface, including the unchecked macros kept cimport-onl
 | func_new_with_qualname | APPROVED | Tier A **0.24x**, Tier B **0.48x** |
 | `PyFunction_GET_*` macros | APPROVED (cimport) | unchecked, borrowed field refs; deliberately not public |
 | `func_new` / `func_new_with_qualname` argument validation | APPROVED | `TypeError` instead of CPython's `SystemError` for a non-code / non-dict argument |
+| `func_add_watcher` / `func_clear_watcher` (Order 071) | APPROVED (cimport) | no Python-level equivalent exists; a Python-callable version would need a trampoline holding every callback alive, and the event stream is interpreter-global, so only compiled callers can bound it |
+| `PyFunction_WatchEvent` enum re-export | APPROVED (cimport) | declaring the members with their real types is what makes a Cython `cdef` callback match `PyFunction_WatchCallback`; the earlier `int`/`PyObject *` spelling fails to compile against the C typedef |
+| `PyFunction_EVENT_MODIFY_QUALNAME` unguarded use | REJECTED (as a plain constant) | 3.15+ only; use `func_event_modify_qualname()` for code that must compile on 3.14 |
 
 ## Lifecycle
 
 | Field | Value |
 |-------|--------|
-| Iteration | 2 |
-| Last pass | 2026-11-10 — Order 067: `func_get_kw_defaults` / `func_set_kw_defaults`, `func_get_annotations` / `func_set_annotations`, `func_new_with_qualname`, `func_new` argument validation; Tier A try-all + Tier B |
+| Iteration | 3 |
+| Last pass | 2026-11-11 — Order 071: watcher registration, clearing, version-gated qualname event; Tier B dispatch cost and 3.14/3.15t cimport smoke |
 | Next action | — |
 
 ## Decision log
@@ -61,6 +68,8 @@ Full `cpython/function` surface, including the unchecked macros kept cimport-onl
 | `func_new_with_qualname` | the qualname-aware constructor beats constructing then patching | Tier A + Tier B | 0.24x / 0.48x | APPROVED | 2 |
 | `func_new` validation | CPython's unchecked C entry points surface `SystemError` for bad arguments | probe: `func_new(1, {})` | `SystemError` before, `TypeError` after | APPROVED | 2 |
 | `PyFunction_GET_*` macros | public unchecked getters invite misuse on non-functions | probe: `func_get_code(len)` raises `SystemError` | kept cimport-only | APPROVED (cimport) | 2 |
+| watcher registration / clearing | expose interpreter lifecycle hooks without a Python trampoline | Tier B dispatch + cimport smoke | watched setters 1.57–1.59x; construction 1.13x; lifecycle and clear errors verified | APPROVED (cimport) | 3 |
+| `func_event_modify_qualname` | one source compiles on both supported versions | cimport smoke + probe | -1 on 3.14; 5 on 3.15t | APPROVED (cimport) | 3 |
 
 ## Bench notes
 
@@ -114,6 +123,19 @@ Harness: [`bench/tier_b/cyfunction.py`](../../bench/tier_b/cyfunction.py) · `cy
 
 Summary: 9/9 picop faster · mean **0.27x** · median 0.29x.
 
+### Order 071 pass (Tier B — watcher dispatch cost)
+
+Harness: [`bench/tier_b/cyfunction.py`](../../bench/tier_b/cyfunction.py) · `cyfunction_tb.pyx` · CPython 3.14.7 · Linux x86_64 · `CPY_TIERB_N=2_000_000` × `runs=5`
+Same mutation loop, watcher registered or not — ratio = watched / unwatched. **Informational**: watchers are a cost, not a win.
+
+| operation | case | cypy mean±σ | p99 | unwatched mean±σ | ratio | p99× | note |
+|-----------|------|-------------|-----|------------------|-------|------|------|
+| func_set_kw_defaults (counting watcher) | vs unwatched setter | 23.72±0.44ms | 24.08ms | 14.92±0.26ms | **1.59x** | 1.58x | baseline faster |
+| func_set_kw_defaults (no-op watcher) | vs unwatched setter | 23.32±0.32ms | 23.74ms | 14.90±0.41ms | **1.57x** | 1.55x | baseline faster |
+| func_new_with_qualname (watcher registered) | vs unwatched constructor | 121.55±0.73ms | 122.28ms | 107.81±0.61ms | **1.13x** | 1.13x | baseline faster |
+
+**Takeaway:** watched setters cost **1.57–1.59x** and watched construction **1.13x** in this pass. The no-op and counting callbacks have similar cost; these are dispatch-cost measurements, not speedup claims.
+
 ### Tier B (Cython baseline)
 
 Harness: [`bench/tier_b/cyfunction.py`](../../bench/tier_b/cyfunction.py) · `cyfunction_tb.pyx` · CPython 3.14.6 · Linux x86_64 · `CPY_TIERB_N=2_000_000` × `runs=5`  
@@ -152,6 +174,8 @@ Ratio = cypy `cdef` loop / typed Cython baseline `==` loop (opaque + sink). **In
 ## Experiment conclusions
 
 **Order 067 — ownership, ABI, and the qualname constructor.** Every `PyFunction_Get*` accessor returns a *borrowed* pointer; the public getters promote it to an owned reference under `cython.critical_section` so the returned object survives the call under free-threaded builds. `func_get_annotations` returns `None` when the annotation slot is uninitialised, which is *not* the same as `f.__annotations__` — attribute access lazily creates an empty dict, so a caller that branches on `None` gets the C-level state, not a synthesised one. `PyFunction_Set*` returns `0`/`-1`; the wrappers raise on `-1`, so the status must never be read as a boolean. `func_new` and `func_new_with_qualname` now reject a non-code object or a non-dict globals before entering `PyFunction_New`: without that guard CPython's unchecked internals surface `SystemError: bad argument to internal function` (measured: `func_new(1, {})`), which is indistinguishable from a real internal fault. `func_new_with_qualname` is the compiler's own path for nested defs and is 0.24x Tier A against building the function and patching `__qualname__`.
+
+**Order 071 — watcher ownership and errors.** `PyFunction_AddWatcher` registers a C callback interpreter-wide, so consumers must filter unrelated function events. `func` and non-NULL `new_value` are borrowed pointers; the event argument is an enum, not a reference. The callback may inspect but must not modify the function. CREATE occurs after initialization; modification and DESTROY notifications precede the operation. Retaining the function during DESTROY resurrects it, so the recipe clears its borrowed pointer and records only C state. Callback exceptions are reported as unraisable rather than vetoing mutation; callbacks must preserve any pending exception on entry ([CPython contract](https://docs.python.org/3.14/c-api/function.html#c.PyFunction_WatchCallback)). The version shim returns -1 on 3.14 and 5 on 3.15t. Cython callbacks use the declared `except -1` signature, and assignment to the module-level tracked pointer requires `global`. Probes on 3.14 and 3.15t observed eight watcher slots, `RuntimeError` on exhaustion, and `ValueError` on invalid or already-cleared handles. Both cimport smoke runs passed, including genuine no-GIL execution on 3.15t.
 
 **Cython-compiled code objects.** Wrapping a `__code__` produced by a Cython `.pyx` module in `func_new` is unsafe: the call aborts with `Fatal Python error: _TAIL_CALL_CACHE: Executing a cache` because Cython code objects carry frame-cache assumptions that a plain `PyFunction` does not set up. Pure-Python code (`compile(...)` / a `.py` function) is fine — the barrel demo in `examples/cimport_ext/demo.pyx` builds its sample with `compile()` for exactly this reason.
 

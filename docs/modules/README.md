@@ -1,6 +1,6 @@
 # Module trackers
 
-One `NNN_cy{name}.md` per area — **`NNN` = QUEUE Order** (zero-padded, `001`…`070`; Order 069 extends existing tracker [`036_cydescr.md`](036_cydescr.md)).
+One `NNN_cy{name}.md` per area — **`NNN` = QUEUE Order** (zero-padded, `001`…`071`; Orders 069 and 071 extend [`036_cydescr.md`](036_cydescr.md) and [`029_cyfunction.md`](029_cyfunction.md)).
 **Process docs are one level up:** [`../README.md`](../README.md), [`../PIPELINE.md`](../PIPELINE.md), [`../TEMPLATE.md`](../TEMPLATE.md).
 
 Gold exemplar: [`001_cytuple.md`](001_cytuple.md).
@@ -39,6 +39,7 @@ Gold exemplar: [`001_cytuple.md`](001_cytuple.md).
 | 68 | [068_cysys.md](068_cysys.md) | `cpython/sysmodule.h` | v2 |
 | 69 | [036_cydescr.md](036_cydescr.md) | `cpython.descrobject` (descriptor helpers) | v2 |
 | 70 | [070_cycriticalsection.md](070_cycriticalsection.md) | `cpython/critical_section.h` | v2 |
+| 71 | [029_cyfunction.md](029_cyfunction.md) | `cpython.function` watchers (`PyFunction_AddWatcher`) | v2 |
 
 ## Absent
 

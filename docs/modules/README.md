@@ -5,7 +5,7 @@ One `NNN_cy{name}.md` per area â€” **`NNN` = QUEUE Order** (zero-padded, `001`â€
 
 Gold exemplar: [`001_cytuple.md`](001_cytuple.md).
 
-**Tracker grades:** 67 modules / 67 trackers grade A (`grades: A=67 B=0 C=0 total=67`).
+**Tracker grades:** 68 modules / 68 trackers grade A (`grades: A=68 B=0 C=0 total=68`).
 
 ## Present
 

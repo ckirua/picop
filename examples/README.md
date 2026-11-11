@@ -92,6 +92,7 @@ for f in examples/py*.py examples/wrap_ansi.py; do python "$f" || exit 1; done
 | 65 | `cywarnings` | smoke | cimport smoke in [`cimport_ext/demo.pyx`](cimport_ext/demo.pyx) |
 | 66 | `cypicklebuf` | smoke | [`pypicklebuf.py`](pypicklebuf.py) |
 | 68 | `cysys` | smoke | [`pysys.py`](pysys.py) |
+| 70 | `cycriticalsection` | cython-recipe | [`cython/critical_sections.md`](cython/critical_sections.md) |
 
 ## Cython recipes
 
@@ -103,6 +104,7 @@ for f in examples/py*.py examples/wrap_ansi.py; do python "$f" || exit 1; done
 | [`cython/sentinel_markers.md`](cython/sentinel_markers.md) | `sentinel` checks, marker construction, and Python 3.14 behavior |
 | [`cython/monitoring_scopes.md`](cython/monitoring_scopes.md) | `cymonitoring` scopes, event gates, and fire helpers |
 | [`cython/free_threading_locks.md`](cython/free_threading_locks.md) | typed `PyMutex` locks vs `cython.critical_section` |
+| [`cython/critical_sections.md`](cython/critical_sections.md) | explicit `cs_begin` / `cs_end` sections and mutex-guarded variants |
 
 | Order | Module | Why not Python example |
 |------:|--------|------------------------|

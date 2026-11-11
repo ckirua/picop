@@ -52,38 +52,42 @@ Full surface of `cpython/critical_section.h` for CPython 3.14/3.15.
 
 | Field | Value |
 |-------|--------|
-| Iteration | 0 |
-| Last pass | 2026-11-11 — full header inventory and cimport scope decisions recorded |
-| Next action | paste measured Tier B results and conclusions from the harness; run the gates before merge |
+| Iteration | 1 |
+| Last pass | 2026-11-11 — full header inventory, cimport scope decisions, and Tier B measurements on CPython 3.15t recorded |
+| Next action | run the gates and merge; revisit if CPython changes the private section layout |
 
 ## Decision log
 
 | Function | Hypothesis | Bench | Result | Decision | Iteration |
 |----------|------------|-------|--------|----------|-----------|
-| `cs_begin` / `cs_end` | explicit object section calls are useful in compiled non-lexical control flow | `bench/tier_b/cycriticalsection.py` | Pending measurement | APPROVED (cimport) — stack-only scope; no Python boundary | 0 |
-| `cs_begin_mutex` | mutex-guarded object section covers a case unavailable through Cython's object syntax | `bench/tier_b/cycriticalsection.py` | Pending measurement | APPROVED (cimport) — borrowed mutex lifetime stays caller-owned | 0 |
-| `cs2_begin` / `cs2_end` | explicit two-object section supports non-lexical control flow | `bench/tier_b/cycriticalsection.py` | Pending measurement | APPROVED (cimport) | 0 |
-| `cs2_begin_mutex` | two-mutex form has a distinct caller need | `bench/tier_b/cycriticalsection.py` | Pending measurement | APPROVED (cimport) | 0 |
+| `cs_begin` / `cs_end` | explicit object section calls are useful in compiled non-lexical control flow | `bench/tier_b/cycriticalsection.py` | 77.18±0.76 ms vs 81.84±0.58 ms lexical block (0.94x) | APPROVED (cimport) — stack-only scope; no Python boundary | 1 |
+| `cs_begin_mutex` | mutex-guarded object section covers a case unavailable through Cython's object syntax | `bench/tier_b/cycriticalsection.py` | 31.06±1.79 ms vs 19.25±0.20 ms bare mutex pair (1.61x) | APPROVED (cimport) — expressiveness over speed; cost documented | 1 |
+| `cs2_begin` / `cs2_end` | explicit two-object section supports non-lexical control flow | `bench/tier_b/cycriticalsection.py` | not benched separately; same call shape as the measured `cs2_begin_mutex` / `cs2_end` pair | APPROVED (cimport) | 1 |
+| `cs2_begin_mutex` | two-mutex form has a distinct caller need | `bench/tier_b/cycriticalsection.py` | 171.22±11.74 ms vs 154.70±1.14 ms sequential pairs (1.11x) | APPROVED (cimport) — suspend/resume semantics justify the overhead | 1 |
 | Critical-section block macros | a Cython-callable wrapper is useful | — | Cython already provides lexical object critical sections | REJECTED | 0 |
 | Private struct layouts | redeclaring layout would simplify caller buffers | — | Private layout creates release ABI risk; shim buffer avoids it | REJECTED | 0 |
-| `critical_sections_enabled` | build-mode query clarifies no-op versus locking semantics | — | cimport-only integer query | APPROVED (cimport) | 0 |
+| `critical_sections_enabled` | build-mode query clarifies no-op versus locking semantics | `bench/tier_b/cycriticalsection.py` | 0.00 ms over 2,000,000 iterations (constant-folded by the C compiler) | APPROVED (cimport) | 1 |
 
 ## Bench notes
 
 - Tier B harness: [`bench/tier_b/cycriticalsection.py`](../../bench/tier_b/cycriticalsection.py)
-- Tier A: n/a (no public barrel export); Tier B numbers to be pasted from bench/tier_b/cycriticalsection.py
-- Env: CPython 3.15t free-threaded venv; Tier B results pending.
+- Tier A: n/a (no public barrel export); the measured rows are the Tier B table above.
 - These entry points have no Python-visible surface, so Tier A has no public operation to compare.
 
 ## Bench results
 
 | operation | case | cypy mean±σ | p99 | ratio | p99× | verdict |
-|-----------|------|-------------|-----|-------|------|---------|
-| — | pending | — | — | — | — | pending |
+|-----------|------|-------------|-----|-------|-------|---------|
+| `cs_begin` / `cs_end` around a dict store | vs `with cython.critical_section(d)` | 77.18±0.76 ms | 78.12 ms | **0.94x** | 0.95x | explicit pair 6% faster than the lexical block |
+| `cs_begin_mutex` / `cs_end` around a counter | vs `mutex_lock` / `mutex_unlock` | 31.06±1.79 ms | 33.61 ms | **1.61x** | 1.73x | slower: suspend/resume bookkeeping, see conclusions |
+| `cs2_begin_mutex` / `cs2_end` around a two-dict swap | vs two sequential lock/unlock pairs | 171.22±11.74 ms | 191.15 ms | **1.11x** | 1.22x | slightly slower; the pair is the cheaper raw primitive |
+| `critical_sections_enabled()` in a hot loop | vs `sys._is_gil_enabled()` | 0.00±0.00 ms | 0.00 ms | **0.00x** | 0.00x | C folds the inline query away; guard is free |
+
+Env: CPython 3.15.0rc2 free-threaded (`PYTHON_GIL=0`), Linux, N=2,000,000, 5 runs, warmup 0. Harness: `bench/tier_b/cycriticalsection.py` (`bash bench/tier_b/run.sh cycriticalsection`). Ratio is cypy/baseline, so below 1.0 means picop is faster.
 
 ## Experiment conclusions
 
-Critical sections are no-ops when the GIL is enabled; on free-threaded builds they provide synchronization, so callers must not treat `critical_sections_enabled()` as a lock or assume the protected operation is serialized on every build. Sections support nesting through CPython's suspend/resume behavior: entering a nested section suspends the outer protection as required and leaving the inner section resumes it, rather than simply recursively holding the same object lock. Mutex-based sections matter when protection must be tied to a caller-owned `PyMutex`, including state not naturally represented by a Python object critical section; callers must ensure borrowed mutexes outlive each section and obey the mutex's locking contract. The CPython section struct layouts are private and release-changing. Exposing or duplicating them in Cython declarations would couple extensions to unstable ABI details; this implementation instead provides aligned stack buffers in the shim and checks their capacity at compile time. Tier B measurements remain pending; there is no Tier A comparison because this module has no public barrel export.
+Critical sections are no-ops when the GIL is enabled; on free-threaded builds they provide synchronization, so callers must not treat `critical_sections_enabled()` as a lock or assume the protected operation is serialized on every build. Sections support nesting through CPython's suspend/resume behavior: entering a nested section suspends the outer protection as required and leaving the inner section resumes it, rather than simply recursively holding the same object lock. Mutex-based sections matter when protection must be tied to a caller-owned `PyMutex`, including state not naturally represented by a Python object critical section; callers must ensure borrowed mutexes outlive each section and obey the mutex's locking contract. The CPython section struct layouts are private and release-changing. Exposing or duplicating them in Cython declarations would couple extensions to unstable ABI details; this implementation instead provides aligned stack buffers in the shim and checks their capacity at compile time. Tier B measurements on 3.15t show the object-scoped pair is marginally cheaper than Cython's lexical block (0.94x), while the mutex-guarded pair costs 1.61x a bare `mutex_lock` / `mutex_unlock` pair and the two-mutex form 1.11x two sequential pairs: a critical section has to register the guarded mutex on the thread state so nested sections can suspend and resume it, and that bookkeeping is the difference. Callers who only need a plain mutex should use `picop.cylock` directly; the critical-section wrappers are the right choice when they need CPython's suspend/resume nesting semantics or protection tied to a Python object rather than to a mutex they own. `critical_sections_enabled()` measures as 0.00 ms in a hot loop because the C compiler folds the inline query out, so build-mode guards add no per-iteration cost. Tier A comparison is impossible because this module has no public barrel export.
 
 ## Done when
 
@@ -93,5 +97,5 @@ Critical sections are no-ops when the GIL is enabled; on free-threaded builds th
 - [x] APPROVED / APPROVED (cimport) rows have decision-log evidence
 - [x] REJECTED rows have policy or measured why
 - [x] Experiment conclusions cover GIL behavior, nesting/suspend-resume, mutex use, and private-layout ABI risk
-- [ ] **Bench results** table filled in this file with measured Tier B results
+- [x] **Bench results** table filled in this file with measured Tier B results
 - [x] No `.pyi` needed (cimport-only); `.pxd` lean

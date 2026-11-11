@@ -5,6 +5,7 @@
 ### Added
 - **`cysys` (Order 068):** add borrowed sys attribute and `-X` getters, CPython 3.15 required/optional attribute lookup, and cimport-only mutation/stream primitives.
 - **`cycriticalsection` (Order 070):** add cimport-only `cs_begin` / `cs_end` / `cs2_*` critical-section wrappers over caller-provided stack buffers plus a `critical_sections_enabled()` build query, for sections Cython's `with cython.critical_section(...)` syntax cannot express.
+- **`cyfunction` watchers (Order 071):** add cimport-only `func_add_watcher` / `func_clear_watcher` over CPython's per-interpreter function lifecycle callbacks (`CREATE`, `DESTROY`, `MODIFY_CODE`, `MODIFY_DEFAULTS`, `MODIFY_KWDEFAULTS`), the `PyFunction_WatchEvent` / `PyFunctionObject` types so a Cython callback matches the C signature, and `func_event_modify_qualname()`, which reports the 3.15-only `MODIFY_QUALNAME` event id or `-1` on 3.14.
 
 
 ## [3.5.0] — 2026-11-10 — Warning dispatch, PickleBuffer helpers, and C-function accessors

@@ -22,7 +22,20 @@ from picop.cyobject cimport obj_call
 from picop.uuid._uuid cimport UUID as DirectUUID, uuid_from_buf
 from picop.cymemoryview cimport memoryview_get_base, memoryview_from_memory
 from picop.cysentinel cimport sentinel_check, sentinel_check_exact, sentinel_new, sentinel_type
-from picop.cyfunction cimport func_check, func_get_code, func_new_with_qualname
+from picop.cyfunction cimport (
+    func_check,
+    func_get_code,
+    func_new_with_qualname,
+    func_add_watcher,
+    func_clear_watcher,
+    func_event_modify_qualname,
+    PyFunction_WatchEvent,
+    PyFunctionObject,
+    PyFunction_EVENT_CREATE,
+    PyFunction_EVENT_DESTROY,
+    PyFunction_EVENT_MODIFY_DEFAULTS,
+    PyFunction_EVENT_MODIFY_KWDEFAULTS,
+)
 from picop.cymethod cimport cfunction_check, cfunction_get_self, classmethod_new, staticmethod_new
 from picop.cylock cimport PyMutex, mutex_init, mutex_is_locked, mutex_lock, mutex_unlock
 from picop.cycriticalsection cimport (
@@ -580,6 +593,100 @@ cpdef bint check_critical_sections():
     if critical_sections_enabled() and (mutex_is_locked(&m1) or mutex_is_locked(&m2)):
         return False
     return a["x"] == 4 and b["y"] == 3
+
+
+cdef PyMutex _section_mu
+cdef dict _section_counter = {}
+
+cpdef void _section_bump():
+    cdef PicopCriticalSection cs
+    cdef int i
+    for i in range(2500):
+        cs_begin_mutex(&cs, &_section_mu)
+        _section_counter["n"] = _section_counter["n"] + 1
+        cs_end(&cs)
+
+
+cpdef bint check_critical_sections_threads():
+    cdef list threads
+    cdef object t
+    _section_counter["n"] = 0
+    mutex_init(&_section_mu)
+    threads = [threading.Thread(target=_section_bump) for _ in range(4)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    return _section_counter["n"] == 10000
+
+
+cdef list _watch_all = []
+cdef list _watch_target = []
+cdef PyFunctionObject *_watch_func = NULL
+
+cdef int _watch_cb(PyFunction_WatchEvent event, PyFunctionObject *func, PyObject *new_value) except -1:
+    # CPython hands us borrowed references; we copy only what we record and
+    # never touch `func`.
+    cdef object value = None
+    if new_value is not NULL:
+        value = <object>new_value
+    _watch_all.append(event)
+    if func == _watch_func:
+        _watch_target.append((event, value))
+    return 0
+
+
+cpdef bint check_function_watchers():
+    global _watch_func
+    cdef int watcher
+    cdef dict ns
+    cdef list expected
+    cdef object sample
+    cdef int qualname_event
+
+    del _watch_all[:]
+    del _watch_target[:]
+    _watch_func = NULL
+
+    watcher = func_add_watcher(_watch_cb)
+
+    # Watchers fire only for real ``PyFunctionObject`` instances. A ``def`` in
+    # this Cython module is a cyfunction, so the sample is built with
+    # compile()/exec() instead.
+    ns = {}
+    exec(compile("def sample(a=1, *, k=0):\n    return a + k", "<demo>", "exec"), ns)
+    sample = ns["sample"]
+    _watch_func = <PyFunctionObject*>sample
+
+    sample.__defaults__ = (2,)
+    sample.__kwdefaults__ = {"k": 3}
+    sample.__qualname__ = "sample_renamed"
+
+    ns = {}
+    exec(compile("def ephemeral(): pass", "<demo>", "exec"), ns)
+    del ns["ephemeral"]
+
+    func_clear_watcher(watcher)
+    _watch_func = NULL
+    sample.__defaults__ = (5,)
+
+    expected = [(PyFunction_EVENT_MODIFY_DEFAULTS, (2,)),
+                (PyFunction_EVENT_MODIFY_KWDEFAULTS, {"k": 3})]
+    qualname_event = func_event_modify_qualname()
+    if qualname_event >= 0:
+        expected.append((qualname_event, "sample_renamed"))
+    if _watch_target != expected:
+        return False
+    if PyFunction_EVENT_CREATE not in _watch_all or PyFunction_EVENT_DESTROY not in _watch_all:
+        return False
+
+    try:
+        func_clear_watcher(watcher)
+    except ValueError:
+        pass
+    else:
+        return False
+    return True
 
 
 cpdef bint check_atomics():

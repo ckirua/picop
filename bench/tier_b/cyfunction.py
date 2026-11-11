@@ -74,6 +74,33 @@ def main() -> None:
         N,
         param="code + globals + qualname",
     )
+    session.section("watcher dispatch overhead (informational)")
+    session.compare(
+        "func_set_kw_defaults (counting watcher)",
+        tb.cypy_func_set_kw_defaults_watched,
+        tb.cypy_func_set_kw_defaults,
+        PAYLOAD,
+        N,
+        {"c": 3},
+        param="vs unwatched setter",
+    )
+    session.compare(
+        "func_set_kw_defaults (no-op watcher)",
+        tb.cypy_func_set_kw_defaults_noop_cb,
+        tb.cypy_func_set_kw_defaults,
+        PAYLOAD,
+        N,
+        {"c": 3},
+        param="vs unwatched setter",
+    )
+    session.compare(
+        "func_new_with_qualname (watcher registered)",
+        tb.cypy_func_new_with_qualname_watched,
+        tb.cypy_func_new_with_qualname,
+        PAYLOAD,
+        N,
+        param="vs unwatched constructor",
+    )
     session.summary(); print("Markdown (paste under ### Tier B):"); print(markdown_table(session._rows)); print()
 
 if __name__ == "__main__":

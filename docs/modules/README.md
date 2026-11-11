@@ -39,6 +39,7 @@ Gold exemplar: [`001_cytuple.md`](001_cytuple.md).
 | 68 | [068_cysys.md](068_cysys.md) | `cpython/sysmodule.h` | v2 |
 | 69 | [036_cydescr.md](036_cydescr.md) | `cpython.descrobject` (descriptor helpers) | v2 |
 | 70 | [070_cycriticalsection.md](070_cycriticalsection.md) | `cpython/critical_section.h` | v2 |
+| 71 | [029_cyfunction.md](029_cyfunction.md) | `cpython.function` watchers (`PyFunction_AddWatcher`) | v2 |
 
 ## Absent
 

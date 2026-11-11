@@ -17,7 +17,7 @@ Phases 1–6 and the **1.0 Core freeze** are done. Per-module evidence lives in 
 
 | Phase | Outcome |
 |-------|---------|
-| 1–2 | All 70 Orders indexed / decided |
+| 1–2 | All 71 Orders indexed / decided |
 | 3 | Depth remaster — **68/68 trackers grade A** (`python scripts/grade_trackers.py`) |
 | 4 | Tier B microbenches pasted / n/a |
 | 5 | Git install + examples + release path |

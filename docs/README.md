@@ -36,7 +36,7 @@ Ship / remaster via [`PIPELINE.md`](PIPELINE.md) + [`TEMPLATE.md`](TEMPLATE.md).
 | [`RELEASE.md`](RELEASE.md) | Version / tag / GitHub Release / PyPI (`picop`) checklist |
 | [`../CHANGELOG.md`](../CHANGELOG.md) | Release notes; Core freeze at 1.0; Protocols/Runtime post-1.0 policy |
 | [`TEMPLATE.md`](TEMPLATE.md) | v2 tracker template |
-| [`modules/`](modules/) | **Trackers** — one `NNN_cy{name}.md` per module (Orders `001`…`070`; Order 069 extends `036_cydescr.md`) |
+| [`modules/`](modules/) | **Trackers** — one `NNN_cy{name}.md` per module (Orders `001`…`071`; Orders 069 and 071 extend existing descriptor and function trackers) |
 | [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_INVENTORY_TIERB.md) · [`EQ_RUNTIME.md`](EQ_RUNTIME.md) · [`AGENT_LOOPS.md`](AGENT_LOOPS.md) | Grind `[eq/…]` issues via chat `/loop` or CLI agent in tmux |
 | [`OPS_INVENTORY.md`](OPS_INVENTORY.md) · [`OPS_INVENTORY_TIERB.md`](OPS_INVENTORY_TIERB.md) | Full public-barrel ops checklist (Tier A/B / pending / n/a); gate: `scripts/ops_inventory_coverage.py` |
 | [`PERF_PARITY.md`](PERF_PARITY.md) | Helpers that are **slower** than the builtin from pure Python, with the call to use instead; cross-checked against `.pyi` docstrings by the same gate |

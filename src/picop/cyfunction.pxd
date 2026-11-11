@@ -36,8 +36,8 @@ cdef extern from "Python.h":
     # The callback is a C function pointer, so this surface is cimport-only.
     # CPython hands the callback a *borrowed* reference to the function and, for
     # MODIFY_* events, a borrowed reference to the value about to be stored; the
-    # callback must not touch `func`. Returning -1 with an exception set aborts
-    # the mutation.
+    # callback may inspect but must not modify `func`. Exceptions returned with
+    # -1 are reported as unraisable; preserve any pending exception on entry.
     # PyFunction_EVENT_MODIFY_QUALNAME is CPython 3.15+; guard its use.
     ctypedef enum PyFunction_WatchEvent:
         PyFunction_EVENT_CREATE

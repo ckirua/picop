@@ -97,6 +97,7 @@ assert demo.check_pystate()
 assert demo.check_lifecycle()
 assert demo.check_port_and_version()
 assert demo.check_warnings()
+assert demo.check_sys()
 assert not free or not sys._is_gil_enabled()
 print("barrel/direct cimport behavior ok; GIL enabled:", sys._is_gil_enabled())
 PY

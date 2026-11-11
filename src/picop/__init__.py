@@ -611,6 +611,7 @@ from .cyunicode import (
     uutf8_bytes,
 )
 from .uuid import UUID, uuid4, uuid4_bytes
+from .cysys import sys_get_attr
 
 
 def __getattr__(name: str):
@@ -743,4 +744,5 @@ __all__: tuple[str, ...] = (
     "warn_ex",
     "warn_explicit",
     "warnings_module",
+    "sys_get_attr",
 )

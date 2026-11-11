@@ -38,6 +38,21 @@ from picop.cypicklebuf cimport (
     pickle_buffer_release,
 )
 import sys
+from picop.cysys cimport (
+    sys_get_object,
+    sys_get_xoptions,
+    sys_get_attr_string,
+    sys_get_optional_attr,
+    sys_get_optional_attr_string,
+    sys_set_object_cstr,
+    sys_write_stdout_cstr,
+    sys_format_stdout_cstr,
+    sys_write_stderr_cstr,
+    sys_format_stderr_cstr,
+)
+cdef extern from "Python.h":
+    void c_decref "Py_DECREF"(PyObject*)
+import io
 import threading
 import time
 from picop.cycode cimport PyCodeObject
@@ -174,9 +189,10 @@ cpdef Py_ssize_t check_submodule():
     return bytes_len(b"ok")
 
 
-
 cpdef bint check_cydescr():
     return descr_name(str.upper) == "upper" and descr_objclass(str.upper) is str
+
+
 cpdef bint check_uuid():
     cdef bytes raw = uuid4_bytes()
     cdef UUID value = UUID(raw)
@@ -200,6 +216,65 @@ cpdef bint check_ownership():
     return True
 
 
+
+cpdef bint check_sys():
+    cdef object old = sys_get_object("version")
+    cdef object marker = object()
+    cdef PyObject* optional = NULL
+    cdef object result
+    cdef Py_ssize_t refs
+    cdef bytes long_payload
+    cdef const char* long_raw
+    refs = sys.getrefcount(sys.version)
+    for _ in range(100):
+        assert sys_get_object("version") is sys.version
+    assert sys.getrefcount(sys.version) == refs
+    assert old is sys.version
+    assert sys_get_xoptions() is sys._xoptions
+    assert sys_set_object_cstr(b"_picop_sys_smoke", marker) == 0
+    assert sys_get_object("_picop_sys_smoke") is marker
+    assert sys_set_object_cstr(b"_picop_sys_smoke", None) == 0
+    assert sys_get_object("_picop_sys_smoke") is None
+    if sys.version_info >= (3, 15):
+        assert sys_get_attr_string("version") is sys.version
+        assert sys_get_optional_attr("version", &optional) == 1
+        result = <object>optional
+        c_decref(optional)
+        assert result is sys.version
+        optional = NULL
+        assert sys_get_optional_attr_string(b"version", &optional) == 1
+        result = <object>optional
+        c_decref(optional)
+        assert result is sys.version
+        optional = NULL
+        assert sys_get_optional_attr_string(b"_picop_missing_sys", &optional) == 0
+        assert optional == NULL
+    out = io.StringIO()
+    err = io.StringIO()
+    previous_out, previous_err = sys.stdout, sys.stderr
+    try:
+        sys.stdout, sys.stderr = out, err
+        sys_write_stdout_cstr(b"literal %s %d")
+        sys_format_stdout_cstr(b"format %s %d")
+        sys_write_stderr_cstr(b"error %s %d")
+        sys_format_stderr_cstr(b"format error %s %d")
+        sys_write_stdout_cstr(b"before\x00after")
+    finally:
+        sys.stdout, sys.stderr = previous_out, previous_err
+    assert out.getvalue() == "literal %s %dformat %s %dbefore"
+    assert err.getvalue() == "error %s %dformat error %s %d"
+    out = io.StringIO()
+    long_payload = b"x" * 1200
+    long_raw = long_payload
+    previous_out = sys.stdout
+    try:
+        sys.stdout = out
+        sys_write_stdout_cstr(long_raw)
+    finally:
+        sys.stdout = previous_out
+    assert len(out.getvalue()) == 1013
+    assert out.getvalue().endswith("... truncated")
+    return True
 cpdef bint check_sentinels():
     try:
         marker = sentinel_new("marker", module="demo", repr="<marker>")

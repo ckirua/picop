@@ -91,6 +91,7 @@ for f in examples/py*.py examples/wrap_ansi.py; do python "$f" || exit 1; done
 | 64 | `cyhash` | smoke | [`pyhash.py`](pyhash.py) |
 | 65 | `cywarnings` | smoke | cimport smoke in [`cimport_ext/demo.pyx`](cimport_ext/demo.pyx) |
 | 66 | `cypicklebuf` | smoke | [`pypicklebuf.py`](pypicklebuf.py) |
+| 68 | `cysys` | smoke | [`pysys.py`](pysys.py) |
 
 ## Cython recipes
 

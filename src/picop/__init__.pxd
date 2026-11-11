@@ -259,6 +259,19 @@ from .cyhash cimport (
     hash_pointer,
 )
 from .cywarnings cimport warn_ex, warn_explicit, warnings_module
+from .cysys cimport (
+    sys_get_attr,
+    sys_get_object,
+    sys_get_xoptions,
+    sys_get_attr_string,
+    sys_set_object_cstr,
+    sys_get_optional_attr,
+    sys_get_optional_attr_string,
+    sys_write_stdout_cstr,
+    sys_write_stderr_cstr,
+    sys_format_stdout_cstr,
+    sys_format_stderr_cstr,
+)
 from .cypicklebuf cimport (
     pickle_buffer_get_buffer,
 )
@@ -1598,4 +1611,5 @@ __all__: tuple[str, ...] = (
     "tuple_pack4",
     "tuple_size",
     "tuple_slice",
+    "sys_get_attr",
 )

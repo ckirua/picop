@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- **`cysys` (Order 068):** add borrowed sys attribute and `-X` getters, CPython 3.15 required/optional attribute lookup, and cimport-only mutation/stream primitives.
+
+
 ## [3.5.0] — 2026-11-10 — Warning dispatch, PickleBuffer helpers, and C-function accessors
 
 ### Added

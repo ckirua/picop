@@ -21,8 +21,8 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 
 | Metric | Count |
 |--------|------:|
-| Public barrel helpers | 514 |
-| `tierA` | 353 |
+| Public barrel helpers | 515 |
+| `tierA` | 354 |
 | `tierB` | 142 |
 | `pending` | 0 |
 | `n/a` | 19 |
@@ -508,6 +508,7 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 | `str_or_empty` | tierA | Tier A `session.compare` present |
 | `str_or_none` | tierA | Tier A `session.compare` present |
 | `str_startswith` | tierA | Tier A `session.compare` present |
+| `sys_get_attr` | tierA | Tier A `session.compare` present |
 | `time_monotonic` | tierA | Tier A `session.compare` present |
 | `time_perf_counter` | tierA | Tier A `session.compare` present |
 | `time_wall` | tierB | Tier A+B compare labels present |

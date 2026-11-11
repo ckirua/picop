@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [3.6.0] — 2026-11-11 — Sys helpers, critical sections, and function watchers
 
 ### Added
 - **`cysys` (Order 068):** add borrowed sys attribute and `-X` getters, CPython 3.15 required/optional attribute lookup, and cimport-only mutation/stream primitives.

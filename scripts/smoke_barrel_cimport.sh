@@ -26,6 +26,7 @@ assert not free or not sys._is_gil_enabled()
 assert demo.check_barrel()
 assert demo.check_submodule() == 2
 assert demo.check_uuid()
+assert demo.check_cydescr()
 assert demo.check_ownership()
 assert demo.check_containers()
 assert demo.check_sentinels()

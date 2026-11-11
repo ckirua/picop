@@ -1,6 +1,6 @@
 # Module trackers
 
-One `NNN_cy{name}.md` per area — **`NNN` = QUEUE Order** (zero-padded, `001`…`065`).
+One `NNN_cy{name}.md` per area — **`NNN` = QUEUE Order** (zero-padded, `001`…`069`; Order 069 extends existing tracker [`036_cydescr.md`](036_cydescr.md)).
 **Process docs are one level up:** [`../README.md`](../README.md), [`../PIPELINE.md`](../PIPELINE.md), [`../TEMPLATE.md`](../TEMPLATE.md).
 
 Gold exemplar: [`001_cytuple.md`](001_cytuple.md).
@@ -36,6 +36,7 @@ Gold exemplar: [`001_cytuple.md`](001_cytuple.md).
 | 65 | [065_cywarnings.md](065_cywarnings.md) | `Python.h` warning APIs | v2 |
 
 | 66 | [066_cypicklebuf.md](066_cypicklebuf.md) | `cpython/picklebufobject.h` (3.15+) | v2 |
+| 69 | [036_cydescr.md](036_cydescr.md) | `cpython.descrobject` (descriptor helpers) | v2 |
 
 ## Absent
 

@@ -197,7 +197,7 @@ from .cycellobject import (
     cell_get,
     cell_set,
 )
-from .cydescr import descr_is_data
+from .cydescr import descr_is_data, descr_name, descr_objclass
 from .cycodecs import (
     codec_register,
     codec_known,

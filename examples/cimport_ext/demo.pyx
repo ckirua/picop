@@ -25,6 +25,7 @@ from picop.cysentinel cimport sentinel_check, sentinel_check_exact, sentinel_new
 from picop.cyfunction cimport func_check, func_get_code, func_new_with_qualname
 from picop.cymethod cimport cfunction_check, cfunction_get_self, classmethod_new, staticmethod_new
 from picop.cylock cimport PyMutex, mutex_init, mutex_is_locked, mutex_lock, mutex_unlock
+from picop.cydescr cimport descr_name, descr_objclass
 
 from cpython.object cimport PyObject
 from libc.stddef cimport size_t
@@ -173,6 +174,9 @@ cpdef Py_ssize_t check_submodule():
     return bytes_len(b"ok")
 
 
+
+cpdef bint check_cydescr():
+    return descr_name(str.upper) == "upper" and descr_objclass(str.upper) is str
 cpdef bint check_uuid():
     cdef bytes raw = uuid4_bytes()
     cdef UUID value = UUID(raw)

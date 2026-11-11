@@ -21,8 +21,8 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 
 | Metric | Count |
 |--------|------:|
-| Public barrel helpers | 512 |
-| `tierA` | 351 |
+| Public barrel helpers | 514 |
+| `tierA` | 353 |
 | `tierB` | 142 |
 | `pending` | 0 |
 | `n/a` | 19 |
@@ -160,6 +160,8 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 | `ctxvar_set` | tierA | Tier A `session.compare` present |
 | `deque_eq` | tierB | Tier A+B compare labels present |
 | `descr_is_data` | tierB | Tier A+B compare labels present |
+| `descr_name` | tierA | Tier A `session.compare` present |
+| `descr_objclass` | tierA | Tier A `session.compare` present |
 | `dict_check` | tierB | Tier A+B compare labels present |
 | `dict_check_exact` | tierA | Tier A `session.compare` present |
 | `dict_clear` | tierA | Tier A `session.compare` present |

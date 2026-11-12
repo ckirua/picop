@@ -4,6 +4,7 @@
 
 ### Added
 - **`cyunicode` `UnicodeWriter` (Order 073):** incremental `str` builder over CPython 3.11+ `PyUnicodeWriter` (`write` / `write_char` / `write_ascii` / `write_repr` / `write_substring` / `write_utf8` / `finish` / `discard`, context-manager). Streaming loops beat `s += p` by ~25% with O(1) extra memory; `''.join` still wins when parts are materialized (crossover documented in PERF_PARITY). Example: [`examples/pyunicode_writer.py`](examples/pyunicode_writer.py).
+- **`cybytes` `BytesWriter` (Order 074):** incremental `bytes` builder — public `PyBytesWriter` API on CPython 3.15+, internal `_PyBytesWriter` mirror on 3.8-3.14. Beats `bytearray` accumulation (0.85x) and `b += p` (0.02x); a `cdef`-level writer loop is ~5x faster than append+join. Loses to `b''.join` when parts are already materialized (3.32x) — a streaming builder, not a join replacement. Strict `finish()`/`discard()` lifecycle with context-manager support. Example: [`examples/pybytes_writer.py`](examples/pybytes_writer.py).
 
 
 ## [3.7.0] — 2026-11-12 — Dict lifecycle watchers

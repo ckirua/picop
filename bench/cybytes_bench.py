@@ -14,6 +14,7 @@ if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
 
 from picop import (
+    BytesWriter,
     bytes_bytearray_eq,
     bytes_check,
     bytes_check_exact,
@@ -24,12 +25,54 @@ from picop import (
     bytes_size,
 )
 
-from _bench_util import BenchSession
+from _bench_util import BenchSession, N
 
 HAYSTACK = b"abcabc"
 NEEDLE_HIT = b"ab"
 NEEDLE_MISS = b"zz"
 NEEDLE_ONE = b"a"
+
+# Incremental-builder scenario: one full build over this many short parts is
+# the unit of work, so the timed loop counts builds, not parts.
+BPART = b"ab"
+BPART_COUNT = 80_000
+BPARTS = tuple(BPART for _ in range(BPART_COUNT))
+BUILD_SAMPLES = 20
+
+
+def bwriter_build(parts: tuple[bytes, ...]) -> bytes:
+    """Plain-Python builder on the public picop.BytesWriter (no cdef)."""
+    writer = BytesWriter(len(parts) * len(BPART))
+    for part in parts:
+        writer.write(part)
+    return writer.finish()
+
+
+def bwriter_build_no_hint(parts: tuple[bytes, ...]) -> bytes:
+    """Same, letting the writer grow on its own."""
+    writer = BytesWriter()
+    for part in parts:
+        writer.write(part)
+    return writer.finish()
+
+
+def bjoin_build(parts: tuple[bytes, ...]) -> bytes:
+    return b"".join(parts)
+
+
+def bba_build(parts: tuple[bytes, ...]) -> bytes:
+    buf = bytearray()
+    for part in parts:
+        buf.extend(part)
+    return bytes(buf)
+
+
+def biadd_build(parts: tuple[bytes, ...]) -> bytes:
+    out = b""
+    for part in parts:
+        out += part
+    return out
+
 HAY_1K = (b"a" * 1022) + b"xy"
 HAY_8K = (b"a" * 8190) + b"xy"
 EQ_SHORT = b"BTCUSDT"
@@ -213,6 +256,25 @@ def main() -> None:
         memoryview(HAYSTACK),
         param="memoryview",
     )
+
+    session.section("BytesWriter vs b''.join vs bytearray vs +=  [80k short parts per build]")
+    expected = BPART * BPART_COUNT
+    assert (
+        bwriter_build(BPARTS)
+        == bwriter_build_no_hint(BPARTS)
+        == bjoin_build(BPARTS)
+        == bba_build(BPARTS)
+        == biadd_build(BPARTS)
+        == expected
+    )
+    # Each sample builds the whole 80k-part payload, so the timed loop counts
+    # builds instead of the env iteration count.
+    session.n = BUILD_SAMPLES
+    session.compare("BytesWriter", bwriter_build, bjoin_build, BPARTS, param="hint 160k vs join")
+    session.compare("BytesWriter", bwriter_build_no_hint, bjoin_build, BPARTS, param="no hint vs join")
+    session.compare("BytesWriter", bwriter_build_no_hint, bba_build, BPARTS, param="no hint vs bytearray")
+    session.compare("BytesWriter", bwriter_build_no_hint, biadd_build, BPARTS, param="no hint vs += ")
+    session.n = N
 
     session.summary()
 

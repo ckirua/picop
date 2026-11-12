@@ -81,3 +81,44 @@ def bytes_size(b: object) -> int:
     Prefer ``bytes_len`` on a typed ``bytes`` hot path.
     """
     ...
+
+class BytesWriter:
+    """Build a ``bytes`` object incrementally with CPython's internal writer.
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``b''.join(parts)`` (Tier A 3.32x)
+    when the parts are already materialized; faster than ``bytearray``
+    accumulation (Tier A 0.85x) and far faster than ``b += p``. Streaming
+    niche: no part list is built. ``finish()``/``discard()`` close the
+    writer; later calls raise ``RuntimeError``.
+    """
+
+    def __init__(self, max_size: int = 0) -> None:
+        """Initialize an empty bytes writer; ``max_size`` is a capacity hint
+        (effective on CPython 3.8-3.14, ignored on 3.15+)."""
+        ...
+
+    def write(self, data: bytes | bytearray) -> None:
+        """Append ``data`` (bytes or bytearray) to the writer."""
+        ...
+
+    def write_char(self, ch: int) -> None:
+        """Append a single byte ``0 <= ch <= 255``."""
+        ...
+
+    def finish(self) -> bytes:
+        """Return the built bytes and close the writer."""
+        ...
+
+    def discard(self) -> None:
+        """Release the writer's buffer without producing a result."""
+        ...
+
+    def __enter__(self) -> "BytesWriter":
+        """Return the writer."""
+        ...
+
+    def __exit__(self, exc, value, tb) -> bool:
+        """Discard the writer if it is still open."""
+        ...

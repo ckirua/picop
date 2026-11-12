@@ -16,6 +16,7 @@ from picop cimport UUID, bytes_eq, list_len, str_eq, uuid4_bytes
 from picop cimport mutex_is_locked as barrel_mutex_is_locked
 from picop.cybytes cimport bytes_len
 from picop.cybytes cimport bytes_concat, bytes_concat_and_del, bytes_resize
+from picop.cybytes cimport BytesWriter
 from picop.cylist cimport list_get, list_get_checked
 from picop.cydict cimport (
     dict_get,
@@ -263,6 +264,15 @@ cpdef bint check_unicode_writer():
     for piece in pieces:
         writer.write(piece)
     return writer.finish() == "".join(pieces)
+
+
+cpdef bint check_bytes_writer():
+    cdef BytesWriter writer = BytesWriter()
+    cdef list pieces = [b"writer", b" loop"]
+    cdef bytes piece
+    for piece in pieces:
+        writer.write(piece)
+    return writer.finish() == b"".join(pieces)
 
 
 

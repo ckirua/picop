@@ -29,6 +29,7 @@ Scanner hot paths plus full include try-all. Depth showed pure `memmem` **loses*
 | bstartswith | cypy | cpdef | public | prefix len + `memcmp` (soft); preferred `bytes_startswith` |
 | bendswith | cypy | cpdef | public | suffix len + tail `memcmp` (soft); preferred `bytes_endswith` |
 | bfrom_object | cypy | cpdef | public | `PyBytes_FromObject` |
+| BytesWriter | cypy | `cdef class` | public | Order 074: incremental builder — public `PyBytesWriter` API on 3.15+, internal `_PyBytesWriter` mirror in `cybytes_shim.h` on 3.8-3.14; `write` / `write_char` / `finish` / `discard`, context-manager |
 | bas_string | cypy | cdef | cimport | `PyBytes_AS_STRING` |
 | bas_string_checked | cypy | cdef | cimport | `PyBytes_AsString` (rejects non-bytes) |
 | bfrom_string | cypy | cdef | cimport | `PyBytes_FromString` |
@@ -60,6 +61,7 @@ Scanner hot paths plus full include try-all. Depth showed pure `memmem` **loses*
 | blen / bsize | APPROVED | **0.59x**; prefer `blen` typed |
 | bcheck / exact | APPROVED | **0.56x** / **0.55x** |
 | bfrom_object | APPROVED | **0.60x** |
+| BytesWriter | APPROVED | Order 074: beats `bytearray` (0.85x) and `+=` (0.02x); loses to `b''.join` on materialized parts (3.32x) — streaming builder, documented in PERF_PARITY |
 | bas_string* / from_string* | APPROVED (cimport) | C pointers / builders |
 | bnew | APPROVED (cimport) | uninit ≠ `bytes(n)`; unsafe as public |
 | bconcat / bconcat_and_del / bresize | APPROVED (cimport) | ownership/`*pv` semantics — cdef |
@@ -72,8 +74,8 @@ Scanner hot paths plus full include try-all. Depth showed pure `memmem` **loses*
 | Field | Value |
 |-------|--------|
 | Freeze | **1.0 Core** — public + documented cimport; see COVERAGE § 1.0 freeze |
-| Iteration | 8 |
-| Last pass | 2026-07-22 — ne/search inventory (Tier A+B) |
+| Iteration | 9 |
+| Last pass | 2026-11-12 — Order 074 `BytesWriter` builder bench (Tier A + B) |
 | Next action | — |
 
 ## Decision log
@@ -83,6 +85,7 @@ Scanner hot paths plus full include try-all. Depth showed pure `memmem` **loses*
 | bcontains | Beat `in` always | scale 6…8KiB | win &lt;256B; **lose** ≥1KiB on pure memmem | hybrid ≤256 → APPROVED | 4 |
 | beq | Beat `==` on typed bytes | short/1KiB eq+ne | wins short; ~tie/win 1KiB | APPROVED (public + hot) | 6 |
 | bba_eq / bytes_bytearray_eq | Cross-type vs `==` | Tier A both dirs + 1KiB | **0.47–0.61x** | APPROVED (public, not hot) | 8 |
+| BytesWriter | Internal bytes writer beats Python builders? | Tier A builder bench + Tier B cdef loop | 0.02x vs `+=`, 0.85x vs bytearray, 3.32x vs join; Tier B 0.21x vs append+join | APPROVED (streaming niche) | 9 |
 | blen / bsize | Beat `len` | harness | **0.59x** | APPROVED | 4 |
 | bcheck* | Beat isinstance | harness | **0.40–0.56x** | APPROVED | 4 |
 | bfrom_object | Beat `bytes(buf)` | harness | **0.60x** | APPROVED | 4 |
@@ -178,6 +181,19 @@ Harness: [`bench/cyne_search_inventory_bench.py`](../../bench/cyne_search_invent
 | `bytes_startswith` | hit/miss + 1KiB | **0.60–0.61x** | **0.74x** hit | pass |
 | `bytes_endswith` | hit/miss + 1KiB | **0.57–0.60x** | **0.89x** hit | pass |
 
+### BytesWriter (Order 074 builder bench)
+
+Harness: [`bench/cybytes_bench.py`](../../bench/cybytes_bench.py) · CPython 3.14.7 · Linux x86_64 · 80,000 short parts per build, 20 builds sampled × `runs=5`
+
+| operation | case | cypy mean±σ | p99 | ratio | p99× | verdict |
+|-----------|------|-------------|-----|-------|------|---------|
+| BytesWriter | hint 160k vs `b''.join` | 62.15±8.86ms | 77.22ms | **3.47x** | 3.58x | baseline wins (single C pass) |
+| BytesWriter | no hint vs `b''.join` | 57.51±0.94ms | 58.46ms | **3.32x** | 2.89x | crossover documented |
+| BytesWriter | no hint vs `bytearray`+`bytes()` | 57.67±0.87ms | 58.81ms | **0.85x** | 0.83x | pass (≥5% gate) |
+| BytesWriter | no hint vs `b += p` | 58.39±0.40ms | 58.85ms | **0.02x** | 0.02x | pass |
+
+**Tier B — `BytesWriter` in a cdef loop** (`bench/tier_b/cybytes.py` + `cybytes_tb.pyx`, N=2,000,000 parts): `cypy_bwriter` 25.73±0.13ms vs `list.append`+`join` baseline 121.15±4.88ms -> **0.21x** (p99 0.20x). The writer wins big when the loop can dispatch in C: no 2M-element part list is materialized.
+
 ## Experiment conclusions
 
 **Tier B `*_eq` inventory:** see section **Tier B — `*_eq` (inventory)** table. Equal ~tie; ne **1.13x** lose (extra len/memcmp vs Cython `==`). 1KiB eq **0.95x**. Matches prior `cybytes` Tier B.
@@ -200,6 +216,8 @@ Harness: [`bench/cyne_search_inventory_bench.py`](../../bench/cyne_search_invent
 | `_PyBytes_Resize` | Unlike `_PyTuple_Resize`, non-unique path **allocates a copy** and DECREFs old `*pv` (expects owned ref). Mis-wrapping without owning the ref is UB |
 | `PyBytes_Concat` / `ConcatAndDel` | Unique+exact → resize in place; else new object via `SETREF`. Both aliased (`bconcat`, `bconcat_and_del`) |
 | `AsString` | `TypeError` on `bytearray`; `AS_STRING` is unchecked typed `bytes` |
+| `BytesWriter` (Order 074) | CPython has **no public** bytes-writer API before 3.15; the wrapper uses `PyBytesWriter_Create/WriteBytes/Finish/Discard` on 3.15+ and mirrors the internal `_PyBytesWriter` (`Init`/`Prepare`/`Finish`/`Dealloc`) in `cybytes_shim.h` on 3.8-3.14 — those functions are non-static in the interpreter (exported for `_pickle`) and link directly. Python-level per-write dispatch (~60 ns) is the cost: join wins when parts are materialized (3.32x), the writer wins vs `bytearray` (0.85x) and crushes `+=` (0.02x). In a `cdef` loop it is ~5x faster than append+join — the right tool is streaming, not batch. The `max_size` hint pre-allocates only on 3.8-3.14; on 3.15+ `PyBytesWriter_Create(size)` *pre-writes* `size` bytes instead of reserving, so the hint is ignored there. On 3.14 the hint barely matters (3.47x vs 3.32x). |
+| `BytesWriter` safety | The writer owns its buffer; `finish()` consumes it (NULL-checked guard, `RuntimeError` on reuse), `discard()` frees it, `__dealloc__` releases an unclosed writer. `Prepare` may reallocate, so the wrapper always re-assigns `_pos` from its return value — cached pointers into the buffer are invalid after each write. |
 | 3.14 ABI | No Format / Intern / Decode / Encode exports |
 
 ## Done when
@@ -213,3 +231,4 @@ Harness: [`bench/cyne_search_inventory_bench.py`](../../bench/cyne_search_invent
 - [x] `bytes_startswith` / `bstartswith` (issue #12) — public + hot
 - [x] `bytes_endswith` / `bendswith` (issue #13) — public + hot
 - [x] `bytes_bytearray_eq` / `bba_eq` (issue #43) — public (not hot); cross-link `buf_eq`
+- [x] Order 074: `BytesWriter` class, tests, builder bench (Tier A + B), PERF_PARITY row, example + cimport smoke

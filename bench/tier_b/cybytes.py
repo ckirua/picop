@@ -26,6 +26,8 @@ def main() -> None:
     session.compare("bytes_len", tb.cypy_blen, tb.baseline_blen, HAY, N, param="small")
     session.compare("bytes_check", tb.cypy_bcheck, tb.baseline_bcheck, HAY, N, param="bytes")
     session.compare("bytes_check_exact", tb.cypy_bcheck_exact, tb.baseline_bcheck_exact, HAY, N, param="bytes")
+    session.section("BytesWriter vs list.append + join  [Tier B builder]")
+    session.compare("BytesWriter", tb.cypy_bwriter, tb.baseline_bjoin, b"ab", 2_000_000, param="N=2,000,000 parts")
     session.summary()
     print("Markdown (paste under ### Tier B):")
     print(markdown_table(session._rows))

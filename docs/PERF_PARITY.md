@@ -90,6 +90,7 @@ These win on most cases and lose on a narrow band. Keep them; know the crossover
 | `hash_buffer` | 0.40x (`array.array('B') n=6`) | 3.03x (`memoryview n=256 (cached)`) |
 | `pickle_buffer_from_object` | 0.10x (`pickle.dumps` buffer-backed object) | 2.16x (`memoryview`, bytearray n=6) |
 | `UnicodeWriter` | 0.74x (`+=` accumulation loop) | 5.16x (`''.join` over materialized parts) |
+| `BytesWriter` | 0.02x (`+=` accumulation loop) | 3.44x (`b''.join` over materialized parts) |
 
 ## Why not a runtime warning
 

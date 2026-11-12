@@ -6,11 +6,24 @@ cimport cython
 from cpython.ref cimport Py_INCREF
 from cpython.object cimport PyObject
 from libc.stddef cimport size_t
-from libc.string cimport memchr, memcmp
+from libc.string cimport memchr, memcmp, memcpy
 
 cdef extern from "cybytes_shim.h":
     void* cy_memmem(const void *haystack, size_t haystacklen,
                     const void *needle, size_t needlelen) nogil
+    cdef struct CyBytesWriter:
+        PyObject *buffer
+        Py_ssize_t allocated
+        Py_ssize_t min_size
+        int use_bytearray
+        int overallocate
+        int use_small_buffer
+        char small_buffer[512]
+    void _PyBytesWriter_Init(CyBytesWriter *writer)
+    void* _PyBytesWriter_Alloc(CyBytesWriter *writer, Py_ssize_t size) except NULL
+    void* _PyBytesWriter_Prepare(CyBytesWriter *writer, void *str, Py_ssize_t size) except NULL
+    PyObject* _PyBytesWriter_Finish(CyBytesWriter *writer, void *str) except NULL
+    void _PyBytesWriter_Dealloc(CyBytesWriter *writer)
 
 cdef extern from "Python.h":
     char* PyBytes_AS_STRING(object op) noexcept
@@ -263,4 +276,16 @@ cdef inline bytes bytes_resize(bytes b, Py_ssize_t newsize):
 
 cpdef inline Py_ssize_t bytes_size(object b) except -1:
     return bsize(b)
+
+
+cdef class BytesWriter:
+    cdef CyBytesWriter _w
+    cdef void *_pos
+    cdef Py_ssize_t _used
+    cdef bint _open
+    cdef void _check_open(self) except *
+    cpdef void write(self, object data)
+    cpdef void write_char(self, int ch)
+    cpdef bytes finish(self)
+    cpdef void discard(self)
 

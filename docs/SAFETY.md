@@ -67,6 +67,11 @@ That does not remove trusted-caller preconditions:
 - `UnicodeWriter` owns its internal buffer: `finish()` consumes the handle and any
   later call raises `RuntimeError` (never UB), `discard()` releases the buffer, and
   an unclosed writer's buffer is freed only at GC — use the context manager.
+- `BytesWriter` mirrors CPython's internal `_PyBytesWriter` struct layout in
+  `cybytes_shim.h`. `Prepare` can reallocate the buffer on every write, so the
+  wrapper re-assigns its current pointer from the return value; any pointer into
+  the buffer captured earlier is invalid. Lifecycle guards (`RuntimeError` after
+  `finish()`/`discard()`) prevent use-after-free.
 - Fill uninitialized bytes/tuple/list slots exclusively before publication.
   Unchecked cell setters retain their caller-managed reference-transfer rules.
 - Direct `PyCodeObject` field reads use the cycode shim: object fields are returned as new references via `Py_NewRef`, while scalar fields are returned by value.

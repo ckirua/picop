@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from picop.cybytes cimport bytes_contains, bytes_eq, bytes_len, bytes_check, bytes_check_exact
+from picop.cybytes cimport bytes_contains, bytes_eq, bytes_len, bytes_check, bytes_check_exact, BytesWriter
 include "_sink.pxi"
 
 cpdef bint baseline_bcontains(bytes haystack, bytes needle, Py_ssize_t n):
@@ -81,3 +81,23 @@ cpdef bint cypy_bcheck_exact(object p, Py_ssize_t n):
         r = bytes_check_exact(tb_obj(p, k))
         tb_sink_bint(r)
     return r
+
+cpdef object cypy_bwriter(bytes part, Py_ssize_t n):
+    cdef Py_ssize_t k
+    cdef BytesWriter writer = BytesWriter()
+    cdef bytes out
+    for k in range(n):
+        writer.write(<bytes>tb_obj(part, k))
+    out = writer.finish()
+    tb_sink_obj(out)
+    return out
+
+cpdef object baseline_bjoin(bytes part, Py_ssize_t n):
+    cdef Py_ssize_t k
+    cdef list parts = []
+    cdef bytes out
+    for k in range(n):
+        parts.append(<bytes>tb_obj(part, k))
+    out = b"".join(parts)
+    tb_sink_obj(out)
+    return out

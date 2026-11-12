@@ -8,6 +8,7 @@ from collections import defaultdict
 import pytest
 
 from picop import (
+    BytesWriter,
     UnicodeWriter,
     anydict_check,
     anydict_check_exact,
@@ -224,6 +225,46 @@ def test_unicode_writer_finish() -> None:
     writer.write("hello")
     writer.write(" world")
     assert writer.finish() == "hello world"
+
+
+def test_bytes_writer_finish_matches_join() -> None:
+    parts = [b"chunk", b"-", b"payload"] * 50
+    writer = BytesWriter()
+    for part in parts:
+        writer.write(part)
+    assert writer.finish() == b"".join(parts)
+
+
+def test_bytes_writer_bytearray_and_char() -> None:
+    with BytesWriter(1024) as writer:
+        writer.write(bytearray(b"ab"))
+        writer.write_char(10)
+        writer.write_char(ord("z"))
+        assert writer.finish() == b"ab\nz"
+
+
+def test_bytes_writer_closed_lifecycle_raises() -> None:
+    writer = BytesWriter()
+    writer.write(b"x")
+    assert writer.finish() == b"x"
+    with pytest.raises(RuntimeError, match="closed"):
+        writer.finish()
+    with pytest.raises(RuntimeError, match="closed"):
+        writer.write(b"y")
+
+    discarded = BytesWriter()
+    discarded.discard()
+    with pytest.raises(RuntimeError, match="closed"):
+        discarded.finish()
+
+
+def test_bytes_writer_argument_validation() -> None:
+    with pytest.raises(ValueError, match="max_size"):
+        BytesWriter(-1)
+    with pytest.raises(TypeError):
+        BytesWriter().write("not bytes")
+    with pytest.raises(ValueError, match="0 <= ch <= 255"):
+        BytesWriter().write_char(256)
 
 
 def test_unicode_writer_substring_and_repr() -> None:

@@ -37,4 +37,27 @@ static inline void *cy_memmem(const void *haystack, size_t haystacklen,
     return NULL;
 }
 
+/*
+ * Mirror of CPython's internal _PyBytesWriter (internal/pycore_bytesobject.h
+ * cannot be included by extension modules: it requires Py_BUILD_CORE).
+ * Field-for-field identical to the interpreter's struct. These functions are
+ * non-static in the interpreter (exported for _pickle), so the linker
+ * resolves them directly.
+ */
+typedef struct CyBytesWriter {
+    PyObject *buffer;
+    Py_ssize_t allocated;
+    Py_ssize_t min_size;
+    int use_bytearray;
+    int overallocate;
+    int use_small_buffer;
+    char small_buffer[512];
+} CyBytesWriter;
+
+extern void _PyBytesWriter_Init(CyBytesWriter *writer);
+extern void *_PyBytesWriter_Alloc(CyBytesWriter *writer, Py_ssize_t size);
+extern void *_PyBytesWriter_Prepare(CyBytesWriter *writer, void *str, Py_ssize_t size);
+extern PyObject *_PyBytesWriter_Finish(CyBytesWriter *writer, void *str);
+extern void _PyBytesWriter_Dealloc(CyBytesWriter *writer);
+
 #endif

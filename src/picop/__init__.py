@@ -343,6 +343,7 @@ from .cybytearray import (
     bytearray_size,
 )
 from .cybytes import (
+    BytesWriter,
     bytes_check,
     bytes_check_exact,
     bytes_contains,

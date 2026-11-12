@@ -21,9 +21,9 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 
 | Metric | Count |
 |--------|------:|
-| Public barrel helpers | 516 |
+| Public barrel helpers | 517 |
 | `tierA` | 354 |
-| `tierB` | 143 |
+| `tierB` | 144 |
 | `pending` | 0 |
 | `n/a` | 19 |
 
@@ -52,6 +52,7 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 | `array_resize` | tierA | Tier A `session.compare` present |
 | `array_resize_smart` | tierA | Tier A `session.compare` present |
 | `array_zero` | tierA | Tier A `session.compare` present |
+| `BytesWriter` | tierB | Tier A+B compare labels present (builder vs join/bytearray/`+=`) |
 | `bool_check` | tierB | Tier A+B compare labels present |
 | `bool_eq` | tierB | Tier A+B compare labels present |
 | `bool_false` | tierA | Tier A `session.compare` present |

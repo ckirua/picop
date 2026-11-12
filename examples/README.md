@@ -96,6 +96,7 @@ for f in examples/py*.py examples/wrap_ansi.py; do python "$f" || exit 1; done
 | 71 | `cyfunction` watchers | cython-recipe | [`cython/function_watchers.md`](cython/function_watchers.md) |
 | 72 | `cydict` watchers | cython-recipe | [`cython/dict_watchers.md`](cython/dict_watchers.md) |
 | 73 | `cyunicode` UnicodeWriter | smoke | [`pyunicode_writer.py`](pyunicode_writer.py) |
+| 74 | `cybytes` BytesWriter | smoke | [`pybytes_writer.py`](pybytes_writer.py) |
 
 ## Cython recipes
 

@@ -23,6 +23,26 @@ def main() -> None:
     session.compare("dict_contains", tb.cypy_dcontains, tb.baseline_dcontains, PAYLOAD, "symbol", N, param="hit")
     session.compare("dict_len", tb.cypy_dlen, tb.baseline_dlen, PAYLOAD, N, param="n=3")
     session.compare("dict_check", tb.cypy_dcheck, tb.baseline_dcheck, PAYLOAD, N, param="dict")
+    session.section("dict set — watcher dispatch cost  [informational]")
+    WATCHED = {"watch_key": "x"}
+    session.compare(
+        "dict_set (no-op watcher)",
+        tb.cypy_dict_set_noop_cb,
+        tb.cypy_dict_set_plain,
+        WATCHED,
+        N,
+        "v",
+        param="N sets",
+    )
+    session.compare(
+        "dict_set (counting watcher)",
+        tb.cypy_dict_set_count_cb,
+        tb.cypy_dict_set_plain,
+        WATCHED,
+        N,
+        "v",
+        param="N sets",
+    )
     session.summary()
     print("Markdown (paste under ### Tier B):")
     print(markdown_table(session._rows))

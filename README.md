@@ -32,15 +32,15 @@ PyPI distribution name and import package are both **`picop`**.
 ### From PyPI
 
 ```bash
-pip install "picop==3.7.0"
+pip install "picop==3.8.0"
 ```
 
-Build deps (`setuptools`, `wheel`, `Cython>=3.7.0`, `picobuild`) are pulled via `pyproject.toml` `[build-system]`. Source installs need a C toolchain only — UUID entropy comes from the operating system (BCrypt on Windows, `/dev/urandom` elsewhere), so no third-party library is linked. Compile extensions separately for each interpreter ABI; regular and free-threaded binaries are not interchangeable.
+Build deps (`setuptools`, `wheel`, `Cython>=3.8.0`, `picobuild`) are pulled via `pyproject.toml` `[build-system]`. Source installs need a C toolchain only — UUID entropy comes from the operating system (BCrypt on Windows, `/dev/urandom` elsewhere), so no third-party library is linked. Compile extensions separately for each interpreter ABI; regular and free-threaded binaries are not interchangeable.
 
 ### From git (users)
 
 ```bash
-pip install "picop @ git+https://github.com/ckirua/picop.git@picop-v3.7.0"
+pip install "picop @ git+https://github.com/ckirua/picop.git@picop-v3.8.0"
 # or unpinned tip of main:
 # pip install "picop @ git+https://github.com/ckirua/picop.git"
 ```
@@ -50,7 +50,7 @@ pip install "picop @ git+https://github.com/ckirua/picop.git@picop-v3.7.0"
 ```bash
 python3.15 -m venv .venv
 source .venv/bin/activate
-pip install setuptools wheel 'Cython>=3.7.0' picobuild
+pip install setuptools wheel 'Cython>=3.8.0' picobuild
 pip install -e . --no-build-isolation
 ```
 

@@ -606,6 +606,7 @@ from .cytuple import (
     tuple_slice,
 )
 from .cyunicode import (
+    UnicodeWriter,
     uintern,
     unicode_eq,
     uutf8_bytes,

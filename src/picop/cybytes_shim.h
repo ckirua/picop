@@ -86,7 +86,11 @@ static inline CyBytesWriter *cy_bytes_writer_create(Py_ssize_t size) {
         PyErr_NoMemory();
         return NULL;
     }
-    w->pub = PyBytesWriter_Create(size);
+    /* 3.15's public Create(size) *pre-writes* size bytes of uninitialized
+       content rather than reserving capacity, so the hint cannot be honoured
+       there. Writes overallocate internally; start empty on every version. */
+    (void)size;
+    w->pub = PyBytesWriter_Create(0);
     if (w->pub == NULL) {
         free(w);
         return NULL;

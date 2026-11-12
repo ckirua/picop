@@ -95,7 +95,8 @@ class BytesWriter:
     """
 
     def __init__(self, max_size: int = 0) -> None:
-        """Initialize an empty bytes writer with an optional size hint."""
+        """Initialize an empty bytes writer; ``max_size`` is a capacity hint
+        (effective on CPython 3.8-3.14, ignored on 3.15+)."""
         ...
 
     def write(self, data: bytes | bytearray) -> None:

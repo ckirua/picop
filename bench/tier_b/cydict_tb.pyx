@@ -65,3 +65,52 @@ cpdef bint cypy_dcheck(object p, Py_ssize_t n):
         r = dict_check(tb_obj(p, k))
         tb_sink_bint(r)
     return r
+
+from picop.cydict cimport (
+    dict_add_watcher,
+    dict_clear_watcher,
+    dict_watch,
+    dict_unwatch,
+    PyDict_WatchEvent,
+    PyDict_EVENT_MODIFIED,
+)
+
+cdef Py_ssize_t _dict_watch_hits = 0
+
+cdef int _dict_noop_cb(PyDict_WatchEvent event, PyObject *d, PyObject *key, PyObject *value) except -1:
+    return 0
+
+cdef int _dict_count_cb(PyDict_WatchEvent event, PyObject *d, PyObject *key, PyObject *value) except -1:
+    global _dict_watch_hits
+    if event == PyDict_EVENT_MODIFIED:
+        _dict_watch_hits += 1
+    return 0
+
+cpdef object cypy_dict_set_plain(dict d, Py_ssize_t n, object value):
+    cdef Py_ssize_t k
+    for k in range(n):
+        d["watch_key"] = value
+    return d
+
+cpdef object cypy_dict_set_noop_cb(dict d, Py_ssize_t n, object value):
+    cdef Py_ssize_t k
+    cdef int watcher = dict_add_watcher(_dict_noop_cb)
+    dict_watch(d, watcher)
+    for k in range(n):
+        d["watch_key"] = value
+    dict_unwatch(d, watcher)
+    dict_clear_watcher(watcher)
+    return d
+
+cpdef object cypy_dict_set_count_cb(dict d, Py_ssize_t n, object value):
+    cdef Py_ssize_t k
+    cdef int watcher = dict_add_watcher(_dict_count_cb)
+    dict_watch(d, watcher)
+    global _dict_watch_hits
+    _dict_watch_hits = 0
+    for k in range(n):
+        d["watch_key"] = value
+    dict_unwatch(d, watcher)
+    dict_clear_watcher(watcher)
+    tb_sink_ssize(_dict_watch_hits)
+    return d

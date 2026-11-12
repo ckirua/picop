@@ -1,6 +1,6 @@
 # Module trackers
 
-One `NNN_cy{name}.md` per area — **`NNN` = QUEUE Order** (zero-padded, `001`…`071`; Orders 069 and 071 extend [`036_cydescr.md`](036_cydescr.md) and [`029_cyfunction.md`](029_cyfunction.md)).
+One `NNN_cy{name}.md` per area — **`NNN` = QUEUE Order** (zero-padded, `001`…`072`; Orders 069, 071 and 072 extend [`036_cydescr.md`](036_cydescr.md), [`029_cyfunction.md`](029_cyfunction.md) and [`003_cydict.md`](003_cydict.md)).
 **Process docs are one level up:** [`../README.md`](../README.md), [`../PIPELINE.md`](../PIPELINE.md), [`../TEMPLATE.md`](../TEMPLATE.md).
 
 Gold exemplar: [`001_cytuple.md`](001_cytuple.md).

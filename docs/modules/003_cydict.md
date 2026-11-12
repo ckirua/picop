@@ -55,8 +55,9 @@ Hot-path get/set/pop/merge/len for typed exact `dict` + `str` keys, plus full in
 | PyDict_Update / Merge / MergeFromSeq2 | C-API | used-by | — | → update/merge aliases |
 | PyDict_Keys / Values / Items | C-API | used-by | — | → cdef only |
 | PyDict_*String* / PopString / ContainsString | C-API | used-by | — | → cdef string-key aliases |
-| PyDict_Watch / AddWatcher / Unwatch / ClearWatcher | C-API | tried | — | event hooks; not wrapped |
+| PyDict_Watch / AddWatcher / Unwatch / ClearWatcher | C-API | tried | — | event hooks; wrapped Order 072 as cimport-only |
 | `_PyDict_*` private | C-API | tried | — | KnownHash / LockHeld / etc.; not wrapped |
+| `dict_add_watcher` / `dict_clear_watcher` / `dict_watch` / `dict_unwatch` | cimport | cdef inline | cimport | Order 072: dict lifecycle watchers (CPython 3.12+); C-callback surface, no Python-callable version |
 
 ## Workflow status
 
@@ -83,15 +84,17 @@ Hot-path get/set/pop/merge/len for typed exact `dict` + `str` keys, plus full in
 | dnext | APPROVED (cimport) | borrowed iteration; no Python baseline |
 | dkeys / dvalues / ditems | APPROVED (cimport) | ad-hoc: lose to `list(d.keys())` (~1.36x); not public |
 | dset_string / ddel_string / dget_string* / dcontains_string / dpop_string | APPROVED (cimport) | C-string keys; temp unicode cost |
-| PyDict_Watch* / `_PyDict_*` | REJECTED | watchers / private ABI — no wrap |
+| PyDict_Watch* (dict watchers) | APPROVED (cimport) | Order 072: `dict_add_watcher` / `dict_clear_watcher` / `dict_watch` / `dict_unwatch`; dispatch cost ~1% on watched sets (Tier B) |
+| `_PyDict_*` | REJECTED | private ABI — no wrap |
 
 ## Lifecycle
 
 | Field | Value |
 |-------|--------|
 | Freeze | **1.0 Core** — public + documented cimport; see COVERAGE § 1.0 freeze |
-| Iteration | 3 |
+| Iteration | 4 |
 P26-07-22 — `*_eq` inventory Tier A (`cyeq_inventory_bench`)|
+P26-11-12 — Order 072 dict watchers: cimport wrappers, Tier B dispatch cost, 3.14/3.15/3.15t probe|
 | Next action | — |
 
 ## Decision log
@@ -108,6 +111,7 @@ P26-07-22 — `*_eq` inventory Tier A (`cyeq_inventory_bench`)|
 | dkeys / ditems / dvalues | List materialize | ad-hoc timeit | ~1.36x vs `list(keys)` | APPROVED (cimport) | 3 |
 | `*String*` / dnext | C-string / iterator | smoke + ABI | symbols present | APPROVED (cimport) | 3 |
 | Watch / `_PyDict_*` | Rare / private | `nm` | exported but out of scope | REJECTED | 3 |
+| `dict_*watcher*` (Order 072) | Observability hook worth a cimport surface | Tier B `bench/tier_b/cydict.py` | watched sets **+1%** vs unwatched | APPROVED (cimport) | 4 |
 
 ## Bench notes
 
@@ -171,6 +175,18 @@ Ratio = cypy `cdef` loop / typed Cython baseline loop (opaque + sink). **Informa
 
 **Tier B takeaway:** primary `dget` **1.15x** vs `dict.get` — Cython emit slightly tighter; keep public (Tier A still wins vs Python).
 
+### Tier B — Order 072 watcher dispatch cost
+
+Harness: [`bench/tier_b/cydict.py`](../../bench/tier_b/cydict.py) · CPython 3.14.7 · Linux x86_64 · `CPY_TIERB_N=2_000_000` × `runs=5`
+Ratio = watched `cdef` set loop / same loop with no watcher registered (identical typed Cython code; **informational**, baseline = picop loop itself).
+
+| operation | case | cypy mean±σ | p99 | cy-base mean±σ | ratio | p99× | note |
+|-----------|------|-------------|-----|----------------|-------|------|------|
+| dict_set (no-op watcher) | N sets | 16.52±0.22ms | 16.86ms | 16.61±0.24ms | **0.99x** | 1.00x | ~tie |
+| dict_set (counting watcher) | N sets | 16.61±0.23ms | 16.93ms | 16.84±0.63ms | **0.99x** | 0.95x | ~tie |
+
+**Watchers are effectively free on mutation hot paths**: watching + a no-op C callback costs ~1% vs the identical unwatched loop; the tag check short-circuits on unwatched dicts. Watch/unwatch and register/clear are O(1) per dict/watcher.
+
 
 ### `*_eq` inventory (Tier A depth)
 
@@ -213,7 +229,9 @@ Ratio = cypy `cdef` loop / typed Cython baseline `==` loop (opaque + sink). **In
 | Views | `PyDict_Keys` etc. allocate lists and **lose** to `list(d.keys())` (~1.36x ad-hoc) and crush vs `.keys()` views → **cdef only** |
 | C-string keys | `*String*` builds a temporary unicode per call — fine when the key is already `const char*` in Cython; prefer `str` objects on hot Python paths |
 | `dupdate` / `dmerge` | Both aliased (`Update` ≡ `Merge(..., 1)`); `dmerge(..., override=False)` keeps existing keys |
-| Watchers / `_PyDict_*` | Present on 3.14 `.so` but out of accelerator scope → REJECTED |
+| Watchers (Order 072) | cimport-only (C function-pointer callback); `RuntimeError` on table exhaustion, `ValueError` for unknown/cleared ids or non-dicts. Ids **2..7** are user slots (0–1 reserved for CPython). Verified identical on 3.14, 3.15, and true no-GIL 3.15t (`sys._is_gil_enabled() == False`) |
+| `CLONED` semantics | Fires on the **watched target** when an *empty* watched dict merges another dict and clones its keys (`d.clear(); d.update(src)` → key arg = source dict, `new_value` NULL). A copy of a watched dict is **not** watched — `d.copy()` fires nothing |
+| Callback refs | `dict`, `key`, `new_value` are borrowed; NULL key/value on CLEARED/DEALLOCATED. Never mutate the watched dict from the callback; return `-1` only to signal an error (CPython reports it as unraisable) |
 
 ## Done when
 
@@ -221,3 +239,4 @@ Ratio = cypy `cdef` loop / typed Cython baseline `==` loop (opaque + sink). **In
 - [x] Try-all + **depth** (None/borrowed, subtypes, views, string keys, ownership)
 - [x] Bench results + experiment conclusions in **this** file
 - [x] Before merge: `.pyi` one-liners; lean `.pxd`; views/string/`dnext` not public
+- [x] Order 072: watcher cimport surface, demo probe (3.14/3.15/3.15t), Tier B dispatch cost

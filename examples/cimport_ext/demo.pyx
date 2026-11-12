@@ -17,7 +17,21 @@ from picop cimport mutex_is_locked as barrel_mutex_is_locked
 from picop.cybytes cimport bytes_len
 from picop.cybytes cimport bytes_concat, bytes_concat_and_del, bytes_resize
 from picop.cylist cimport list_get, list_get_checked
-from picop.cydict cimport dict_get, dict_get_with_error
+from picop.cydict cimport (
+    dict_get,
+    dict_get_with_error,
+    dict_add_watcher,
+    dict_clear_watcher,
+    dict_watch,
+    dict_unwatch,
+    PyDict_WatchEvent,
+    PyDict_EVENT_ADDED,
+    PyDict_EVENT_MODIFIED,
+    PyDict_EVENT_DELETED,
+    PyDict_EVENT_CLONED,
+    PyDict_EVENT_CLEARED,
+    PyDict_EVENT_DEALLOCATED,
+)
 from picop.cyobject cimport obj_call
 from picop.uuid._uuid cimport UUID as DirectUUID, uuid_from_buf
 from picop.cymemoryview cimport memoryview_get_base, memoryview_from_memory
@@ -682,6 +696,89 @@ cpdef bint check_function_watchers():
 
     try:
         func_clear_watcher(watcher)
+    except ValueError:
+        pass
+    else:
+        return False
+    return True
+
+
+cdef list _dict_events = []
+
+cdef int _dict_event_cb(PyDict_WatchEvent event, PyObject *d, PyObject *key, PyObject *new_value) except -1:
+    # Borrowed refs: record copies, never touch `d`. Preserve any exception.
+    cdef object k = None
+    cdef object v = None
+    if key is not NULL:
+        k = <object>key
+    if new_value is not NULL:
+        v = <object>new_value
+    _dict_events.append((event, k, v))
+    return 0
+
+
+cpdef bint check_dict_watchers():
+    cdef int watcher
+    cdef int rc
+    cdef list ids
+    cdef dict d
+    cdef dict src
+    cdef dict copy
+    cdef dict doomed
+
+    del _dict_events[:]
+
+    watcher = dict_add_watcher(_dict_event_cb)
+    d = {"a": 1}
+    dict_watch(d, watcher)
+
+    d["a"] = 2
+    d["b"] = 3
+    del d["b"]
+    d.clear()
+    src = {"c": 9}
+    d.update(src)
+    dict_unwatch(d, watcher)
+    d["x"] = 1
+    copy = d.copy()
+    doomed = {"t": 1}
+    dict_watch(doomed, watcher)
+    del doomed
+
+    # Probed 3.14 sequence: CLEARED then CLONED when an empty watched target
+    # merges a dict (key = the source dict, not a key); a plain copy of a
+    # watched dict fires nothing because the copy is not watched.
+    expected = [(PyDict_EVENT_MODIFIED, "a", 2),
+                (PyDict_EVENT_ADDED, "b", 3),
+                (PyDict_EVENT_DELETED, "b", None),
+                (PyDict_EVENT_CLEARED, None, None),
+                (PyDict_EVENT_CLONED, src, None),
+                (PyDict_EVENT_DEALLOCATED, None, None)]
+    if _dict_events != expected:
+        return False
+
+    # Watcher table: ids 2..7 are user slots on 3.14/3.15 (0 and 1 are
+    # reserved for CPython); exhaustion raises RuntimeError, clearing an
+    # unknown or already-cleared id raises ValueError.
+    ids = [watcher]
+    try:
+        while True:
+            ids.append(dict_add_watcher(_dict_event_cb))
+    except RuntimeError:
+        pass
+    for rc in range(len(ids)):
+        try:
+            dict_clear_watcher(ids[rc])
+        except ValueError:
+            return False
+    try:
+        dict_clear_watcher(watcher)
+    except ValueError:
+        pass
+    else:
+        return False
+    try:
+        dict_clear_watcher(99)
     except ValueError:
         pass
     else:

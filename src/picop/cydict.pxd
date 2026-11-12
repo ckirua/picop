@@ -38,6 +38,30 @@ cdef extern from "Python.h":
     int PyDict_Pop(object mp, object key, PyObject **result) except -1
     int PyDict_PopString(object mp, const char *key, PyObject **result) except -1
 
+    # Dict watchers (CPython 3.12+): interpreter-wide registration, per-dict
+    # notification. The callback is a C function pointer, so this surface is
+    # cimport-only. CPython hands the callback *borrowed* references for dict,
+    # key and new_value (NULL key/value on CLEARED/DEALLOCATED); inspect only —
+    # never mutate the watched dict from the callback. A -1 callback return is
+    # reported as unraisable; preserve any pending exception on entry.
+    ctypedef enum PyDict_WatchEvent:
+        PyDict_EVENT_ADDED
+        PyDict_EVENT_MODIFIED
+        PyDict_EVENT_DELETED
+        PyDict_EVENT_CLONED
+        PyDict_EVENT_CLEARED
+        PyDict_EVENT_DEALLOCATED
+    ctypedef int (*PyDict_WatchCallback)(
+        PyDict_WatchEvent event,
+        PyObject *dict,
+        PyObject *key,
+        PyObject *new_value,
+    ) except -1
+    int PyDict_AddWatcher(PyDict_WatchCallback callback) except? -1
+    int PyDict_ClearWatcher(int watcher_id) except? -1
+    int PyDict_Watch(int watcher_id, object dict) except? -1
+    int PyDict_Unwatch(int watcher_id, object dict) except? -1
+
 
 cdef inline bint dcheck(object p) noexcept:
     return PyDict_Check(p)
@@ -326,4 +350,21 @@ cpdef inline int dict_update(dict d, dict other) except -1:
 
 cdef inline list dict_values(dict d):
     return dvalues(d)
+
+# Dict watchers (cimport-only). Registration is per-interpreter and global:
+# the handle sees every dict explicitly marked with `dict_watch`.
+# `dict_add_watcher` returns the handle accepted by `dict_clear_watcher`,
+# `dict_watch` and `dict_unwatch`; all four raise when CPython returns -1
+# (watcher table full / unknown id / non-dict).
+cdef inline int dict_add_watcher(PyDict_WatchCallback callback) except? -1:
+    return PyDict_AddWatcher(callback)
+
+cdef inline int dict_clear_watcher(int watcher_id) except? -1:
+    return PyDict_ClearWatcher(watcher_id)
+
+cdef inline int dict_watch(dict d, int watcher_id) except? -1:
+    return PyDict_Watch(watcher_id, d)
+
+cdef inline int dict_unwatch(dict d, int watcher_id) except? -1:
+    return PyDict_Unwatch(watcher_id, d)
 

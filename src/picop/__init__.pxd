@@ -564,6 +564,18 @@ from .cydict cimport (
     dict_pop_string,
     dict_set_string,
     dict_values,
+    PyDict_WatchEvent,
+    PyDict_WatchCallback,
+    PyDict_EVENT_ADDED,
+    PyDict_EVENT_MODIFIED,
+    PyDict_EVENT_DELETED,
+    PyDict_EVENT_CLONED,
+    PyDict_EVENT_CLEARED,
+    PyDict_EVENT_DEALLOCATED,
+    dict_add_watcher,
+    dict_clear_watcher,
+    dict_watch,
+    dict_unwatch,
 )
 from .cyfrozendict cimport (
     anydict_check,

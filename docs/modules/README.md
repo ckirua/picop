@@ -1,6 +1,6 @@
 # Module trackers
 
-One `NNN_cy{name}.md` per area - **`NNN` = QUEUE Order** (zero-padded, `001`...`074`; Orders 069, 071, 072, 073 and 074 extend [`036_cydescr.md`](036_cydescr.md), [`029_cyfunction.md`](029_cyfunction.md), [`003_cydict.md`](003_cydict.md), [`007_cyunicode.md`](007_cyunicode.md) and [`002_cybytes.md`](002_cybytes.md)).
+One `NNN_cy{name}.md` per area - **`NNN` = QUEUE Order** (zero-padded, `001`...`074`; Orders 069, 071, 072, 073 and 074 extend [`036_cydescr.md`](036_cydescr.md), [`029_cyfunction.md`](029_cyfunction.md), [`003_cydict.md`](003_cydict.md), [`007_cyunicode.md`](007_cyunicode.md) and [`002_cybytes.md`](002_cybytes.md)). CPython 3.15 header diff and the next queue: [`../INVENTORY_315.md`](../INVENTORY_315.md).
 **Process docs are one level up:** [`../README.md`](../README.md), [`../PIPELINE.md`](../PIPELINE.md), [`../TEMPLATE.md`](../TEMPLATE.md).
 
 Gold exemplar: [`001_cytuple.md`](001_cytuple.md).

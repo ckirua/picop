@@ -87,9 +87,9 @@ class BytesWriter:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``b''.join(parts)`` (Tier A 3.44x)
+    Slower than the plain-Python equivalent ``b''.join(parts)`` (Tier A 3.32x)
     when the parts are already materialized; faster than ``bytearray``
-    accumulation (Tier A 0.88x) and far faster than ``b += p``. Streaming
+    accumulation (Tier A 0.85x) and far faster than ``b += p``. Streaming
     niche: no part list is built. ``finish()``/``discard()`` close the
     writer; later calls raise ``RuntimeError``.
     """

@@ -29,7 +29,7 @@ Scanner hot paths plus full include try-all. Depth showed pure `memmem` **loses*
 | bstartswith | cypy | cpdef | public | prefix len + `memcmp` (soft); preferred `bytes_startswith` |
 | bendswith | cypy | cpdef | public | suffix len + tail `memcmp` (soft); preferred `bytes_endswith` |
 | bfrom_object | cypy | cpdef | public | `PyBytes_FromObject` |
-| BytesWriter | cypy | `cdef class` | public | Order 074: incremental builder over internal `_PyBytesWriter` (Init/Alloc/Prepare/Finish/Dealloc mirror in `cybytes_shim.h`); `write` / `write_char` / `finish` / `discard`, context-manager; CPython 3.8+ |
+| BytesWriter | cypy | `cdef class` | public | Order 074: incremental builder — public `PyBytesWriter` API on 3.15+, internal `_PyBytesWriter` mirror in `cybytes_shim.h` on 3.8-3.14; `write` / `write_char` / `finish` / `discard`, context-manager |
 | bas_string | cypy | cdef | cimport | `PyBytes_AS_STRING` |
 | bas_string_checked | cypy | cdef | cimport | `PyBytes_AsString` (rejects non-bytes) |
 | bfrom_string | cypy | cdef | cimport | `PyBytes_FromString` |
@@ -61,7 +61,7 @@ Scanner hot paths plus full include try-all. Depth showed pure `memmem` **loses*
 | blen / bsize | APPROVED | **0.59x**; prefer `blen` typed |
 | bcheck / exact | APPROVED | **0.56x** / **0.55x** |
 | bfrom_object | APPROVED | **0.60x** |
-| BytesWriter | APPROVED | Order 074: beats `bytearray` (0.88x) and `+=` (0.02x); loses to `b''.join` on materialized parts (3.44x) — streaming builder, documented in PERF_PARITY |
+| BytesWriter | APPROVED | Order 074: beats `bytearray` (0.85x) and `+=` (0.02x); loses to `b''.join` on materialized parts (3.32x) — streaming builder, documented in PERF_PARITY |
 | bas_string* / from_string* | APPROVED (cimport) | C pointers / builders |
 | bnew | APPROVED (cimport) | uninit ≠ `bytes(n)`; unsafe as public |
 | bconcat / bconcat_and_del / bresize | APPROVED (cimport) | ownership/`*pv` semantics — cdef |
@@ -85,7 +85,7 @@ Scanner hot paths plus full include try-all. Depth showed pure `memmem` **loses*
 | bcontains | Beat `in` always | scale 6…8KiB | win &lt;256B; **lose** ≥1KiB on pure memmem | hybrid ≤256 → APPROVED | 4 |
 | beq | Beat `==` on typed bytes | short/1KiB eq+ne | wins short; ~tie/win 1KiB | APPROVED (public + hot) | 6 |
 | bba_eq / bytes_bytearray_eq | Cross-type vs `==` | Tier A both dirs + 1KiB | **0.47–0.61x** | APPROVED (public, not hot) | 8 |
-| BytesWriter | Internal `_PyBytesWriter` beats Python builders? | Tier A builder bench + Tier B cdef loop | 0.02x vs `+=`, 0.88x vs bytearray, 3.44x vs join; Tier B 0.20x vs append+join | APPROVED (streaming niche) | 9 |
+| BytesWriter | Internal bytes writer beats Python builders? | Tier A builder bench + Tier B cdef loop | 0.02x vs `+=`, 0.85x vs bytearray, 3.32x vs join; Tier B 0.21x vs append+join | APPROVED (streaming niche) | 9 |
 | blen / bsize | Beat `len` | harness | **0.59x** | APPROVED | 4 |
 | bcheck* | Beat isinstance | harness | **0.40–0.56x** | APPROVED | 4 |
 | bfrom_object | Beat `bytes(buf)` | harness | **0.60x** | APPROVED | 4 |
@@ -187,12 +187,12 @@ Harness: [`bench/cybytes_bench.py`](../../bench/cybytes_bench.py) · CPython 3.1
 
 | operation | case | cypy mean±σ | p99 | ratio | p99× | verdict |
 |-----------|------|-------------|-----|-------|------|---------|
-| BytesWriter | hint 160k vs `b''.join` | 62.74±2.00ms | 65.22ms | **3.44x** | 3.22x | baseline wins (single C pass) |
-| BytesWriter | no hint vs `b''.join` | 64.08±3.36ms | 69.12ms | **3.48x** | 3.26x | crossover documented |
-| BytesWriter | no hint vs `bytearray`+`bytes()` | 61.97±1.98ms | 63.91ms | **0.88x** | 0.88x | pass (≥5% gate) |
-| BytesWriter | no hint vs `b += p` | 62.69±2.47ms | 65.05ms | **0.02x** | 0.02x | pass |
+| BytesWriter | hint 160k vs `b''.join` | 62.15±8.86ms | 77.22ms | **3.47x** | 3.58x | baseline wins (single C pass) |
+| BytesWriter | no hint vs `b''.join` | 57.51±0.94ms | 58.46ms | **3.32x** | 2.89x | crossover documented |
+| BytesWriter | no hint vs `bytearray`+`bytes()` | 57.67±0.87ms | 58.81ms | **0.85x** | 0.83x | pass (≥5% gate) |
+| BytesWriter | no hint vs `b += p` | 58.39±0.40ms | 58.85ms | **0.02x** | 0.02x | pass |
 
-**Tier B — `BytesWriter` in a cdef loop** (`bench/tier_b/cybytes.py` + `cybytes_tb.pyx`, N=2,000,000 parts): `cypy_bwriter` 23.98±0.34ms vs `list.append`+`join` baseline 120.62±5.04ms -> **0.20x** (p99 0.19x). The writer wins big when the loop can dispatch in C: no 2M-element part list is materialized.
+**Tier B — `BytesWriter` in a cdef loop** (`bench/tier_b/cybytes.py` + `cybytes_tb.pyx`, N=2,000,000 parts): `cypy_bwriter` 25.73±0.13ms vs `list.append`+`join` baseline 121.15±4.88ms -> **0.21x** (p99 0.20x). The writer wins big when the loop can dispatch in C: no 2M-element part list is materialized.
 
 ## Experiment conclusions
 
@@ -216,7 +216,7 @@ Harness: [`bench/cybytes_bench.py`](../../bench/cybytes_bench.py) · CPython 3.1
 | `_PyBytes_Resize` | Unlike `_PyTuple_Resize`, non-unique path **allocates a copy** and DECREFs old `*pv` (expects owned ref). Mis-wrapping without owning the ref is UB |
 | `PyBytes_Concat` / `ConcatAndDel` | Unique+exact → resize in place; else new object via `SETREF`. Both aliased (`bconcat`, `bconcat_and_del`) |
 | `AsString` | `TypeError` on `bytearray`; `AS_STRING` is unchecked typed `bytes` |
-| `BytesWriter` (Order 074) | CPython has **no public** bytes-writer API; the wrapper mirrors the internal `_PyBytesWriter` (`Init`/`Alloc`/`Prepare`/`Finish`/`Dealloc`) in `cybytes_shim.h` — these symbols are exported for `_pickle` and link directly. Python-level per-write dispatch (~60 ns) is the cost: join wins when parts are materialized (3.44x), the writer wins vs `bytearray` (0.88x) and crushes `+=` (0.02x). In a `cdef` loop it is 5x faster than append+join — the right tool is streaming, not batch. `max_size` hint barely helps (3.44x vs 3.48x). |
+| `BytesWriter` (Order 074) | CPython has **no public** bytes-writer API before 3.15; the wrapper uses `PyBytesWriter_Create/WriteBytes/Finish/Discard` on 3.15+ and mirrors the internal `_PyBytesWriter` (`Init`/`Prepare`/`Finish`/`Dealloc`) in `cybytes_shim.h` on 3.8-3.14 — those functions are non-static in the interpreter (exported for `_pickle`) and link directly. Python-level per-write dispatch (~60 ns) is the cost: join wins when parts are materialized (3.32x), the writer wins vs `bytearray` (0.85x) and crushes `+=` (0.02x). In a `cdef` loop it is ~5x faster than append+join — the right tool is streaming, not batch. The `max_size` hint barely helps (3.47x vs 3.32x, hint slightly worse). |
 | `BytesWriter` safety | The writer owns its buffer; `finish()` consumes it (NULL-checked guard, `RuntimeError` on reuse), `discard()` frees it, `__dealloc__` releases an unclosed writer. `Prepare` may reallocate, so the wrapper always re-assigns `_pos` from its return value — cached pointers into the buffer are invalid after each write. |
 | 3.14 ABI | No Format / Intern / Decode / Encode exports |
 

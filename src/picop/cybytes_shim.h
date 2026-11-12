@@ -2,6 +2,7 @@
 #define CYCEL_CYBYTES_SHIM_H
 
 #include <stddef.h>
+#include <stdlib.h>
 #include <string.h>
 
 /*
@@ -38,13 +39,26 @@ static inline void *cy_memmem(const void *haystack, size_t haystacklen,
 }
 
 /*
- * Mirror of CPython's internal _PyBytesWriter (internal/pycore_bytesobject.h
- * cannot be included by extension modules: it requires Py_BUILD_CORE).
- * Field-for-field identical to the interpreter's struct. These functions are
- * non-static in the interpreter (exported for _pickle), so the linker
- * resolves them directly.
+ * Incremental bytes writer.
+ *
+ * CPython 3.15+ exports a real public API (cpython/bytesobject.h:
+ * PyBytesWriter_Create / WriteBytes / Finish / Discard) with an opaque
+ * struct; we use it directly.
+ *
+ * CPython 3.8-3.14 has no public writer API. The internal _PyBytesWriter
+ * (internal/pycore_bytesobject.h) cannot be included by extension modules
+ * (it requires Py_BUILD_CORE), but its functions are non-static in the
+ * interpreter (exported for _pickle), so the linker resolves them against
+ * this field-for-field mirror of the struct.
+ *
+ * Both paths expose the same uniform wrapper API:
+ *   cy_bytes_writer_create(size) -> writer (NULL on error, exception set)
+ *   cy_bytes_writer_write(writer, data, size) -> 0 / -1 (exception set)
+ *   cy_bytes_writer_finish(writer) -> bytes (NULL on error)
+ *   cy_bytes_writer_discard(writer)
  */
-typedef struct CyBytesWriter {
+#if PY_VERSION_HEX < 0x030F0000
+typedef struct CyInternalBytesWriter {
     PyObject *buffer;
     Py_ssize_t allocated;
     Py_ssize_t min_size;
@@ -52,12 +66,104 @@ typedef struct CyBytesWriter {
     int overallocate;
     int use_small_buffer;
     char small_buffer[512];
+} CyInternalBytesWriter;
+#endif
+
+typedef struct CyBytesWriter {
+#if PY_VERSION_HEX >= 0x030F0000
+    PyBytesWriter *pub;
+#else
+    CyInternalBytesWriter internal;
+    char *pos;
+#endif
 } CyBytesWriter;
 
-extern void _PyBytesWriter_Init(CyBytesWriter *writer);
-extern void *_PyBytesWriter_Alloc(CyBytesWriter *writer, Py_ssize_t size);
-extern void *_PyBytesWriter_Prepare(CyBytesWriter *writer, void *str, Py_ssize_t size);
-extern PyObject *_PyBytesWriter_Finish(CyBytesWriter *writer, void *str);
-extern void _PyBytesWriter_Dealloc(CyBytesWriter *writer);
+#if PY_VERSION_HEX >= 0x030F0000
+
+static inline CyBytesWriter *cy_bytes_writer_create(Py_ssize_t size) {
+    CyBytesWriter *w = (CyBytesWriter *)malloc(sizeof(CyBytesWriter));
+    if (w == NULL) {
+        PyErr_NoMemory();
+        return NULL;
+    }
+    w->pub = PyBytesWriter_Create(size);
+    if (w->pub == NULL) {
+        free(w);
+        return NULL;
+    }
+    return w;
+}
+
+static inline int cy_bytes_writer_write(CyBytesWriter *w, const char *data,
+                                        Py_ssize_t size) {
+    return PyBytesWriter_WriteBytes(w->pub, data, size);
+}
+
+static inline PyObject *cy_bytes_writer_finish(CyBytesWriter *w) {
+    PyObject *result = PyBytesWriter_Finish(w->pub);
+    free(w);
+    return result;
+}
+
+static inline void cy_bytes_writer_discard(CyBytesWriter *w) {
+    PyBytesWriter_Discard(w->pub);
+    free(w);
+}
+
+#else
+
+extern void _PyBytesWriter_Init(CyInternalBytesWriter *writer);
+extern void *_PyBytesWriter_Prepare(CyInternalBytesWriter *writer, void *str, Py_ssize_t size);
+extern PyObject *_PyBytesWriter_Finish(CyInternalBytesWriter *writer, void *str);
+extern void _PyBytesWriter_Dealloc(CyInternalBytesWriter *writer);
+
+static inline CyBytesWriter *cy_bytes_writer_create(Py_ssize_t size) {
+    CyBytesWriter *w = (CyBytesWriter *)malloc(sizeof(CyBytesWriter));
+    if (w == NULL) {
+        PyErr_NoMemory();
+        return NULL;
+    }
+    memset(w, 0, sizeof(CyBytesWriter));
+    _PyBytesWriter_Init(&w->internal);
+    /* Replicate _PyBytesWriter_Alloc(): it is not exported under its own
+       name in all builds, but Prepare from the small buffer is equivalent. */
+    w->internal.use_small_buffer = 1;
+    w->internal.overallocate = 1;
+    w->internal.allocated = 512;
+    if (size > 0) {
+        w->pos = (char *)_PyBytesWriter_Prepare(&w->internal, w->internal.small_buffer, size);
+        if (w->pos == NULL) {
+            free(w);
+            return NULL;
+        }
+    } else {
+        w->pos = w->internal.small_buffer;
+    }
+    return w;
+}
+
+static inline int cy_bytes_writer_write(CyBytesWriter *w, const char *data,
+                                        Py_ssize_t size) {
+    w->pos = (char *)_PyBytesWriter_Prepare(&w->internal, w->pos, size);
+    if (w->pos == NULL) {
+        return -1;
+    }
+    memcpy(w->pos, data, (size_t)size);
+    w->pos += size;
+    return 0;
+}
+
+static inline PyObject *cy_bytes_writer_finish(CyBytesWriter *w) {
+    PyObject *result = _PyBytesWriter_Finish(&w->internal, w->pos);
+    free(w);
+    return result;
+}
+
+static inline void cy_bytes_writer_discard(CyBytesWriter *w) {
+    _PyBytesWriter_Dealloc(&w->internal);
+    free(w);
+}
+
+#endif
 
 #endif

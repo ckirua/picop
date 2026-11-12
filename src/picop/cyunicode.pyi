@@ -29,3 +29,57 @@ def unicode_eq(a: str, b: str) -> bool:
     :mod:`picop.cystr` on value-op hot paths.
     """
     ...
+
+class UnicodeWriter:
+    """Build a string incrementally with CPython's Unicode writer.
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``''.join(parts)`` (Tier A 5.16x)
+    when the parts are already materialized; faster than ``s += p`` accumulation
+    (Tier A 0.74x) and cheaper in memory because no part list is built.
+    """
+
+    def __init__(self, max_size: int = 0) -> None:
+        """Initialize an empty string writer."""
+        ...
+
+    def write(self, text: object) -> None:
+        """Append a string to the writer."""
+        ...
+
+    def write_char(self, ch: int) -> None:
+        """Append a Unicode code point."""
+        ...
+
+    def write_ascii(self, text: str) -> None:
+        """Append ASCII text."""
+        ...
+
+    def write_repr(self, obj: object) -> None:
+        """Append the representation of an object."""
+        ...
+
+    def write_substring(self, text: str, start: int = 0, end: int = -1) -> None:
+        """Append a substring."""
+        ...
+
+    def write_utf8(self, data: bytes) -> None:
+        """Append UTF-8 encoded bytes."""
+        ...
+
+    def finish(self) -> str:
+        """Finish writing and return the built string."""
+        ...
+
+    def discard(self) -> None:
+        """Discard the writer buffer."""
+        ...
+
+    def __enter__(self) -> UnicodeWriter:
+        """Return this writer."""
+        ...
+
+    def __exit__(self, exc_type: object, exc: object, tb: object) -> bool:
+        """Discard an unfinished writer when leaving the context."""
+        ...

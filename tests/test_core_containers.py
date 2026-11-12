@@ -8,6 +8,7 @@ from collections import defaultdict
 import pytest
 
 from picop import (
+    UnicodeWriter,
     anydict_check,
     anydict_check_exact,
     anydict_len,
@@ -55,6 +56,7 @@ from picop import (
     tuple_len,
     tuple_pack2,
     tuple_slice,
+    UnicodeWriter,
 )
 
 
@@ -215,3 +217,49 @@ def test_frozendict_new_and_empty_semantics() -> None:
         made["status"] = "CLOSED"
     with pytest.raises(TypeError):
         frozendict_new(1)
+
+
+def test_unicode_writer_finish() -> None:
+    writer = UnicodeWriter(32)
+    writer.write("hello")
+    writer.write(" world")
+    assert writer.finish() == "hello world"
+
+
+def test_unicode_writer_substring_and_repr() -> None:
+    writer = UnicodeWriter()
+    writer.write_substring("hello world", 6)
+    writer.write_repr({"x": 1})
+    assert writer.finish() == "world{'x': 1}"
+
+
+def test_unicode_writer_utf8_bytes() -> None:
+    writer = UnicodeWriter()
+    writer.write_utf8("café".encode("utf-8"))
+    assert writer.finish() == "café"
+
+
+def test_unicode_writer_context_manager() -> None:
+    with UnicodeWriter() as writer:
+        writer.write("context")
+    with pytest.raises(RuntimeError, match="already finished"):
+        writer.finish()
+
+
+def test_unicode_writer_double_finish_raises() -> None:
+    writer = UnicodeWriter()
+    writer.finish()
+    with pytest.raises(RuntimeError, match="already finished"):
+        writer.finish()
+
+
+def test_unicode_writer_empty_finish() -> None:
+    assert UnicodeWriter().finish() == ""
+
+
+def test_unicode_writer_char_mixed() -> None:
+    writer = UnicodeWriter()
+    writer.write("ab")
+    writer.write_char(ord("c"))
+    writer.write_ascii("def")
+    assert writer.finish() == "abcdef"

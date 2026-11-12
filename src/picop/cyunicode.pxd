@@ -17,7 +17,30 @@ from cpython.unicode cimport (
 
 
 cdef extern from "Python.h":
+    ctypedef struct PyUnicodeWriter:
+        pass
+    PyUnicodeWriter *PyUnicodeWriter_Create(Py_ssize_t length)
+    void PyUnicodeWriter_Discard(PyUnicodeWriter *writer)
+    str PyUnicodeWriter_Finish(PyUnicodeWriter *writer)
+    int PyUnicodeWriter_WriteStr(PyUnicodeWriter *writer, object text) except -1
+    int PyUnicodeWriter_WriteChar(PyUnicodeWriter *writer, Py_UCS4 ch) except -1
+    int PyUnicodeWriter_WriteASCII(PyUnicodeWriter *writer, const char *text, Py_ssize_t size) except -1
+    int PyUnicodeWriter_WriteRepr(PyUnicodeWriter *writer, object obj) except -1
+    int PyUnicodeWriter_WriteSubstring(PyUnicodeWriter *writer, str text, Py_ssize_t start, Py_ssize_t end) except -1
+    int PyUnicodeWriter_WriteUTF8(PyUnicodeWriter *writer, const char *utf8, Py_ssize_t size) except -1
     void PyUnicode_InternInPlace(PyObject **string)
+
+cdef class UnicodeWriter:
+    cdef PyUnicodeWriter *_w
+    cdef void _check_open(self) except *
+    cpdef write(self, object text)
+    cpdef write_char(self, Py_UCS4 ch)
+    cpdef write_ascii(self, str text)
+    cpdef write_repr(self, object obj)
+    cpdef write_substring(self, str text, Py_ssize_t start=*, Py_ssize_t end=*)
+    cpdef write_utf8(self, bytes data)
+    cpdef str finish(self)
+    cpdef discard(self)
 
 
 cdef inline const char *uutf8(str s) except NULL:

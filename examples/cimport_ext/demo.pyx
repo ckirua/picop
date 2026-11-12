@@ -50,6 +50,7 @@ from picop.cyfunction cimport (
     PyFunction_EVENT_MODIFY_DEFAULTS,
     PyFunction_EVENT_MODIFY_KWDEFAULTS,
 )
+from picop.cyunicode cimport UnicodeWriter
 from picop.cymethod cimport cfunction_check, cfunction_get_self, classmethod_new, staticmethod_new
 from picop.cylock cimport PyMutex, mutex_init, mutex_is_locked, mutex_lock, mutex_unlock
 from picop.cycriticalsection cimport (
@@ -253,6 +254,15 @@ cpdef bint check_ownership():
     else:
         raise AssertionError("concat must propagate buffer errors")
     return True
+
+
+cpdef bint check_unicode_writer():
+    cdef UnicodeWriter writer = UnicodeWriter()
+    cdef list pieces = ["writer", " loop"]
+    cdef str piece
+    for piece in pieces:
+        writer.write(piece)
+    return writer.finish() == "".join(pieces)
 
 
 

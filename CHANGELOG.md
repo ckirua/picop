@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [3.7.0] — 2026-11-12 — Dict lifecycle watchers
 
 ### Added
 - **`cydict` watchers (Order 072):** cimport-only `dict_add_watcher` / `dict_clear_watcher` / `dict_watch` / `dict_unwatch` over CPython 3.12+ dict lifecycle callbacks (`ADDED`, `MODIFIED`, `DELETED`, `CLONED`, `CLEARED`, `DEALLOCATED`), plus the `PyDict_WatchEvent` enum and `PyDict_WatchCallback` type so a Cython callback matches the C signature. Tier B measures watcher dispatch at ~1% of an unwatched set loop; recipe: [`examples/cython/dict_watchers.md`](examples/cython/dict_watchers.md).

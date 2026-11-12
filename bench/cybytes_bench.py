@@ -270,6 +270,7 @@ def main() -> None:
     # Each sample builds the whole 80k-part payload, so the timed loop counts
     # builds instead of the env iteration count.
     session.n = BUILD_SAMPLES
+    session.compare("BytesWriter", bwriter_build, bwriter_build_no_hint, BPARTS, param="hint vs no hint")
     session.compare("BytesWriter", bwriter_build, bjoin_build, BPARTS, param="hint 160k vs join")
     session.compare("BytesWriter", bwriter_build_no_hint, bjoin_build, BPARTS, param="no hint vs join")
     session.compare("BytesWriter", bwriter_build_no_hint, bba_build, BPARTS, param="no hint vs bytearray")

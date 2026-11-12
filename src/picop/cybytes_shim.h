@@ -86,14 +86,26 @@ static inline CyBytesWriter *cy_bytes_writer_create(Py_ssize_t size) {
         PyErr_NoMemory();
         return NULL;
     }
-    /* 3.15's public Create(size) *pre-writes* size bytes of uninitialized
-       content rather than reserving capacity, so the hint cannot be honoured
-       there. Writes overallocate internally; start empty on every version. */
-    (void)size;
-    w->pub = PyBytesWriter_Create(0);
-    if (w->pub == NULL) {
-        free(w);
-        return NULL;
+    /* 3.15's public writer has no pure reservation call: Create(size)
+       allocates the buffer but also sets the logical size to size, and
+       Resize sets the size too (it never shrinks the allocation). Creating
+       with the hint and rewinding to zero via Resize(0) turns the hint into
+       reserved capacity: writes then fill from offset 0 and Finish()
+       truncates to the bytes actually written. */
+    if (size > 0) {
+        w->pub = PyBytesWriter_Create(size);
+        if (w->pub == NULL || PyBytesWriter_Resize(w->pub, 0) < 0) {
+            PyBytesWriter_Discard(w->pub);
+            free(w);
+            return NULL;
+        }
+    }
+    else {
+        w->pub = PyBytesWriter_Create(0);
+        if (w->pub == NULL) {
+            free(w);
+            return NULL;
+        }
     }
     return w;
 }

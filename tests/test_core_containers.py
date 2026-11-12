@@ -267,6 +267,21 @@ def test_bytes_writer_argument_validation() -> None:
         BytesWriter().write_char(256)
 
 
+def test_bytes_writer_hint_preserves_output() -> None:
+    w = BytesWriter(65_536)  # hint above the 512-byte internal buffer
+    w.write(b"ab")
+    w.write(b"cd")
+    w.write(bytearray(b"ef"))
+    w.write_char(10)
+    out = w.finish()
+    assert out == b"abcdef\n"
+    assert len(out) == 7
+
+    w2 = BytesWriter(256)  # hint <= 512: no-op path, still correct
+    w2.write(b"x")
+    assert w2.finish() == b"x"
+
+
 def test_unicode_writer_substring_and_repr() -> None:
     writer = UnicodeWriter()
     writer.write_substring("hello world", 6)

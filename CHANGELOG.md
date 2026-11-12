@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+- **`cybytes` `BytesWriter` (Order 075):** the `max_size` capacity hint is now honoured on CPython 3.15+ via `PyBytesWriter_Create(hint)` + `PyBytesWriter_Resize(writer, 0)` (previously ignored there; 3.8-3.14 behaviour unchanged).
+
 ## [3.8.0] — 2026-11-12 — Incremental str/bytes writers
 
 ### Added

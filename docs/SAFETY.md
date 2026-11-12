@@ -64,6 +64,9 @@ That does not remove trusted-caller preconditions:
 - Noexcept memoryview metadata helpers require a valid, unreleased view. Stable
   acquired exports prevent resize/release, not concurrent writes by arbitrary
   exporters; synchronize content mutations separately.
+- `UnicodeWriter` owns its internal buffer: `finish()` consumes the handle and any
+  later call raises `RuntimeError` (never UB), `discard()` releases the buffer, and
+  an unclosed writer's buffer is freed only at GC — use the context manager.
 - Fill uninitialized bytes/tuple/list slots exclusively before publication.
   Unchecked cell setters retain their caller-managed reference-transfer rules.
 - Direct `PyCodeObject` field reads use the cycode shim: object fields are returned as new references via `Py_NewRef`, while scalar fields are returned by value.

@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- **`cyunicode` `UnicodeWriter` (Order 073):** incremental `str` builder over CPython 3.11+ `PyUnicodeWriter` (`write` / `write_char` / `write_ascii` / `write_repr` / `write_substring` / `write_utf8` / `finish` / `discard`, context-manager). Streaming loops beat `s += p` by ~25% with O(1) extra memory; `''.join` still wins when parts are materialized (crossover documented in PERF_PARITY). Example: [`examples/pyunicode_writer.py`](examples/pyunicode_writer.py).
+
+
 ## [3.7.0] — 2026-11-12 — Dict lifecycle watchers
 
 ### Added

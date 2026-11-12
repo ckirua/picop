@@ -31,7 +31,14 @@ def unicode_eq(a: str, b: str) -> bool:
     ...
 
 class UnicodeWriter:
-    """Build a string incrementally with CPython's Unicode writer."""
+    """Build a string incrementally with CPython's Unicode writer.
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``''.join(parts)`` (Tier A 5.16x)
+    when the parts are already materialized; faster than ``s += p`` accumulation
+    (Tier A 0.74x) and cheaper in memory because no part list is built.
+    """
 
     def __init__(self, max_size: int = 0) -> None:
         """Initialize an empty string writer."""

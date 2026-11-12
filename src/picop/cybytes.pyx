@@ -7,9 +7,10 @@ Fast :class:`bytes` accessors.
 cdef class BytesWriter:
     """Incremental ``bytes`` builder over CPython's writer.
 
-    ``max_size`` is a capacity hint: it pre-allocates on CPython 3.8-3.14
-    (internal ``_PyBytesWriter``) and is ignored on 3.15+ (the public
-    ``PyBytesWriter`` has no capacity reservation; writes overallocate).
+    ``max_size`` is a capacity hint, honoured on CPython 3.8-3.14 (internal
+    ``_PyBytesWriter``) and on 3.15+ (``PyBytesWriter_Create`` +
+    ``PyBytesWriter_Resize(writer, 0)`` reserve capacity without any
+    pre-written content).
     """
 
     def __init__(self, int max_size=0):

@@ -69,9 +69,11 @@ That does not remove trusted-caller preconditions:
   an unclosed writer's buffer is freed only at GC — use the context manager.
 - `BytesWriter` uses the public `PyBytesWriter` API on CPython 3.15+ and mirrors
   CPython's internal `_PyBytesWriter` struct in `cybytes_shim.h` on 3.8-3.14.
-  Note `PyBytesWriter_Create(size)` on 3.15+ pre-writes `size` bytes rather than
-  reserving capacity, so the wrapper always creates an empty writer and the
-  `max_size` hint is ignored there. `Prepare` can reallocate the buffer on every
+  Note `PyBytesWriter_Create(size)` on 3.15+ pre-writes `size` bytes and
+  `PyBytesWriter_Resize` also sets the logical size; the wrapper creates the
+  writer at the hinted capacity and rewinds it to zero with `Resize(writer, 0)`,
+  which never shrinks the allocation — `max_size` becomes reserved capacity on
+  every supported version. `Prepare` can reallocate the buffer on every
   write, so the wrapper tracks the write position in its own handle; any pointer
   into the buffer captured earlier is invalid. Lifecycle guards
   (`RuntimeError` after `finish()`/`discard()`) prevent use-after-free.

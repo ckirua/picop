@@ -10,7 +10,7 @@ Method: set-diff of `PyAPI_FUNC`/`PyAPI_DATA`/opaque typedefs between CPython **
 | Public tuple builder | `PyTuple_FromArray` | **Order 076** (extends 001) — shipped | `tuple_from_array` cimport helper; loop fallback pre-3.15 |
 | Interpreter view / guard (free-threading-safe thread state) | `PyInterpreterView_FromCurrent/FromMain/Close`, `PyInterpreterGuard_FromCurrent/FromView/Close`, `PyThreadState_Ensure/EnsureFromView/Release` | **Order 077** (extends 012) — shipped | `interpreter_guard()` CM + `guards_supported()` public; raw helpers cimport-only, GILState fallback pre-3.15 |
 | Immortal set | `PyUnstable_SetImmortal` | **Order 078** (extends 028) — shipped | `ref_set_immortal` cimport helper; 3.14 refcount-pin emulation |
-| Lazy-import mode | `PyImport_Get/SetLazyImportsMode/Filter`, `PyLazyImport_Type` | minor, extends 068 | Per-interpreter lazy-import controls (PEP 843) |
+| Lazy-import mode | `PyImport_Get/SetLazyImportsMode/Filter`, `PyLazyImport_Type` | **Order 079** (extends 068) — shipped | public mode probe/get/set; filters cimport-only; `PyLazyImport_Type` rejected (internal header) |
 
 ## New public API — indexed, no demand
 

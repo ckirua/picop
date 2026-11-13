@@ -89,6 +89,7 @@ That does not remove trusted-caller preconditions:
   False, `interpreter_guard()` raises `RuntimeError`, and the ensure/release
   helpers fall back to `PyGILState_Ensure`/`PyGILState_Release`.
 - `ref_set_immortal` pins an object's reference count: the object is **never freed**, so use it only for long-lived singletons. It returns 0 (no pin) when the object is not uniquely referenced or is a str — mirroring CPython 3.15 `PyUnstable_SetImmortal`. On 3.14 the emulation works only in GIL builds; 3.14 free-threaded builds refuse the pin.
+- `set_lazy_import_mode` changes import behavior for the whole interpreter (CPython 3.15+): modules imported afterwards are deferred until first use. Restore the previous mode when done. The filter (cimport-only) is retained with a strong reference until replaced or cleared with `None`.
 - Fill uninitialized bytes/tuple/list slots exclusively before publication.
   Unchecked cell setters retain their caller-managed reference-transfer rules.
 - Direct `PyCodeObject` field reads use the cycode shim: object fields are returned as new references via `Py_NewRef`, while scalar fields are returned by value.

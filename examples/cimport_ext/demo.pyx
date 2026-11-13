@@ -90,6 +90,11 @@ from picop.cysys cimport (
     sys_format_stdout_cstr,
     sys_write_stderr_cstr,
     sys_format_stderr_cstr,
+    lazy_imports_supported,
+    lazy_import_mode,
+    set_lazy_import_mode,
+    lazy_import_filter_get,
+    lazy_import_filter_set,
 )
 cdef extern from "Python.h":
     void c_decref "Py_DECREF"(PyObject*)
@@ -874,6 +879,31 @@ cpdef bint check_ref_immortal():
     cdef bint refused = ref_set_immortal(alias)  # refcount 2 -> refused
     del shared, alias
     return refused == False
+
+
+def _lazy_filter_all(name):
+    return True
+
+
+cpdef bint check_lazy_imports():
+    if not lazy_imports_supported():
+        return True
+    cdef str original = lazy_import_mode()
+    set_lazy_import_mode("all")
+    if lazy_import_mode() != "all":
+        return False
+    if lazy_import_filter_set(_lazy_filter_all) != 0 or lazy_import_filter_get() is not _lazy_filter_all:
+        return False
+    if lazy_import_filter_set(None) != 0 or lazy_import_filter_get() is not None:
+        return False
+    try:
+        lazy_import_filter_set(123)
+    except ValueError:
+        pass
+    else:
+        return False
+    set_lazy_import_mode(original)
+    return True
 
 
 cpdef bint check_arg_unpack(object args, object kwargs):

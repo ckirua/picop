@@ -512,6 +512,9 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 | `str_or_none` | tierA | Tier A `session.compare` present |
 | `str_startswith` | tierA | Tier A `session.compare` present |
 | `sys_get_attr` | tierA | Tier A `session.compare` present |
+| `lazy_imports_supported` | tierA | Tier A `session.compare` present (vs version check) |
+| `lazy_import_mode` | tierA | Tier A `session.compare` present (vs `sys.flags.lazy_imports`) |
+| `set_lazy_import_mode` | n/a (state mutation; no pure-Python equivalent) | getter compare covers the read path |
 | `time_monotonic` | tierA | Tier A `session.compare` present |
 | `time_perf_counter` | tierA | Tier A `session.compare` present |
 | `time_wall` | tierB | Tier A+B compare labels present |

@@ -31,6 +31,11 @@ Full callable surface of `sysmodule.h` across CPython 3.14 and 3.15.
 | `PySys_FormatStdout` | C-API | function | `sys_format_stdout_cstr` (cimport) | Fixed `%s` format; Unicode formatter, no 1000-byte truncation |
 | `PySys_FormatStderr` | C-API | function | `sys_format_stderr_cstr` (cimport) | Fixed `%s` format; Unicode formatter, no 1000-byte truncation |
 | `PySys_GetXOptions` | C-API | function | `sys_get_xoptions` (cimport) | Borrowed result; owned return |
+| `PyImport_SetLazyImportsMode` | C-API (3.15, import.h) | function | `set_lazy_import_mode` | `"normal"`/`"all"`; always succeeds |
+| `PyImport_GetLazyImportsMode` | C-API (3.15, import.h) | function | `lazy_import_mode` | Returned as a mode name string |
+| `PyImport_SetLazyImportsFilter` | C-API (3.15, import.h) | function | `lazy_import_filter_set` (cimport) | Callable or `None`; `ValueError` for non-callables |
+| `PyImport_GetLazyImportsFilter` | C-API (3.15, import.h) | function | `lazy_import_filter_get` (cimport) | New reference; `None` when unset |
+| `PyLazyImport_Type` | internal (pycore header) | type | — | REJECTED: internal header only |
 | `PySys_SetArgv` | C-API | candidate | — | REJECTED: deprecated since 3.11; process-global startup mutation |
 | `PySys_SetArgvEx` | C-API | candidate | — | REJECTED: deprecated since 3.11; process-global startup mutation |
 | `PySys_ResetWarnOptions` | C-API (3.14) | candidate | — | REJECTED: deprecated and removed in 3.15 |
@@ -50,6 +55,10 @@ Full callable surface of `sysmodule.h` across CPython 3.14 and 3.15.
 | `sys_format_stdout_cstr` | APPROVED (cimport) | Public candidate 1.15x rejected; Cython callers keep Unicode formatting |
 | `sys_format_stderr_cstr` | APPROVED (cimport) | Public candidate 1.24x rejected; Cython callers keep Unicode formatting |
 | `sys_get_xoptions` | APPROVED (cimport) | Public candidate 1.49x versus `sys._xoptions` rejected; typed call is separately measured in Tier B |
+| `lazy_imports_supported` | APPROVED | 3.15-only probe; 3.14 builds use a NotImplementedError shim so no unavailable ABI symbols are referenced |
+| `lazy_import_mode` | APPROVED | Tier A probe versus `sys.flags.lazy_imports`; see bench results (Order 079) |
+| `set_lazy_import_mode` | APPROVED | No pure-Python equivalent exists; mode strings validated before the C call |
+| `lazy_import_filter_set` / `lazy_import_filter_get` | APPROVED (cimport) | Callable-or-None contract preserved; strong-reference retention documented in SAFETY |
 | `PySys_SetArgv` | REJECTED | Deprecated startup mutation |
 | `PySys_SetArgvEx` | REJECTED | Deprecated startup mutation |
 | `PySys_ResetWarnOptions` | REJECTED | Removed in CPython 3.15 |
@@ -58,8 +67,8 @@ Full callable surface of `sysmodule.h` across CPython 3.14 and 3.15.
 
 | Field | Value |
 |-------|--------|
-| Iteration | 2 |
-| Last pass | 2026-11-11 — full header inventory, ownership tests, Tier A/B measurement, API demotions |
+| Iteration | 3 |
+| Last pass | 2026-11-13 — Order 079 lazy-import controls (probe/get/set public, filters cimport-only, Tier A measurement on 3.15) |
 | Next action | None |
 
 ## Decision log
@@ -80,6 +89,10 @@ Full callable surface of `sysmodule.h` across CPython 3.14 and 3.15.
 | `PySys_SetArgv` | Legacy argv API may support embedding | Header lifecycle | Deprecated since 3.11 | REJECTED | 2 |
 | `PySys_SetArgvEx` | Legacy argv API may support embedding | Header lifecycle | Deprecated since 3.11 | REJECTED | 2 |
 | `PySys_ResetWarnOptions` | Warning option reset may be useful | Header lifecycle | Deprecated in 3.14, absent in 3.15 | REJECTED | 2 |
+| `PyImport_SetLazyImportsMode` | No Python-level equivalent exists for the 3.15 lazy-import mode | Behavior test in a fresh interpreter | `"all"` defers module registration until first use; round-trip exact | APPROVED | 3 |
+| `PyImport_GetLazyImportsMode` | Typed getter beats the `sys.flags` attribute | Tier A | 0.23x; mode returned as `"normal"`/`"all"` | APPROVED | 3 |
+| `lazy_imports_supported` (probe) | Feature probe beats a version check | Tier A | 0.40x versus `sys.version_info >= (3, 15)` | APPROVED | 3 |
+| `PyLazyImport_Type` | Lazy proxy type could be exposed to Cython | Header lifecycle | Declared only in internal `pycore_lazyimportobject.h` | REJECTED | 3 |
 
 ## Bench notes
 
@@ -103,6 +116,8 @@ Full callable surface of `sysmodule.h` across CPython 3.14 and 3.15.
 | `sys_write_stderr` (candidate) | output | 173.87±8.35 ms | 183.82 ms | 1.21x | 1.10x | public candidate rejected |
 | `sys_format_stdout` (candidate) | output | 169.27±7.11 ms | 180.13 ms | 1.15x | 1.16x | public candidate rejected |
 | `sys_format_stderr` (candidate) | output | 184.78±5.40 ms | 189.37 ms | 1.24x | 1.20x | public candidate rejected |
+| `lazy_imports_supported` | probe vs `sys.version_info` check (3.15) | 1.94±0.06 ms | 2.04 ms | 0.40x | 0.41x | picop faster |
+| `lazy_import_mode` | vs `sys.flags.lazy_imports` attribute (3.15) | 1.99±0.04 ms | 2.04 ms | 0.23x | 0.23x | picop faster |
 
 ### Tier B
 
@@ -124,3 +139,4 @@ Tier A keeps only `sys_get_attr` as a Python-visible operation after comparative
 - [x] Borrowed and new-reference ownership contracts tested
 - [x] Tier A/Tier B results and depth conclusions recorded
 - [x] Public stub summaries and lean Cython declarations
+- [x] Order 079: lazy-import probe/getter/setter public; filter helpers cimport-only; behavior verified in a fresh 3.15 interpreter

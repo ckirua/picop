@@ -50,3 +50,21 @@ cdef inline PyThreadState *eval_save_thread() nogil:
 
 cdef inline void eval_restore_thread(PyThreadState *tstate) nogil:
     PyEval_RestoreThread(tstate)
+# Order 077: PEP 788 interpreter guards / views (CPython 3.15+).
+# Uniform void* handles; the shim branches on PY_VERSION_HEX so the API
+# exists on 3.8-3.14 too (guard/view acquire raise, ensure falls back to
+# PyGILState). Tokens are opaque — never pass them to PyThreadState APIs.
+cdef extern from "cythread_shim.h":
+    int guards_enabled "cy_interpreter_guards_enabled"() noexcept
+    void *guard_from_current "cy_guard_from_current"() except NULL
+    void *guard_from_view "cy_guard_from_view"(void *view)
+    void guard_close "cy_guard_close"(void *guard) noexcept
+    void *view_from_current "cy_view_from_current"() except NULL
+    void *view_from_main "cy_view_from_main"()
+    void view_close "cy_view_close"(void *view) noexcept
+    void *threadstate_ensure "cy_threadstate_ensure"(void *guard) except NULL
+    void *threadstate_ensure_from_view "cy_threadstate_ensure_from_view"(void *view) except NULL
+    void threadstate_release "cy_threadstate_release"(void *token) noexcept
+
+cpdef guards_supported()
+cpdef interpreter_guard()

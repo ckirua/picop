@@ -269,8 +269,10 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 | `gen_check` | tierB | Tier A+B compare labels present |
 | `gen_check_exact` | tierA | Tier A `session.compare` present |
 | `gen_eq` | tierB | Tier A+B compare labels present |
+| `guards_supported` | tierA | Tier A `session.compare` present (vs version check) |
 | `hash_buffer` | tierA | Tier A `session.compare` present |
 | `int_eq` | tierB | Tier A+B compare labels present |
+| `interpreter_guard` | tierA | Tier A compare present (guard vs no-op; overhead, informational — Tier B vs GILState in 012 tracker) |
 | `iter_check` | tierB | Tier A+B compare labels present |
 | `iter_eq` | tierB | Tier A+B compare labels present |
 | `iter_next` | tierA | Tier A `session.compare` present |

@@ -174,8 +174,10 @@ from picop.cypystate cimport (
 from picop.cyref cimport (
     ref_decref,
     ref_incref,
+    ref_is_immortal,
     ref_is_uniquely_referenced,
     ref_refcnt,
+    ref_set_immortal,
     ref_xdecref,
 )
 from picop.cypyport cimport PY_SSIZE_T_MAX, int64_t
@@ -856,6 +858,22 @@ cpdef bint check_refs():
     ref_decref(value)
     ref_xdecref(NULL)
     return ref_refcnt(value) == before and ref_is_uniquely_referenced(value)
+
+
+cpdef bint check_ref_immortal():
+    cdef object pinned = [1, 2, 3]  # uniquely referenced -> pin succeeds
+    cdef bint made = ref_set_immortal(pinned)
+    if not made:
+        # 3.14 free-threaded builds refuse pinning (no safe emulation).
+        import sys
+        return not sys._is_gil_enabled()
+    if not ref_is_immortal(pinned):
+        return False
+    shared = [0]
+    alias = shared
+    cdef bint refused = ref_set_immortal(alias)  # refcount 2 -> refused
+    del shared, alias
+    return refused == False
 
 
 cpdef bint check_arg_unpack(object args, object kwargs):

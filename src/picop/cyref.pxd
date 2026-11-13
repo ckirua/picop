@@ -22,6 +22,10 @@ cdef extern from "Python.h":
     int PyUnstable_Object_IsUniquelyReferenced(object o) noexcept
 
 
+cdef extern from "cyref_shim.h":
+    int cy_ref_set_immortal(object o) noexcept
+
+
 cdef inline void ref_incref(object o) noexcept:
     Py_INCREF(o)
 
@@ -54,6 +58,12 @@ cdef inline int ref_is_unique_temporary(object o) noexcept:
 
 cdef inline int ref_is_immortal(object o) noexcept:
     return PyUnstable_IsImmortal(o)
+
+
+cdef inline int ref_set_immortal(object o) noexcept:
+    # Mirrors 3.15 PyUnstable_SetImmortal: 1 if immortal after the call,
+    # 0 if not uniquely referenced or a str. Immortal objects are never freed.
+    return cy_ref_set_immortal(o)
 
 
 cdef inline void ref_enable_try_incref(object o) noexcept:

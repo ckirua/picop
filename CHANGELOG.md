@@ -5,7 +5,7 @@
 ### Added
 - **`cytuple` `tuple_from_array` (Order 076):** cimport-only builder over CPython 3.15+ public `PyTuple_FromArray`, with an equivalent `PyTuple_New` + INCREF-loop fallback on 3.8-3.14. Beats the idiomatic `cdef` `tnew`+`tset` fill (0.83x on 3.14, 0.94x on 3.15); a literal tuple display still wins when the items are known inline.
 - **`cythread` interpreter guards (Order 077):** PEP 788 `PyInterpreterGuard`/`PyInterpreterView`/`PyThreadState_Ensure/Release` wrappers. Public `interpreter_guard()` context manager and `guards_supported()` probe on CPython 3.15+ (raw helpers cimport-only); on 3.8-3.14 `interpreter_guard()` raises `RuntimeError` and the ensure/release helpers fall back to `PyGILState_Ensure/Release`. Guard acquire costs ~6x a cached GILState check — a finalization-safety tool, not a micro-opt. Example: [`examples/pyinterpreter_guard.py`](examples/pyinterpreter_guard.py).
-
+- **`cyref` `ref_set_immortal` (Order 078):** cimport-only immortalize helper — thin wrapper over CPython 3.15+ `PyUnstable_SetImmortal`, emulated via refcount pinning on 3.14 GIL builds (3.14 free-threaded returns 0). Returns 1 when the object is immortal after the call, 0 when the pin is refused (shared ref or str).
 ### Changed
 - **`cybytes` `BytesWriter` (Order 075):** the `max_size` capacity hint is now honoured on CPython 3.15+ via `PyBytesWriter_Create(hint)` + `PyBytesWriter_Resize(writer, 0)` (previously ignored there; 3.8-3.14 behaviour unchanged).
 

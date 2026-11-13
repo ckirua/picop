@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [3.9.0] — 2026-11-13 — Tuple builders, interpreter guards, and lazy-import controls
 
 ### Added
 - **`cytuple` `tuple_from_array` (Order 076):** cimport-only builder over CPython 3.15+ public `PyTuple_FromArray`, with an equivalent `PyTuple_New` + INCREF-loop fallback on 3.8-3.14. Beats the idiomatic `cdef` `tnew`+`tset` fill (0.83x on 3.14, 0.94x on 3.15); a literal tuple display still wins when the items are known inline.

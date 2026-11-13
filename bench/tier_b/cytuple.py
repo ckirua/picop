@@ -77,6 +77,27 @@ def main() -> None:
         param="tuple",
     )
 
+    assert tb.smoke_from_array(PAYLOAD) == PAYLOAD
+    inc, release, empty, err = tb.smoke_refcount()
+    assert inc and release and empty and "size must be >= 0" in err
+    session.section("tuple_from_array (3.15+ builder, fallback pre-3.15)")
+    session.compare(
+        "tuple_from_array",
+        tb.cypy_tfrom_array,
+        tb.baseline_tfrom_literal,
+        PAYLOAD,
+        N,
+        param="vs literal (t[i], t[i], ...)",
+    )
+    session.compare(
+        "tuple_from_array",
+        tb.cypy_tfrom_array,
+        tb.baseline_tnew_fill,
+        PAYLOAD,
+        N,
+        param="vs tnew + 4x tset fill",
+    )
+
     session.summary()
     print("Markdown (paste under ### Tier B):")
     print(markdown_table(session._rows))

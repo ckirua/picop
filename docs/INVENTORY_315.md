@@ -8,7 +8,7 @@ Method: set-diff of `PyAPI_FUNC`/`PyAPI_DATA`/opaque typedefs between CPython **
 |-----|-----------|---------|-------------|
 | BytesWriter 3.15 extensions | `PyBytesWriter_Grow`, `GrowAndUpdatePointer`, `Resize`, `FinishWithSize`, `FinishWithPointer`, `GetData`, `GetSize`, `Format` | **Order 075** | Honours `max_size` hint on 3.15+ via `Grow` (currently ignored there — see 002 tracker); add `finish(size)` variant |
 | Public tuple builder | `PyTuple_FromArray` | **Order 076** (extends 001) — shipped | `tuple_from_array` cimport helper; loop fallback pre-3.15 |
-| Interpreter view / guard (free-threading-safe thread state) | `PyInterpreterView_FromCurrent/FromMain/Close`, `PyInterpreterGuard_FromCurrent/FromView/Close`, `PyThreadState_Ensure/EnsureFromView/Release` | **Order 077** (extends 012) | New 3.15 API for acquiring thread state without GIL assumptions |
+| Interpreter view / guard (free-threading-safe thread state) | `PyInterpreterView_FromCurrent/FromMain/Close`, `PyInterpreterGuard_FromCurrent/FromView/Close`, `PyThreadState_Ensure/EnsureFromView/Release` | **Order 077** (extends 012) — shipped | `interpreter_guard()` CM + `guards_supported()` public; raw helpers cimport-only, GILState fallback pre-3.15 |
 | Immortal set | `PyUnstable_SetImmortal` | minor, extends 026 | Pairs with existing `ref_is_immortal` |
 | Lazy-import mode | `PyImport_Get/SetLazyImportsMode/Filter`, `PyLazyImport_Type` | minor, extends 068 | Per-interpreter lazy-import controls (PEP 843) |
 

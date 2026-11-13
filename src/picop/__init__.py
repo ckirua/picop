@@ -356,6 +356,7 @@ from .cybytes import (
     bytes_len,
     bytes_size,
 )
+from .cythread import guards_supported, interpreter_guard
 from .cydeque import (
     deque_eq,
 )
@@ -682,6 +683,9 @@ __all__: tuple[str, ...] = (
     "tuple_pack2",
     "tuple_pack3",
     "tuple_pack4",
+    "BytesWriter",
+    "guards_supported",
+    "interpreter_guard",
     "bytes_check",
     "bytes_check_exact",
     "bytes_len",

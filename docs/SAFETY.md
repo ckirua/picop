@@ -80,6 +80,14 @@ That does not remove trusted-caller preconditions:
 - `tuple_from_array` INCREFs every array element (the caller keeps its own
   references), so it is safe over borrowed-reference arrays; negative sizes raise
   `ValueError` before any allocation.
+- `interpreter_guard()` (CPython 3.15+) prevents interpreter finalization while
+  open; an unclosed guard is closed at dealloc, and a guard is never reused after
+  `__exit__`. `threadstate_ensure`/`threadstate_release` must be paired on the
+  same thread — over-release is `Py_FatalError`, not an exception. Tokens are
+  opaque `void*` sentinels (sometimes an internal non-`PyThreadState` value):
+  never dereference or compare them. On CPython < 3.15 `guards_supported()` is
+  False, `interpreter_guard()` raises `RuntimeError`, and the ensure/release
+  helpers fall back to `PyGILState_Ensure`/`PyGILState_Release`.
 - Fill uninitialized bytes/tuple/list slots exclusively before publication.
   Unchecked cell setters retain their caller-managed reference-transfer rules.
 - Direct `PyCodeObject` field reads use the cycode shim: object fields are returned as new references via `Py_NewRef`, while scalar fields are returned by value.

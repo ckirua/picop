@@ -614,7 +614,7 @@ from .cyunicode import (
     uutf8_bytes,
 )
 from .uuid import UUID, uuid4, uuid4_bytes
-from .cysys import sys_get_attr
+from .cysys import lazy_import_mode, lazy_imports_supported, set_lazy_import_mode, sys_get_attr
 
 
 def __getattr__(name: str):
@@ -751,4 +751,7 @@ __all__: tuple[str, ...] = (
     "warn_explicit",
     "warnings_module",
     "sys_get_attr",
+    "lazy_imports_supported",
+    "lazy_import_mode",
+    "set_lazy_import_mode",
 )

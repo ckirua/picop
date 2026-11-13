@@ -20,7 +20,7 @@ Refcount macros and 3.14 unstable unique-ref helpers for Cython. Not safe as a p
 |--------|--------|-------|
 | ref_incref / xincref / decref / xdecref | cimport | |
 | ref_refcnt | cimport | immortal caveat |
-| ref_is_uniquely_referenced / immortal / deferred / try_incref | cimport | 3.14 unstable |
+| ref_set_immortal | cimport | 3.15 `PyUnstable_SetImmortal`; refcount-pin emulation on 3.14 GIL builds, refused on 3.14 free-threaded (Order 078) |
 | Py_CLEAR | — | REJECTED as wrapper (needs lvalue macro); cimport `cpython.ref.Py_CLEAR` |
 | public surface | — | REJECTED |
 
@@ -28,7 +28,7 @@ Refcount macros and 3.14 unstable unique-ref helpers for Cython. Not safe as a p
 
 | Function | Status | Why |
 |----------|--------|-----|
-| incref/decref/refcnt/unstable* | APPROVED (cimport) | compile smoke; ownership-critical |
+| ref_set_immortal | APPROVED (cimport) | uniform API via cyref_shim.h |
 | CLEAR wrapper | REJECTED | macro needs assignable lvalue |
 | public cpdef | REJECTED | can free live objects / imbalance |
 
@@ -36,8 +36,8 @@ Refcount macros and 3.14 unstable unique-ref helpers for Cython. Not safe as a p
 
 | Field | Value |
 |-------|--------|
-| Iteration | 1 |
-| Last pass | 2026-07-21 — Phase 4 Tier B n/a |
+| Iteration | 2 |
+| Last pass | 2026-11-13 — Order 078 ref_set_immortal (smoke demo, 3.14 & 3.15) |
 | Next action | — |
 
 ## Decision log
@@ -45,7 +45,7 @@ Refcount macros and 3.14 unstable unique-ref helpers for Cython. Not safe as a p
 | Function | Probe | Decision | Iteration |
 |----------|-------|----------|-----------|
 | INCREF/DECREF | macros; compile via cimport | APPROVED (cimport) | 1 |
-| Unstable unique/immortal | ABI present 3.14 | APPROVED (cimport) | 1 |
+| ref_set_immortal | Uniform immortal-pinning helper | smoke: pins unique-ref list, refuses shared ref | APPROVED (cimport) | 2 |
 | CLEAR wrap | cannot clear caller ptr safely | REJECTED | 1 |
 | public | ownership hazard | REJECTED | 1 |
 
@@ -77,7 +77,9 @@ Refcount macros and 3.14 unstable unique-ref helpers for Cython. Not safe as a p
 | Immortal | `Py_REFCNT` not precise for immortal objects |
 | Unique-ref | Prefer `ref_is_uniquely_referenced` over `refcnt==1` (free-threaded) |
 | CLEAR | Use `Py_CLEAR` from `cpython.ref` on a C variable, not a Python-visible wrapper |
+- `ref_set_immortal` pins `ob_refcnt` at the immortal threshold — the object is never freed; returns 0 without pinning for non-unique refs or str, mirroring 3.15 `PyUnstable_SetImmortal`.
 
 ## Done when
 
 - [x] Inventory + try-all evidence + cimport exports + QUEUE
+- [x] `ref_set_immortal` documented and smoke-tested on 3.14 and 3.15

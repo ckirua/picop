@@ -160,6 +160,7 @@ from .cyref cimport (
     ref_is_unique_temporary,
     ref_is_uniquely_referenced,
     ref_refcnt,
+    ref_set_immortal,
     ref_try_incref,
     ref_xdecref,
     ref_xincref,

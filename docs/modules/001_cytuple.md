@@ -43,6 +43,7 @@ Implemented **every** inventory candidate, tier-A benched. Public winners stay `
 | PyTuple_SetItem | C-API | tried | — | unique-ref only — see Experiment below |
 | PyTuple_SET_ITEM | C-API | used-by | — | → `tset` |
 | _PyTuple_Resize | C-API | used-by | — | → `tresize` |
+| PyTuple_FromArray | C-API | new (3.15) | cimport | → `tuple_from_array` (`cytuple_shim.h` loop fallback pre-3.15) |
 
 ## Workflow status
 
@@ -60,6 +61,7 @@ Implemented **every** inventory candidate, tier-A benched. Public winners stay `
 | tnew | APPROVED (cimport) | REJECTED public (~2.11x); kept `cdef` |
 | tset | APPROVED (cimport) | with `tnew`; kept `cdef` |
 | tresize | APPROVED (cimport) | SystemError from Python; kept `cdef` |
+| tuple_from_array | APPROVED (cimport) | 3.15+ `PyTuple_FromArray`; INCREF loop fallback 3.8-3.14 |
 | tset_new | REJECTED | removed (duplicate of `tset`) |
 | PyTuple_SetItem wrapper | REJECTED | unique-ref; use `tset` |
 
@@ -68,7 +70,7 @@ Implemented **every** inventory candidate, tier-A benched. Public winners stay `
 | Field | Value |
 |-------|--------|
 | Freeze | **1.0 Core** — public + documented cimport; see COVERAGE § 1.0 freeze |
-| Iteration | 6 |
+| Iteration | 7 |
 P26-07-22 — `*_eq` inventory Tier A (`cyeq_inventory_bench`)|
 | Next action | — |
 
@@ -87,6 +89,7 @@ P26-07-22 — `*_eq` inventory Tier A (`cyeq_inventory_bench`)|
 | tset_new | Duplicate fill helper | — | identical to `tset` | removed | 5 |
 | tresize | Usable from Python | smoke | SystemError | REJECTED public → **cdef** | 5 |
 | PyTuple_SetItem | Public fill wrapper | smoke | SystemError | REJECTED | 4 |
+| tuple_from_array | One-call builder beats per-slot fill | tier_b/cytuple | **0.83x** (3.14) / **0.94x** (3.15) vs `tnew`+4×`tset` | APPROVED (cimport) | 7 |
 
 ## Bench results
 
@@ -137,6 +140,19 @@ Ratio = cypy `cdef` loop / typed Cython baseline loop (opaque + sink). **Informa
 
 **Tier B takeaway:** primary `tget` **0.91x** vs typed `t[i]` — matches/beats Cython emit; no API change.
 
+### Tier B — `tuple_from_array` (Order 076)
+
+Harness: [`bench/tier_b/cytuple.py`](../../bench/tier_b/cytuple.py) · `cytuple_tb.pyx` · Linux x86_64 · `CPY_TIERB_N=2_000_000` × `runs=5` · CPython 3.14.7 (fallback loop) and 3.15.0rc2 (`PyTuple_FromArray`). Tier A: n/a — `cdef` helper; a `PyObject **` array cannot come from Python.
+
+| operation | case | cypy mean±σ | p99 | cy-base mean±σ | ratio | p99× | note |
+|-----------|------|-------------|-----|----------------|-------|------|------|
+| tuple_from_array | vs literal (3.14) | 45.67±0.80ms | 46.85ms | 43.28±0.35ms | **1.06x** | 1.07x | literal path faster |
+| tuple_from_array | vs tnew+4×tset fill (3.14) | 45.24±0.37ms | 45.79ms | 54.58±0.49ms | **0.83x** | 0.83x | cypy faster |
+| tuple_from_array | vs literal (3.15) | 50.40±0.94ms | 51.97ms | 46.99±1.66ms | **1.07x** | 1.04x | literal path faster |
+| tuple_from_array | vs tnew+4×tset fill (3.15) | 50.17±0.23ms | 50.55ms | 53.51±1.58ms | **0.94x** | 0.91x | cypy faster |
+
+**Order 076 takeaway:** the helper wins against the idiomatic per-slot `cdef` fill (0.83x / 0.94x) and loses to a literal tuple display (1.06x / 1.07x) — the literal is still correct when items are known inline; `tuple_from_array` is for C-level arrays that already exist.
+
 
 
 ### `*_eq` inventory (Tier A depth)
@@ -184,5 +200,6 @@ Ratio = cypy `cdef` loop / typed Cython baseline `==` loop (opaque + sink). **In
 - [x] Full inventory
 - [x] Every candidate **tried** (implement and/or smoke/bench)
 - [x] Decision log + bench table + conclusions in this tracker
-- [x] No silent skips for this module’s C-API surface
+- [x] No silent skips for this module's C-API surface
+- [x] Order 076: `tuple_from_array` shim (3.15+ public builder, INCREF-loop fallback), Tier B ratios, refcount smoke on 3.14 & 3.15
 - [x] Before merge: public docs in `cytuple.pyi`; lean `.pxd`

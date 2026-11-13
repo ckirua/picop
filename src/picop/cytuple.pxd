@@ -93,6 +93,11 @@ cdef inline tuple tresize(tuple t, Py_ssize_t newsize):
         return None
     return <tuple>p
 
+cdef extern from "cytuple_shim.h":
+    # NULL return (negative size or allocation failure) already signals the
+    # raised exception; Cython checks NULL for object-returning externs.
+    object cy_tuple_from_array(PyObject *const *array, Py_ssize_t size)
+
 # Wave 4 N1/N5 preferred names (0.3: soft letter/bare are cdef-only)
 
 cpdef inline bint tuple_check(object p) noexcept:
@@ -136,4 +141,9 @@ cpdef inline Py_ssize_t tuple_size(tuple t) except -1:
 
 cpdef inline tuple tuple_slice(tuple t, Py_ssize_t low, Py_ssize_t high):
     return tslice(t, low, high)
+
+cdef inline tuple tuple_from_array(PyObject **items, Py_ssize_t n):
+    # 3.15+: public PyTuple_FromArray; older versions: equivalent INCREF loop.
+    # NULL return (negative size or allocation failure) propagates the exception.
+    return cy_tuple_from_array(items, n)
 

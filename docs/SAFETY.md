@@ -77,6 +77,9 @@ That does not remove trusted-caller preconditions:
   write, so the wrapper tracks the write position in its own handle; any pointer
   into the buffer captured earlier is invalid. Lifecycle guards
   (`RuntimeError` after `finish()`/`discard()`) prevent use-after-free.
+- `tuple_from_array` INCREFs every array element (the caller keeps its own
+  references), so it is safe over borrowed-reference arrays; negative sizes raise
+  `ValueError` before any allocation.
 - Fill uninitialized bytes/tuple/list slots exclusively before publication.
   Unchecked cell setters retain their caller-managed reference-transfer rules.
 - Direct `PyCodeObject` field reads use the cycode shim: object fields are returned as new references via `Py_NewRef`, while scalar fields are returned by value.

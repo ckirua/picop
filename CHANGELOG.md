@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Added
+- **`cytuple` `tuple_from_array` (Order 076):** cimport-only builder over CPython 3.15+ public `PyTuple_FromArray`, with an equivalent `PyTuple_New` + INCREF-loop fallback on 3.8-3.14. Beats the idiomatic `cdef` `tnew`+`tset` fill (0.83x on 3.14, 0.94x on 3.15); a literal tuple display still wins when the items are known inline.
+
 ### Changed
 - **`cybytes` `BytesWriter` (Order 075):** the `max_size` capacity hint is now honoured on CPython 3.15+ via `PyBytesWriter_Create(hint)` + `PyBytesWriter_Resize(writer, 0)` (previously ignored there; 3.8-3.14 behaviour unchanged).
 

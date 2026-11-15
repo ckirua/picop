@@ -470,10 +470,23 @@ def sync_stub_notes(ratios, pub, baselines, threshold: float) -> int:
                     f"(Tier A {_band(always[name])}); {reason}."
                 )
             elif name in mixed:
-                cases = ", ".join(
-                    f"{ratio:.2f}x ({case or 'default input'})"
-                    for ratio, case in sorted(mixed[name])
-                )
+                per_dump: dict[str, list[float]] = {}
+                for ratio, case in mixed[name]:
+                    label, _, detail = (case or "").partition(": ")
+                    per_dump.setdefault(label or "default input", []).append(ratio)
+                if len(per_dump) == 1:
+                    cases = ", ".join(
+                        f"{ratio:.2f}x ({detail or 'default input'})"
+                        for ratio, detail in sorted(
+                            (ratio, detail.partition(": ")[2])
+                            for ratio, detail in mixed[name]
+                        )
+                    )
+                else:
+                    cases = ", ".join(
+                        f"{sum(vals) / len(vals):.2f}x ({label})"
+                        for label, vals in sorted(per_dump.items())
+                    )
                 target = f"{MIXED_NOTE}: {cases}; {reason}."
             else:
                 target = ""

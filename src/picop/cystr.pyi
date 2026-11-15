@@ -68,8 +68,8 @@ def str_endswith(s: str, suffix: str) -> bool:
 
     Notes
     -----
-    Mixed Tier A parity: 0.95x (3.15: hit), 0.96x (3.14: hit), 1.02x (3.15: miss),
-    1.05x (3.14: miss); ``PyUnicode_GET_LENGTH`` on a known compact ``str``.
+    Mixed Tier A parity: 0.98x (3.14), 1.01x (3.14t), 0.97x (3.15), 0.91x (3.15t);
+    ``PyUnicode_GET_LENGTH`` on a known compact ``str``.
 
     Uses 1BYTE ``memcmp`` or Tailmatch depending on kind.
     """
@@ -132,9 +132,6 @@ def str_startswith(s: str, prefix: str) -> bool:
 
     Notes
     -----
-    Mixed Tier A parity: 0.95x (3.15: hit), 0.98x (3.14: hit), 1.07x (3.15: miss),
-    1.08x (3.14: miss); ``PyUnicode_GET_LENGTH`` on a known compact ``str``.
-
     Uses 1BYTE ``memcmp`` or Tailmatch depending on kind.
     """
     ...
@@ -175,13 +172,7 @@ def str_ge(a: str, b: str) -> bool:
 
 
 def str_len(s: str) -> int:
-    """Return ``len(s)`` via ``PyUnicode_GET_LENGTH``.
-
-    Notes
-    -----
-    Mixed Tier A parity: 0.98x (3.15: n=70), 1.05x (3.14: n=70);
-    ``PyUnicode_GET_LENGTH`` on a known compact ``str``.
-    """
+    """Return ``len(s)`` via ``PyUnicode_GET_LENGTH``."""
     ...
 
 def str_ne(a: str, b: str) -> bool:

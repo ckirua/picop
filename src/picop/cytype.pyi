@@ -18,11 +18,5 @@ def type_eq(a: object, b: object) -> bool:
     ...
 
 def type_is_subtype(a: object, b: object) -> bool:
-    """Return True if ``a`` is a subtype of ``b`` (``PyType_IsSubtype``).
-
-    Notes
-    -----
-    Mixed Tier A parity: 0.95x (3.15: int!<bool), 0.95x (3.15: bool<int), 1.02x
-    (3.14: bool<int), 1.04x (3.14: int!<bool); the typed Cython call site.
-    """
+    """Return True if ``a`` is a subtype of ``b`` (``PyType_IsSubtype``)."""
     ...

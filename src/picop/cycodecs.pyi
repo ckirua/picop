@@ -46,6 +46,9 @@ def codec_incremental_encoder(encoding: bytes, errors: bytes | None = None) -> o
 
     Notes
     -----
+    Mixed Tier A parity: 0.98x (3.14), 1.14x (3.14t), 0.99x (3.15), 1.14x (3.15t);
+    codec/error-handler bridge for extension authors.
+
     ``encoding`` / ``errors`` must be ``bytes`` when provided, not ``str``.
     """
     ...
@@ -55,6 +58,9 @@ def codec_incremental_decoder(encoding: bytes, errors: bytes | None = None) -> o
 
     Notes
     -----
+    Mixed Tier A parity: 0.94x (3.14), 1.14x (3.14t), 1.07x (3.15), 1.06x (3.15t);
+    codec/error-handler bridge for extension authors.
+
     ``encoding`` / ``errors`` must be ``bytes`` when provided, not ``str``.
     """
     ...
@@ -102,7 +108,7 @@ def codec_strict_errors(exc: object) -> object:
     Notes
     -----
     Slower than the plain-Python equivalent ``codecs.lookup(enc).decode(b,
-    'strict')`` (Tier A 4.07–4.13x); codec/error-handler bridge for extension
+    'strict')`` (Tier A 3.27–9.46x); codec/error-handler bridge for extension
     authors.
     """
     ...
@@ -112,19 +118,13 @@ def codec_ignore_errors(exc: object) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``codecs.ignore_errors`` (Tier A
-    1.21–1.27x); codec/error-handler bridge for extension authors.
+    Mixed Tier A parity: 0.98x (3.14), 1.01x (3.14t), 0.99x (3.15), 1.02x (3.15t);
+    codec/error-handler bridge for extension authors.
     """
     ...
 
 def codec_replace_errors(exc: object) -> object:
-    """Replace error handler (``PyCodec_ReplaceErrors``).
-
-    Notes
-    -----
-    Slower than the plain-Python equivalent ``codecs.replace_errors`` (Tier A
-    1.04–1.04x); codec/error-handler bridge for extension authors.
-    """
+    """Replace error handler (``PyCodec_ReplaceErrors``)."""
     ...
 
 def codec_xmlcharrefreplace_errors(exc: object) -> object:
@@ -132,23 +132,11 @@ def codec_xmlcharrefreplace_errors(exc: object) -> object:
     ...
 
 def codec_backslashreplace_errors(exc: object) -> object:
-    """Backslash replace handler.
-
-    Notes
-    -----
-    Mixed Tier A parity: 1.01x (3.14: bs), 1.02x (3.15: bs); codec/error-handler
-    bridge for extension authors.
-    """
+    """Backslash replace handler."""
     ...
 
 def codec_namereplace_errors(exc: object) -> object:
-    """Name replace handler.
-
-    Notes
-    -----
-    Mixed Tier A parity: 0.99x (3.14: name), 1.04x (3.15: name); codec/error-handler
-    bridge for extension authors.
-    """
+    """Name replace handler."""
     ...
 
 def codec_decode(o: object, encoding: bytes, errors: bytes | None = None) -> object:
@@ -157,7 +145,7 @@ def codec_decode(o: object, encoding: bytes, errors: bytes | None = None) -> obj
     Notes
     -----
     Slower than the plain-Python equivalent ``lambda b, e, err: b.decode(e.decode(),
-    (err or b'strict').decode())`` (Tier A 1.32–1.64x); codec/error-handler bridge
+    (err or b'strict').decode())`` (Tier A 1.55–1.68x); codec/error-handler bridge
     for extension authors.
     """
     ...
@@ -168,7 +156,7 @@ def codec_encode(o: object, encoding: bytes, errors: bytes | None = None) -> obj
     Notes
     -----
     Slower than the plain-Python equivalent ``lambda s, e, err: s.encode(e.decode(),
-    (err or b'strict').decode())`` (Tier A 1.14–1.67x); codec/error-handler bridge
+    (err or b'strict').decode())`` (Tier A 1.24–1.44x); codec/error-handler bridge
     for extension authors.
     """
     ...

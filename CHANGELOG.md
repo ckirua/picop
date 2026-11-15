@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Changed
+- **Perf-parity docs (Order 082):** `docs/PERF_PARITY.md` and the `.pyi` parity notes are regenerated from the CI dumps (3.14, 3.14t, 3.15, 3.15t — 2,848 Tier A cases), so `scripts/perf_parity_drift.py` reports no drift against the CI dumps: 31 helpers always slower, 64 mixed. `scripts/perf_parity_report.py --sync-stubs` now summarises mixed helpers per interpreter instead of listing every case.
+
 ### Fixed
 - **`cypicklebuf` (Order 081):** the version guard in `cypicklebuf_shim.h` claimed `PyPickleBuffer_FromObject` / `Release` / `Check` / `GetBuffer` were CPython 3.15-only, so every helper raised `NotImplementedError` on 3.14. The API is public in `cpython/picklebufobject.h` on 3.14 as well (header declarations and exported symbols verified on 3.14.7); the branch is gone and the helpers now work on every supported interpreter. `tests/test_cypicklebuf.py` no longer skips on 3.14.
 

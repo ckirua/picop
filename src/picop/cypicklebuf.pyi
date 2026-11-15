@@ -5,10 +5,7 @@ def pickle_buffer_from_object(obj: object) -> object:
 
     Notes
     -----
-    Mixed Tier A parity: 0.21x (3.15: pickle.dumps buffer-backed record n=248),
-    0.22x (3.14: pickle.dumps buffer-backed record n=248), 1.97x (3.14: bytearray
-    n=6), 2.17x (3.15: bytearray n=6), 2.98x (3.14: bytearray n=4096), 3.21x (3.15:
-    bytearray n=4096), 3.34x (3.14: bytearray n=248), 3.56x (3.15: bytearray n=248);
+    Mixed Tier A parity: 1.50x (3.14), 2.27x (3.14t), 1.31x (3.15), 1.80x (3.15t);
     the typed Cython call site.
 
     Tier A shows this is slower than the plain-Python equivalent

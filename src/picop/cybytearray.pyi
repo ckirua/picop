@@ -45,6 +45,9 @@ def bytearray_contains(haystack: bytearray, needle: bytes) -> bool:
 
     Notes
     -----
+    Mixed Tier A parity: 0.45x (3.14), 0.48x (3.14t), 0.44x (3.15), 0.44x (3.15t);
+    the typed Cython call site.
+
     Mirrors ``bytes_contains`` search strategy on a typed ``bytearray``.
     """
     ...

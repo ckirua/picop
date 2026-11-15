@@ -78,6 +78,9 @@ def bytes_size(b: object) -> int:
 
     Notes
     -----
+    Mixed Tier A parity: 1.22x (3.14), 0.72x (3.14t), 0.69x (3.15), 0.67x (3.15t);
+    byte-string bridge for unknown bytes-like objects.
+
     Prefer ``bytes_len`` on a typed ``bytes`` hot path.
     """
     ...

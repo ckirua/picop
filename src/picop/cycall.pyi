@@ -12,8 +12,8 @@ def call_noargs(callable: object) -> object:
 
     Notes
     -----
-    Mixed Tier A parity: 0.96x (3.14: zero args), 1.08x (3.15: zero args); the typed
-    Cython call site.
+    Mixed Tier A parity: 1.01x (3.14), 1.07x (3.14t), 0.97x (3.15), 0.97x (3.15t);
+    the typed Cython call site.
     """
     ...
 
@@ -24,5 +24,11 @@ def call_onearg(callable: object, arg: object) -> object:
 
 
 def call_twoargs(callable: object, arg0: object, arg1: object) -> object:
-    """Call ``callable(arg0, arg1)`` through CPython vectorcall."""
+    """Call ``callable(arg0, arg1)`` through CPython vectorcall.
+
+    Notes
+    -----
+    Mixed Tier A parity: 1.09x (3.14), 1.03x (3.14t), 1.02x (3.15), 1.03x (3.15t);
+    the typed Cython call site.
+    """
     ...

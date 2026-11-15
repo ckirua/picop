@@ -22,7 +22,13 @@ def func_get_code(op: object) -> object:
     ...
 
 def func_get_globals(op: object) -> object:
-    """Return the globals dict of function ``op`` (owned ref)."""
+    """Return the globals dict of function ``op`` (owned ref).
+
+    Notes
+    -----
+    Mixed Tier A parity: 0.83x (3.14), 1.08x (3.14t), 0.76x (3.15), 0.94x (3.15t);
+    function defaults without the Python attribute machinery.
+    """
     ...
 
 def func_get_module(op: object) -> object | None:
@@ -51,6 +57,9 @@ def func_set_closure(op: object, closure: object) -> int:
 
     Notes
     -----
+    Mixed Tier A parity: 1.02x (3.14), 1.31x (3.14t), 0.97x (3.15), 1.05x (3.15t);
+    function defaults without the Python attribute machinery.
+
     Returns ``0`` on success; errors raise — do not use the status as a bool.
     """
     ...
@@ -87,6 +96,9 @@ def func_set_annotations(op: object, annotations: object) -> int:
 
     Notes
     -----
+    Mixed Tier A parity: 0.63x (3.14), 1.20x (3.14t), 0.55x (3.15), 0.68x (3.15t);
+    function defaults without the Python attribute machinery.
+
     Returns ``0`` on success; errors raise — do not use the status as a bool.
     """
     ...

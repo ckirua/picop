@@ -30,6 +30,10 @@ Scanner hot paths plus full include try-all. Depth showed pure `memmem` **loses*
 | bendswith | cypy | cpdef | public | suffix len + tail `memcmp` (soft); preferred `bytes_endswith` |
 | bfrom_object | cypy | cpdef | public | `PyBytes_FromObject` |
 | BytesWriter | cypy | `cdef class` | public | Order 074: incremental builder — public `PyBytesWriter` API on 3.15+, internal `_PyBytesWriter` mirror in `cybytes_shim.h` on 3.8-3.14; `write` / `write_char` / `finish` / `discard`, context-manager |
+| BytesWriter.size | cypy | `cpdef` | public | Order 080: `PyBytesWriter_GetSize` (3.15+) / tracked logical size (3.8-3.14) |
+| BytesWriter.grow | cypy | `cdef` | cimport | Order 080: `PyBytesWriter_GrowAndUpdatePointer` (3.15+) / `_PyBytesWriter_Prepare` mirror; negative `extra` rewinds |
+| BytesWriter.data | cypy | `cdef` | cimport | Order 080: `PyBytesWriter_GetData` (3.15+) / `pos - written` mirror |
+| BytesWriter.finish_with_size | cypy | `cdef` | cimport | Order 080: `PyBytesWriter_FinishWithSize` (3.15+) / `_PyBytesWriter_Finish` at `base + size` |
 | bas_string | cypy | cdef | cimport | `PyBytes_AS_STRING` |
 | bas_string_checked | cypy | cdef | cimport | `PyBytes_AsString` (rejects non-bytes) |
 | bfrom_string | cypy | cdef | cimport | `PyBytes_FromString` |
@@ -62,6 +66,10 @@ Scanner hot paths plus full include try-all. Depth showed pure `memmem` **loses*
 | bcheck / exact | APPROVED | **0.56x** / **0.55x** |
 | bfrom_object | APPROVED | **0.60x** |
 | BytesWriter | APPROVED | Order 074: beats `bytearray` (0.85x) and `+=` (0.02x); loses to `b''.join` on materialized parts (3.32x) — streaming builder, documented in PERF_PARITY |
+| BytesWriter.size | APPROVED | Order 080 public accessor (additive minor); class already Tier A/B gated |
+| BytesWriter.grow / data / finish_with_size | APPROVED (cimport) | Order 080: direct fill beats `write()` in a `cdef` loop (**0.61x**, 3.14 / see Bench); no Python-side win → cimport only |
+| FinishWithPointer | REJECTED | Order 080: no capability `grow()` + `finish_with_size()` don't already give (`FinishWithPointer` = `FinishWithSize(buf - GetData())`) |
+| `PyBytesWriter_Format` | REJECTED | Order 080: C varargs; `("%d" % n).encode()` + `write()` has no bench case |
 | bas_string* / from_string* | APPROVED (cimport) | C pointers / builders |
 | bnew | APPROVED (cimport) | uninit ≠ `bytes(n)`; unsafe as public |
 | bconcat / bconcat_and_del / bresize | APPROVED (cimport) | ownership/`*pv` semantics — cdef |
@@ -74,8 +82,8 @@ Scanner hot paths plus full include try-all. Depth showed pure `memmem` **loses*
 | Field | Value |
 |-------|--------|
 | Freeze | **1.0 Core** — public + documented cimport; see COVERAGE § 1.0 freeze |
-| Iteration | 9 |
-| Last pass | 2026-11-12 — Order 074 `BytesWriter` builder bench (Tier A + B) |
+| Iteration | 10 |
+| Last pass | 2026-11-15 — Order 080 `BytesWriter` direct fill (`grow` / `data` / `finish_with_size` / `size`), Tier B on 3.14 + 3.15 |
 | Next action | — |
 
 ## Decision log
@@ -86,6 +94,10 @@ Scanner hot paths plus full include try-all. Depth showed pure `memmem` **loses*
 | beq | Beat `==` on typed bytes | short/1KiB eq+ne | wins short; ~tie/win 1KiB | APPROVED (public + hot) | 6 |
 | bba_eq / bytes_bytearray_eq | Cross-type vs `==` | Tier A both dirs + 1KiB | **0.47–0.61x** | APPROVED (public, not hot) | 8 |
 | BytesWriter | Internal bytes writer beats Python builders? | Tier A builder bench + Tier B cdef loop | 0.02x vs `+=`, 0.85x vs bytearray, 3.32x vs join; Tier B 0.21x vs append+join | APPROVED (streaming niche) | 9 |
+| BytesWriter direct fill (Order 080) | `grow()` + `memcpy` beats `write()` when the loop is already typed | Tier B cdef loop, 2M parts, 3.14.7 + 3.15.0rc2 | **0.61x** (3.14) vs hinted `write()`; grow-once **0.36x**; vs `bytearray` slice fill **0.06x** | APPROVED (cimport) — public `size()` only | 10 |
+| `Grow` vs hint amortization | Does per-chunk `grow()` cost reallocations? | Tier B, hinted vs unhinted grow | 0.97x (3.14) — ~tie; overallocation absorbs it | APPROVED; hint still recommended | 10 |
+| `FinishWithPointer` | Second finish variant worth wrapping? | 3.15 source (`bytesobject.c`) | `size = buf - data()` then `FinishWithSize` — already expressible | REJECTED | 10 |
+| `PyBytesWriter_Format` | Wrap varargs writer | 3.15 source | varargs ABI, no typed-caller bench case | REJECTED | 10 |
 | blen / bsize | Beat `len` | harness | **0.59x** | APPROVED | 4 |
 | bcheck* | Beat isinstance | harness | **0.40–0.56x** | APPROVED | 4 |
 | bfrom_object | Beat `bytes(buf)` | harness | **0.60x** | APPROVED | 4 |
@@ -196,6 +208,32 @@ Harness: [`bench/cybytes_bench.py`](../../bench/cybytes_bench.py) · CPython 3.1
 
 **Tier B — `BytesWriter` in a cdef loop** (`bench/tier_b/cybytes.py` + `cybytes_tb.pyx`, N=2,000,000 parts): `cypy_bwriter` 25.73±0.13ms vs `list.append`+`join` baseline 121.15±4.88ms -> **0.21x** (p99 0.20x). The writer wins big when the loop can dispatch in C: no 2M-element part list is materialized.
 
+### BytesWriter direct fill (Order 080, Tier B)
+
+Harness: [`bench/tier_b/cybytes.py`](../../bench/tier_b/cybytes.py) · [`bench/tier_b/cybytes_tb.pyx`](../../bench/tier_b/cybytes_tb.pyx) · `CPY_TIERB_N=2_000_000` (scale row `200_000`) × `runs=5` · Linux x86_64. Ratio = direct-fill loop / typed baseline loop. **Informational** — `grow()` / `data()` / `finish_with_size()` are cimport-only, so there is no Tier A row to reopen; the `BytesWriter` class keeps its existing Tier A/B compare labels.
+
+**CPython 3.14.7 (internal `_PyBytesWriter_Prepare` mirror)**
+
+| operation | case | cypy mean±σ | p99 | cy-base mean±σ | ratio | p99× | note |
+|-----------|------|-------------|-----|----------------|-------|------|------|
+| BytesWriter.grow | `grow()`+`memcpy` vs `write()`, both hinted | 17.92±0.41ms | 18.58ms | 29.31±0.56ms | **0.61x** | 0.62x | cypy faster (≥5% gate) |
+| BytesWriter.grow | no hint vs hint (grow path) | 19.69±0.32ms | 20.11ms | 20.40±1.64ms | 0.97x | 0.87x | ~tie — `Prepare` overallocates |
+| BytesWriter.grow | `grow(n)` once vs `grow(plen)` per chunk | 7.03±0.33ms | 7.45ms | 19.40±0.35ms | **0.36x** | 0.38x | cypy faster |
+| BytesWriter.grow | vs `bytearray(n*plen)` slice fill | 19.64±0.66ms | 20.40ms | 329.21±24.54ms | **0.06x** | 0.06x | cypy faster |
+| BytesWriter.grow | scale: 200k parts | 1.76±0.03ms | 1.80ms | 2.66±0.06ms | **0.66x** | 0.66x | cypy faster |
+
+**CPython 3.15.0rc2 (public `PyBytesWriter_Grow` / `GrowAndUpdatePointer`)** — repeat run in brackets
+
+| operation | case | cypy mean±σ | p99 | cy-base mean±σ | ratio | p99× | note |
+|-----------|------|-------------|-----|----------------|-------|------|------|
+| BytesWriter.grow | `grow()`+`memcpy` vs `write()`, both hinted | 32.29±0.90ms | 33.50ms | 36.05±0.36ms | **0.90x** | 0.92x | pass (≥5% gate); repeat **0.93x** |
+| BytesWriter.grow | no hint vs hint (grow path) | 33.68±0.45ms | 34.28ms | 35.88±2.25ms | 0.94x | 0.87x | pass; repeat 1.04x (noise) |
+| BytesWriter.grow | `grow(n)` once vs `grow(plen)` per chunk | 7.36±1.26ms | 9.50ms | 34.98±0.36ms | **0.21x** | 0.27x | cypy faster; repeat **0.20x** |
+| BytesWriter.grow | vs `bytearray(n*plen)` slice fill | 35.15±1.39ms | 37.30ms | 308.51±12.93ms | **0.11x** | 0.11x | cypy faster; repeat **0.12x** |
+| BytesWriter.grow | scale: 200k parts | 3.68±0.99ms | 5.36ms | 3.44±0.03ms | 1.07x | 1.54x | baseline faster (repeat 1.06x) |
+
+Probe notes: 3.14 and 3.15 both build the same shim; the internal mirror tracks its own `written` field because `Prepare` returns the new write pointer and the buffer base is not recoverable from it. `Grow` on 3.15 goes through `byteswriter_resize(..., overallocate=1)`, the same amortized growth `WriteBytes` uses, so per-chunk `grow()` costs only the extra argument passing — visible as the small 3.15 margin. Direct fill wins everywhere the loop is already typed; at 200k parts on 3.15 the two paths are within noise.
+
 ## Experiment conclusions
 
 **Tier B `*_eq` inventory:** see section **Tier B — `*_eq` (inventory)** table. Equal ~tie; ne **1.13x** lose (extra len/memcmp vs Cython `==`). 1KiB eq **0.95x**. Matches prior `cybytes` Tier B.
@@ -219,7 +257,8 @@ Harness: [`bench/cybytes_bench.py`](../../bench/cybytes_bench.py) · CPython 3.1
 | `PyBytes_Concat` / `ConcatAndDel` | Unique+exact → resize in place; else new object via `SETREF`. Both aliased (`bconcat`, `bconcat_and_del`) |
 | `AsString` | `TypeError` on `bytearray`; `AS_STRING` is unchecked typed `bytes` |
 | `BytesWriter` (Order 074) | CPython has **no public** bytes-writer API before 3.15; the wrapper uses `PyBytesWriter_Create/WriteBytes/Finish/Discard` on 3.15+ and mirrors the internal `_PyBytesWriter` (`Init`/`Prepare`/`Finish`/`Dealloc`) in `cybytes_shim.h` on 3.8-3.14 — those functions are non-static in the interpreter (exported for `_pickle`) and link directly. Python-level per-write dispatch (~60 ns) is the cost: join wins when parts are materialized (3.32x), the writer wins vs `bytearray` (0.85x) and crushes `+=` (0.02x). In a `cdef` loop it is ~5x faster than append+join — the right tool is streaming, not batch. Order 075: the `max_size` hint is honoured on all supported versions — 3.8-3.14 via internal `Prepare`, 3.15+ via `PyBytesWriter_Create(hint)` + `PyBytesWriter_Resize(writer, 0)` (there is no pure reservation call: `Create(size)` pre-writes and `Resize` sets the logical size too, but rewinding to 0 never shrinks the allocation, so the buffer starts as reserved capacity). On 3.14 the hint barely matters (3.47x vs 3.32x). |
-| `BytesWriter` safety | The writer owns its buffer; `finish()` consumes it (NULL-checked guard, `RuntimeError` on reuse), `discard()` frees it, `__dealloc__` releases an unclosed writer. `Prepare` may reallocate, so the wrapper always re-assigns `_pos` from its return value — cached pointers into the buffer are invalid after each write. |
+| `BytesWriter` direct fill (Order 080) | `grow(extra)` + `memcpy` removes the per-chunk Python object: **0.61x** vs hinted `write()` on 3.14, **0.90x** on 3.15 (repeat 0.93x). Reserving once and filling in place is the fast shape (**0.36x** / **0.21x** vs per-chunk `grow()`), and any typed `bytearray` slice fill is ~10-16x slower. On 3.15 `Grow` and `WriteBytes` share `byteswriter_resize(..., overallocate=1)`, so the margin is only the dispatch saved — the win is largest when the chunk pointer is already C-typed. Public surface stays `write()`/`finish()`/`size()`; `grow()`/`data()`/`finish_with_size()` are cimport-only because a raw `char *` cannot be safely handed to Python. |
+| `BytesWriter` safety | The writer owns its buffer; `finish()` consumes it (NULL-checked guard, `RuntimeError` on reuse), `discard()` frees it, `__dealloc__` releases an unclosed writer. `Prepare` and `grow()` may reallocate, so the wrapper always re-assigns `pos` from the return value — cached pointers into the buffer are invalid after each `grow()`/`write()`. Bytes reserved by `grow()` are uninitialized: write them, or truncate with `finish_with_size(written)`. The wrapper range-checks `finish_with_size()` before calling CPython, whose `FinishWithSize` discards the writer on a bad size. |
 | 3.14 ABI | No Format / Intern / Decode / Encode exports |
 
 ## Done when
@@ -234,3 +273,4 @@ Harness: [`bench/cybytes_bench.py`](../../bench/cybytes_bench.py) · CPython 3.1
 - [x] `bytes_endswith` / `bendswith` (issue #13) — public + hot
 - [x] `bytes_bytearray_eq` / `bba_eq` (issue #43) — public (not hot); cross-link `buf_eq`
 - [x] Order 074: `BytesWriter` class, tests, builder bench (Tier A + B), PERF_PARITY row, example + cimport smoke
+- [x] Order 080: `size()` public, `grow()` / `data()` / `finish_with_size()` cimport-only, Tier B evidence on 3.14 + 3.15, `FinishWithPointer` / `Format` rejected, direct-fill recipe + smoke-demo coverage

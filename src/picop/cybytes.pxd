@@ -17,6 +17,10 @@ cdef extern from "cybytes_shim.h":
     int cy_bytes_writer_write(CyBytesWriter* writer, const char* data, Py_ssize_t size) except -1
     PyObject* cy_bytes_writer_finish(CyBytesWriter* writer) except NULL
     void cy_bytes_writer_discard(CyBytesWriter* writer)
+    Py_ssize_t cy_bytes_writer_size(CyBytesWriter* writer) noexcept
+    char* cy_bytes_writer_data(CyBytesWriter* writer) noexcept
+    char* cy_bytes_writer_grow(CyBytesWriter* writer, Py_ssize_t extra) except NULL
+    PyObject* cy_bytes_writer_finish_with_size(CyBytesWriter* writer, Py_ssize_t size) except NULL
 
 cdef extern from "Python.h":
     char* PyBytes_AS_STRING(object op) noexcept
@@ -277,6 +281,10 @@ cdef class BytesWriter:
     cdef void _check_open(self) except *
     cpdef void write(self, object data)
     cpdef void write_char(self, int ch)
+    cpdef Py_ssize_t size(self)
+    cdef char *data(self) noexcept
+    cdef char *grow(self, Py_ssize_t extra) except NULL
+    cdef bytes finish_with_size(self, Py_ssize_t size)
     cpdef bytes finish(self)
     cpdef void discard(self)
 

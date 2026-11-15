@@ -19,3 +19,6 @@ Full inventory and safety notes: `docs/modules/NNN_cy{name}.md`.
 ## Ownership (public + cimport)
 
 See [`borrow_vs_owned.md`](borrow_vs_owned.md) (DX-05) for `dict_get`/`dict_get_ref`, `list_get`/`list_get_checked`, and borrowed `char*` notes.
+
+See [`bytes_writer_direct_fill.md`](bytes_writer_direct_fill.md) for direct-fill
+BytesWriter examples (Order 080).

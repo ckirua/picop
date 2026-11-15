@@ -11,6 +11,9 @@ cdef class BytesWriter:
     ``_PyBytesWriter``) and on 3.15+ (``PyBytesWriter_Create`` +
     ``PyBytesWriter_Resize(writer, 0)`` reserve capacity without any
     pre-written content).
+
+    ``size()`` reports bytes written; ``grow()``, ``data()`` and
+    ``finish_with_size()`` are cimport-only direct-fill helpers.
     """
 
     def __init__(self, int max_size=0):
@@ -43,6 +46,23 @@ cdef class BytesWriter:
             raise ValueError("write_char expects 0 <= ch <= 255")
         cdef unsigned char b = ch
         cy_bytes_writer_write(self._w, <const char *>&b, 1)
+
+    cpdef Py_ssize_t size(self):
+        self._check_open()
+        return cy_bytes_writer_size(self._w)
+
+    cdef char *data(self) noexcept:
+        return cy_bytes_writer_data(self._w)
+
+    cdef char *grow(self, Py_ssize_t extra) except NULL:
+        self._check_open()
+        return cy_bytes_writer_grow(self._w, extra)
+
+    cdef bytes finish_with_size(self, Py_ssize_t size):
+        self._check_open()
+        result = <bytes>cy_bytes_writer_finish_with_size(self._w, size)
+        self._open = 0
+        return result
 
     cpdef bytes finish(self):
         self._check_open()

@@ -279,8 +279,37 @@ cpdef bint check_bytes_writer():
     cdef bytes piece
     for piece in pieces:
         writer.write(piece)
-    return writer.finish() == b"".join(pieces)
+    assert writer.size() == 11
+    assert writer.finish() == b"".join(pieces)
 
+    cdef BytesWriter filled = BytesWriter(16)
+    cdef char *p = filled.grow(8)
+    assert filled.size() == 8
+    assert filled.data() == p
+    p[0] = 0x61
+    p[1] = 0x62
+    p[2] = 0x63
+    assert filled.finish_with_size(3) == b"abc"
+
+    cdef BytesWriter rewound = BytesWriter()
+    rewound.write(b"abcd")
+    p = rewound.grow(-2)
+    assert rewound.size() == 2
+    assert rewound.finish() == b"ab"
+
+    cdef BytesWriter partial = BytesWriter(64)
+    p = partial.grow(16)
+    p[0] = 0x78
+    assert partial.finish_with_size(1) == b"x"
+    assert BytesWriter().finish_with_size(0) == b""
+
+    try:
+        BytesWriter().finish_with_size(5)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("finish_with_size accepted a size larger than written")
+    return True
 
 
 cpdef bint check_sys():

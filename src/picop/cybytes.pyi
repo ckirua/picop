@@ -96,7 +96,8 @@ class BytesWriter:
 
     def __init__(self, max_size: int = 0) -> None:
         """Initialize an empty bytes writer; ``max_size`` is a capacity hint
-        (effective on CPython 3.8-3.14, ignored on 3.15+)."""
+        (honoured on every supported CPython; 3.15+ uses ``Create(hint)`` +
+        ``Resize(0)``)."""
         ...
 
     def write(self, data: bytes | bytearray) -> None:
@@ -105,6 +106,10 @@ class BytesWriter:
 
     def write_char(self, ch: int) -> None:
         """Append a single byte ``0 <= ch <= 255``."""
+        ...
+
+    def size(self) -> int:
+        """Return the number of bytes written so far."""
         ...
 
     def finish(self) -> bytes:

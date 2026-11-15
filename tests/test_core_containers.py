@@ -281,6 +281,17 @@ def test_bytes_writer_hint_preserves_output() -> None:
     w2.write(b"x")
     assert w2.finish() == b"x"
 
+def test_bytes_writer_size_accessor() -> None:
+    writer = BytesWriter(4096)
+    assert writer.size() == 0
+    writer.write(b"abc")
+    writer.write_char(10)
+    assert writer.size() == 4
+    assert writer.finish() == b"abc\n"
+    with pytest.raises(RuntimeError, match="closed"):
+        writer.size()
+
+
 
 def test_unicode_writer_substring_and_repr() -> None:
     writer = UnicodeWriter()

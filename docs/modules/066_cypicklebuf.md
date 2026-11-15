@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|--------|
 | Status | present |
-| Maps to | `cpython/picklebufobject.h` (CPython 3.15+) |
+| Maps to | `cpython/picklebufobject.h` (public C-API in every supported interpreter: 3.14 and 3.15) |
 | Sources | `src/picop/cypicklebuf.*`, `src/picop/cypicklebuf_shim.h` |
 | Surface | public + cimport |
 | Tracker lifecycle | decided (Tier A + Tier B + depth) |
@@ -12,11 +12,11 @@
 
 ## Why
 
-Expose CPython's buffer-backed pickle transport object for serializers and Cython code that needs the exact `PickleBuffer` API. Creation, release, exact-type check, and type object have safe Python-facing forms. `PyPickleBuffer_GetBuffer` returns a pointer into the PickleBuffer's owned export; it is cimport-only because a raw pointer can outlive its owner. Releasing the PickleBuffer invalidates that storage, so no borrowed memoryview wrapper is returned. CPython 3.14 lacks the C API; the module compiles there but its operations raise `NotImplementedError` instead of pretending to implement the 3.15 API.
+Expose CPython's buffer-backed pickle transport object for serializers and Cython code that needs the exact `PickleBuffer` API. Creation, release, exact-type check, and type object have safe Python-facing forms. `PyPickleBuffer_GetBuffer` returns a pointer into the PickleBuffer's owned export; it is cimport-only because a raw pointer can outlive its owner. Releasing the PickleBuffer invalidates that storage, so no borrowed memoryview wrapper is returned. The header was mis-read as 3.15-only at first, which made the shim refuse to call it on 3.14; `cpython/picklebufobject.h` declares all four functions on 3.14 as well (verified by header inspection and exported symbols in the 3.14.7 binary), so the shim now has no version branch.
 
 ## Inventory
 
-Full callable/public surface of `cpython/picklebufobject.h` in CPython 3.15. `PyPickleBuffer_Check` is a macro and performs exact type identity via `Py_IS_TYPE`; there is no CheckExact alias. `PyPickleBuffer_GetObj` is absent.
+Full callable/public surface of `cpython/picklebufobject.h` (declarations identical in 3.14.7 and 3.15.0rc2). `PyPickleBuffer_Check` is a macro and performs exact type identity via `Py_IS_TYPE`; there is no CheckExact alias. `PyPickleBuffer_GetObj` is absent.
 
 | Symbol | Layer | Kind | Export | Notes |
 |--------|-------|------|--------|-------|
@@ -44,8 +44,8 @@ Full callable/public surface of `cpython/picklebufobject.h` in CPython 3.15. `Py
 
 | Field | Value |
 |-------|--------|
-| Iteration | 1 |
-| Last pass | 2026-11-10 — full header inventory, Tier A/Tier B measurement, release and shape probes |
+| Iteration | 2 |
+| Last pass | 2026-11-15 — Order 081: the shim's 3.15-only guard removed, helpers exercised on CPython 3.14.7 and 3.15.0rc2, Tier A re-measured on both |
 | Next action | None |
 
 ## Decision log
@@ -57,6 +57,7 @@ Full callable/public surface of `cpython/picklebufobject.h` in CPython 3.15. `Py
 | `pickle_buffer_get_buffer` | Exposing buffer to Python risks pointer lifetime misuse | Cython cimport smoke | Non-NULL while live; NULL after release | APPROVED (cimport) | 1 |
 | `PyPickleBuffer_Release` | Release invalidates buffer access | test + Cython smoke | new memoryview acquisition fails; direct GetBuffer pointer becomes NULL | APPROVED | 1 |
 | absent exact/get-object APIs | Candidate APIs may be exposed | CPython 3.15 header scan | absent | REJECTED | 1 |
+| `pickle_buffer_*` on CPython 3.14 | The shim's `PY_VERSION_HEX >= 0x030F0000` guard assumed the C API is 3.15-only | header grep of `cpython/picklebufobject.h` in 3.14.7, `nm -D` on the 3.14.7 binary, `bench/cypicklebuf_bench.py` on 3.14.7, `tests/test_cypicklebuf.py` on 3.14.7 | all four symbols exported on 3.14.7; 5/5 tests pass; Tier A ratios 2.09–3.53x vs memoryview, 0.22x vs `pickle.dumps` — identical shape to 3.15 | REJECTED guard: the version branch was wrong and made the public helpers raise `NotImplementedError` on 3.14, which crashed the perf-parity bench job | 2 |
 
 ## Bench notes
 
@@ -68,16 +69,25 @@ Full callable/public surface of `cpython/picklebufobject.h` in CPython 3.15. `Py
 
 ## Bench results
 
-### Tier A
+### Tier A (CPython 3.14.7 — helpers live here now; measured 2026-11-15)
 
-| operation | case | cypy mean±σ | p99 | ratio | p99× | verdict |
+| operation | case | picop mean±σ | p99 | ratio | p99× | verdict |
 |-----------|------|-------------|-----|-------|------|---------|
-| `pickle_buffer_from_object` | bytearray n=6 vs memoryview | 2.08±1.47 ms | 4.55 ms | 2.16x | 4.52x | baseline faster |
-| `pickle_buffer_from_object` | bytearray n=248 vs memoryview | 1.68±0.35 ms | 2.06 ms | 1.70x | 1.80x | baseline faster |
-| `pickle_buffer_from_object` | bytearray n=4096 vs memoryview | 1.56±0.33 ms | 1.94 ms | 1.62x | 2.00x | baseline faster |
-| `pickle_buffer_from_object` | buffer-backed record creation vs `pickle.dumps` | 1.89±0.38 ms | 2.36 ms | 0.10x | 0.07x | picop faster; not a semantic replacement for memoryview |
+| `pickle_buffer_from_object` | bytearray n=6 vs memoryview | 15.96±7.01 ms | 27.82 ms | 2.09x | 3.58x | baseline faster |
+| `pickle_buffer_from_object` | bytearray n=248 vs memoryview | 27.29±21.35 ms | 56.61 ms | 3.53x | 7.28x | baseline faster |
+| `pickle_buffer_from_object` | bytearray n=4096 vs memoryview | 24.40±27.58 ms | 71.29 ms | 3.18x | 9.16x | baseline faster |
+| `pickle_buffer_from_object` | buffer-backed record creation vs `pickle.dumps` | 30.54±34.10 ms | 88.52 ms | 0.22x | 0.42x | picop faster; not a semantic replacement for memoryview |
 
-### Tier B
+### Tier A (CPython 3.15.0rc2, re-measured 2026-11-15)
+
+| operation | case | picop mean±σ | p99 | ratio | p99× | verdict |
+|-----------|------|-------------|-----|-------|------|---------|
+| `pickle_buffer_from_object` | bytearray n=6 vs memoryview | 15.89±7.02 ms | 27.77 ms | 2.18x | 3.75x | baseline faster |
+| `pickle_buffer_from_object` | bytearray n=248 vs memoryview | 27.14±21.46 ms | 56.78 ms | 3.72x | 7.64x | baseline faster |
+| `pickle_buffer_from_object` | bytearray n=4096 vs memoryview | 24.31±27.51 ms | 71.08 ms | 3.35x | 9.69x | baseline faster |
+| `pickle_buffer_from_object` | buffer-backed record creation vs `pickle.dumps` | 30.69±35.55 ms | 91.13 ms | 0.18x | 0.33x | picop faster; not a semantic replacement for memoryview |
+
+### Tier B (iteration 1, CPython 3.15.0rc2)
 
 | operation | case | cypy mean±σ | p99 | cy-base mean±σ | ratio | p99× | verdict |
 |-----------|------|-------------|-----|----------------|-------|------|---------|
@@ -85,9 +95,9 @@ Full callable/public surface of `cpython/picklebufobject.h` in CPython 3.15. `Py
 
 ## Experiment conclusions
 
-Why the helper loses to `memoryview`: PickleBuffer construction adds protocol-specific wrapper allocation and ownership state that a plain view does not provide. Scale measurements across 6, 248, and 4096 bytes show the gap declining from 2.16x on 6 B to 1.70x at 248 B and 1.62x at 4 KiB, but still slower than `memoryview(obj)`. Against complete `pickle.dumps` of a custom buffer-backed record, direct PickleBuffer creation is 0.10x the measured cost because it constructs the protocol object without serializing the record. Tier B's typed loop repeats the same operation 2,000,000 times and shows 2.23x vs memoryview construction; the C API wrapper's allocation/ownership work dominates. Keep the Python API for protocol semantics, not as a faster general view constructor, and document this mixed Tier A parity in `.pyi` and `PERF_PARITY.md`.
+Why the helper loses to `memoryview`: PickleBuffer construction adds protocol-specific wrapper allocation and ownership state that a plain view does not provide. Re-measured across 6, 248, and 4096 bytes on both interpreters the wrapper costs 2.09–2.18x on 6 B, 3.53–3.72x at 248 B and 3.18–3.35x at 4 KiB versus `memoryview(obj)` (iteration 1 read 1.62–2.16x on a quieter machine; the ordering — wrapper slower at every size — is unchanged). Against complete `pickle.dumps` of a custom buffer-backed record, direct PickleBuffer creation is 0.18–0.22x the measured cost because it constructs the protocol object without serializing the record. Tier B's typed loop repeats the same operation 2,000,000 times and shows 2.23x vs memoryview construction; the C API wrapper's allocation/ownership work dominates. Keep the Python API for protocol semantics, not as a faster general view constructor, and document this mixed Tier A parity in `.pyi` and `PERF_PARITY.md`.
 
-`PyPickleBuffer_GetBuffer` returns NULL after release and CPython sets `ValueError` on that call; the cimport smoke observes a valid non-NULL pointer while live and the post-release error corresponding to the NULL result. A previously acquired Python memoryview holds its own export and remains valid until that view is released; acquiring a new view from the released PickleBuffer also raises `ValueError`. Therefore the direct pointer stays cimport-only and callers must keep the owning PickleBuffer alive and unreleased throughout pointer use. CPython 3.14 build compiles through the version shim and calls fail explicitly with `NotImplementedError`; usable implementations require 3.15+. Header ABI inspection confirmed the API is present on 3.15, and no `GetObj` or `CheckExact` exists.
+`PyPickleBuffer_GetBuffer` returns NULL after release and CPython sets `ValueError` on that call; the cimport smoke observes a valid non-NULL pointer while live and the post-release error corresponding to the NULL result. A previously acquired Python memoryview holds its own export and remains valid until that view is released; acquiring a new view from the released PickleBuffer also raises `ValueError`. Therefore the direct pointer stays cimport-only and callers must keep the owning PickleBuffer alive and unreleased throughout pointer use. The shim's `PY_VERSION_HEX >= 0x030F0000` branch (which made every call raise `NotImplementedError` on 3.14) was a misread of the header: 3.14.7 declares all four functions in `cpython/picklebufobject.h` and exports `PyPickleBuffer_FromObject`, `PyPickleBuffer_GetBuffer`, `PyPickleBuffer_Release` and `PyPickleBuffer_Type`, so the helpers behave identically on 3.14 and 3.15 (Tier A ratios differ by under 0.2x). Header inspection shows no `GetObj` or `CheckExact` in either interpreter.
 
 ## Done when
 

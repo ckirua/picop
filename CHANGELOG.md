@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Fixed
+- **`cypicklebuf` (Order 081):** the version guard in `cypicklebuf_shim.h` claimed `PyPickleBuffer_FromObject` / `Release` / `Check` / `GetBuffer` were CPython 3.15-only, so every helper raised `NotImplementedError` on 3.14. The API is public in `cpython/picklebufobject.h` on 3.14 as well (header declarations and exported symbols verified on 3.14.7); the branch is gone and the helpers now work on every supported interpreter. `tests/test_cypicklebuf.py` no longer skips on 3.14.
+
 ### Added
 - **`cybytes` `BytesWriter` direct fill (Order 080):** CPython 3.15+ `PyBytesWriter_GetSize` / `GetData` / `Grow` / `GrowAndUpdatePointer` / `FinishWithSize` are now wrapped, mirrored on 3.8-3.14 through the internal `_PyBytesWriter_Prepare` / `_PyBytesWriter_Finish` path the writer already uses. Public: `size()`. Cimport-only: `grow(extra)` (grows the logical size, negative rewinds, returns a pointer to the freshly reserved region), `data()`, `finish_with_size(size)`. In a typed `cdef` loop, `grow()` + `memcpy` beats `write()` at **0.61x** (3.14) / **0.90x** (3.15); filling one reserved block beats per-chunk `grow()` at **0.36x**, and beats a `bytearray` slice fill at **0.06x**. Recipe: [`examples/cython/bytes_writer_direct_fill.md`](examples/cython/bytes_writer_direct_fill.md). `FinishWithPointer` and `Format` were rejected (no capability gain / varargs ABI).
 

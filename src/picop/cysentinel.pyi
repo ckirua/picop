@@ -19,6 +19,9 @@ def sentinel_new(name: str, module: str | None = None, repr: str | None = None) 
 
     Notes
     -----
+    Slower than the plain-Python equivalent ``sentinel(name)`` (Tier A 1.04x);
+    sentinel-singleton bridge for extension authors.
+
     Unlike the builtin ``sentinel`` constructor, ``module`` and ``repr``
     default to ``None`` rather than being inferred. Embedded NUL characters
     raise ``ValueError`` (the C API is NUL-terminated) and unpaired surrogates

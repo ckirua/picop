@@ -17,7 +17,14 @@ def uutf8_bytes(s: str) -> bytes:
     ...
 
 def uintern(s: str) -> str:
-    """Intern ``s`` via ``PyUnicode_InternInPlace`` and return the canonical instance."""
+    """Intern ``s`` via ``PyUnicode_InternInPlace`` and return the canonical instance.
+
+    Notes
+    -----
+    Mixed Tier A parity: 0.99x (3.15: short), 1.01x (3.15: already), 1.02x (3.15:
+    non-ascii), 1.05x (3.14: short), 1.07x (3.14: non-ascii), 1.63x (3.14: already);
+    interning on the typed Cython path.
+    """
     ...
 
 def unicode_eq(a: str, b: str) -> bool:

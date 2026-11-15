@@ -8,7 +8,13 @@ take raw borrowed argument vectors and cannot be called from Python.
 
 
 def call_noargs(callable: object) -> object:
-    """Call ``callable`` without constructing an argument tuple."""
+    """Call ``callable`` without constructing an argument tuple.
+
+    Notes
+    -----
+    Mixed Tier A parity: 0.96x (3.14: zero args), 1.08x (3.15: zero args); the typed
+    Cython call site.
+    """
     ...
 
 

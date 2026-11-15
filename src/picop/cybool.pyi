@@ -13,7 +13,13 @@ def bool_eq(a: object, b: object) -> bool:
     ...
 
 def bool_from_long(v: int) -> object:
-    """Return ``True`` or ``False`` via ``PyBool_FromLong`` (nonzero → True)."""
+    """Return ``True`` or ``False`` via ``PyBool_FromLong`` (nonzero → True).
+
+    Notes
+    -----
+    Mixed Tier A parity: 1.01x (3.15: 1→True), 1.09x (3.14: 0→False), 1.16x (3.14:
+    1→True), 1.17x (3.15: 0→False); returns the C ``bool`` for a Cython ``int``.
+    """
     ...
 
 def bool_true() -> object:

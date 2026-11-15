@@ -43,7 +43,13 @@ def obj_delattr(o: object, name: object) -> int:
     ...
 
 def obj_repr(o: object) -> object:
-    """Return ``repr(o)`` via ``PyObject_Repr``."""
+    """Return ``repr(o)`` via ``PyObject_Repr``.
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``repr(x)`` (Tier A 1.07–1.12x); last-
+    resort bridge for unknown objects.
+    """
     ...
 
 def obj_bytes(o: object) -> object:
@@ -51,7 +57,13 @@ def obj_bytes(o: object) -> object:
     ...
 
 def obj_issubclass(derived: object, cls: object) -> bool:
-    """Return ``issubclass(derived, cls)`` via ``PyObject_IsSubclass``."""
+    """Return ``issubclass(derived, cls)`` via ``PyObject_IsSubclass``.
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``issubclass(a, b)`` (Tier A
+    1.09–1.10x); last-resort bridge for unknown objects.
+    """
     ...
 
 def obj_call(callable_object: object, args: object, kw: object = None) -> object:
@@ -98,8 +110,8 @@ def obj_as_fd(o: object) -> int:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``x.fileno()`` (Tier A 1.36x); last-
-    resort bridge for unknown objects.
+    Slower than the plain-Python equivalent ``x.fileno()`` (Tier A 1.16–1.17x);
+    last-resort bridge for unknown objects.
 
     On error raises — do not treat the result as a boolean success flag.
     """
@@ -110,7 +122,13 @@ def obj_dir(o: object) -> object:
     ...
 
 def obj_iter(o: object) -> object:
-    """Return ``iter(o)`` via ``PyObject_GetIter``."""
+    """Return ``iter(o)`` via ``PyObject_GetIter``.
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``iter(x)`` (Tier A 1.05–1.07x); last-
+    resort bridge for unknown objects.
+    """
     ...
 
 def obj_format(obj: object, format_spec: object) -> object:
@@ -138,11 +156,23 @@ def obj_delattr_cstr(o: object, name: bytes) -> int:
     ...
 
 def obj_callable(o: object) -> bool:
-    """Return True if ``o`` is callable (``PyCallable_Check``)."""
+    """Return True if ``o`` is callable (``PyCallable_Check``).
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``callable(x)`` (Tier A 1.10–1.12x);
+    last-resort bridge for unknown objects.
+    """
     ...
 
 def obj_getattr(o: object, name: object) -> object:
-    """Return ``getattr(o, name)`` via ``PyObject_GetAttr``."""
+    """Return ``getattr(o, name)`` via ``PyObject_GetAttr``.
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``getattr(x, name)`` (Tier A
+    1.06–1.09x); last-resort bridge for unknown objects.
+    """
     ...
 
 def obj_getattr_cstr(o: object, name: bytes) -> object:
@@ -150,11 +180,23 @@ def obj_getattr_cstr(o: object, name: bytes) -> object:
     ...
 
 def obj_getitem(o: object, key: object) -> object:
-    """Return ``o[key]`` via ``PyObject_GetItem``."""
+    """Return ``o[key]`` via ``PyObject_GetItem``.
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``x[key]`` (Tier A 1.07–1.08x); last-
+    resort bridge for unknown objects.
+    """
     ...
 
 def obj_hasattr(o: object, name: object) -> bool:
-    """Return True if ``o`` has attribute ``name`` (``PyObject_HasAttr``)."""
+    """Return True if ``o`` has attribute ``name`` (``PyObject_HasAttr``).
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``hasattr(x, name)`` (Tier A
+    1.10–1.13x); last-resort bridge for unknown objects.
+    """
     ...
 
 def obj_hasattr_cstr(o: object, name: bytes) -> bool:
@@ -162,11 +204,23 @@ def obj_hasattr_cstr(o: object, name: bytes) -> bool:
     ...
 
 def obj_hash(o: object) -> int:
-    """Return the hash of ``o`` (``PyObject_Hash``)."""
+    """Return the hash of ``o`` (``PyObject_Hash``).
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``hash(x)`` (Tier A 1.06–1.08x); last-
+    resort bridge for unknown objects.
+    """
     ...
 
 def obj_isinstance(inst: object, cls: object) -> bool:
-    """Return True if ``inst`` is an instance of ``cls`` (``PyObject_IsInstance``)."""
+    """Return True if ``inst`` is an instance of ``cls`` (``PyObject_IsInstance``).
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``isinstance(x, t)`` (Tier A
+    1.12–1.13x); last-resort bridge for unknown objects.
+    """
     ...
 
 def obj_istrue(o: object) -> bool:
@@ -174,17 +228,29 @@ def obj_istrue(o: object) -> bool:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``bool(x)`` (Tier A 1.05–1.08x); last-
+    Slower than the plain-Python equivalent ``bool(x)`` (Tier A 1.10–1.16x); last-
     resort bridge for unknown objects.
     """
     ...
 
 def obj_len(o: object) -> int:
-    """Return ``len(o)`` via ``PyObject_Length``."""
+    """Return ``len(o)`` via ``PyObject_Length``.
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``len(x)`` (Tier A 1.13–1.14x); last-
+    resort bridge for unknown objects.
+    """
     ...
 
 def obj_size(o: object) -> int:
-    """Return ``Py_SIZE``-style length via ``PyObject_Size`` (alias of ``obj_len``)."""
+    """Return ``Py_SIZE``-style length via ``PyObject_Size`` (alias of ``obj_len``).
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``len(x)`` (Tier A 1.05–1.11x); last-
+    resort bridge for unknown objects.
+    """
     ...
 
 def obj_str(o: object) -> object:
@@ -192,8 +258,8 @@ def obj_str(o: object) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``str(x)`` (Tier A 1.02x); last-resort
-    bridge for unknown objects.
+    Slower than the plain-Python equivalent ``str(x)`` (Tier A 1.03–1.11x); last-
+    resort bridge for unknown objects.
     """
     ...
 
@@ -202,7 +268,7 @@ def obj_type(o: object) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``type(x)`` (Tier A 1.07x); last-resort
-    bridge for unknown objects.
+    Slower than the plain-Python equivalent ``type(x)`` (Tier A 1.34–1.39x); last-
+    resort bridge for unknown objects.
     """
     ...

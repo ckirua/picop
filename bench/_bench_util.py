@@ -48,6 +48,13 @@ class CompareRow:
         return self.cypy.mean / self.baseline.mean
 
     @property
+    def ratio_median(self) -> float:
+        """Median-of-runs ratio: insensitive to one contended run."""
+        if self.baseline.median <= 0.0:
+            return 0.0
+        return self.cypy.median / self.baseline.median
+
+    @property
     def ratio_p99(self) -> float:
         if self.baseline.p99 <= 0.0:
             return 0.0
@@ -342,7 +349,8 @@ class BenchSession:
                         {
                             "label": row.label,
                             "case": row.param,
-                            "ratio": round(row.ratio_mean, 4),
+                            "ratio": round(row.ratio_median, 4),
+                            "mean_ratio": round(row.ratio_mean, 4),
                             "p99_ratio": round(row.ratio_p99, 4),
                         }
                         for row in self._rows

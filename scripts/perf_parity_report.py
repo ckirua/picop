@@ -584,7 +584,14 @@ def main() -> int:
     ap.add_argument(
         "--from-json",
         type=Path,
-        help="reuse a previous --json dump instead of re-running the benches",
+        nargs="+",
+        help="reuse previous --json dumps instead of re-running the benches. Pass one dump "
+        "per interpreter, or several runs: every (helper, case) pair is pooled by the "
+        "median ratio so a single contended run cannot move a table row.",
+    )
+    ap.add_argument(
+        "--config",
+        help="describe the measurement source in the stats line (default: this interpreter)",
     )
     args = ap.parse_args()
 

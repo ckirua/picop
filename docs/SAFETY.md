@@ -73,10 +73,14 @@ That does not remove trusted-caller preconditions:
   `PyBytesWriter_Resize` also sets the logical size; the wrapper creates the
   writer at the hinted capacity and rewinds it to zero with `Resize(writer, 0)`,
   which never shrinks the allocation — `max_size` becomes reserved capacity on
-  every supported version. `Prepare` can reallocate the buffer on every
-  write, so the wrapper tracks the write position in its own handle; any pointer
-  into the buffer captured earlier is invalid. Lifecycle guards
-  (`RuntimeError` after `finish()`/`discard()`) prevent use-after-free.
+  every supported version. `Prepare` and `grow()` can reallocate, so any pointer
+  captured before either call is invalid. Bytes reserved by `grow()` are
+  uninitialized and must be written before `finish()`. Negative `grow()` rewinds
+  the logical size. The wrapper validates `finish_with_size()` before calling
+  CPython (whose `PyBytesWriter_FinishWithSize` discards the writer for an
+  out-of-range size), so a rejected call leaves the writer open. Calling
+  `finish_with_size()`, `finish()` or `discard()` after close raises
+  `RuntimeError`, never UB.
 - `tuple_from_array` INCREFs every array element (the caller keeps its own
   references), so it is safe over borrowed-reference arrays; negative sizes raise
   `ValueError` before any allocation.

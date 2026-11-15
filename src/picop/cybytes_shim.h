@@ -54,6 +54,10 @@ static inline void *cy_memmem(const void *haystack, size_t haystacklen,
  * Both paths expose the same uniform wrapper API:
  *   cy_bytes_writer_create(size) -> writer (NULL on error, exception set)
  *   cy_bytes_writer_write(writer, data, size) -> 0 / -1 (exception set)
+ *   cy_bytes_writer_size(writer) -> logical size
+ *   cy_bytes_writer_data(writer) -> buffer base
+ *   cy_bytes_writer_grow(writer, extra) -> newly reserved region
+ *   cy_bytes_writer_finish_with_size(writer, size) -> bytes (NULL on error)
  *   cy_bytes_writer_finish(writer) -> bytes (NULL on error)
  *   cy_bytes_writer_discard(writer)
  */
@@ -75,8 +79,10 @@ typedef struct CyBytesWriter {
 #else
     CyInternalBytesWriter internal;
     char *pos;
+    Py_ssize_t written;   /* logical size; the buffer base is pos - written */
 #endif
 } CyBytesWriter;
+
 
 #if PY_VERSION_HEX >= 0x030F0000
 
@@ -113,6 +119,37 @@ static inline CyBytesWriter *cy_bytes_writer_create(Py_ssize_t size) {
 static inline int cy_bytes_writer_write(CyBytesWriter *w, const char *data,
                                         Py_ssize_t size) {
     return PyBytesWriter_WriteBytes(w->pub, data, size);
+}
+
+static inline Py_ssize_t cy_bytes_writer_size(const CyBytesWriter *w) {
+    return PyBytesWriter_GetSize(w->pub);
+}
+
+static inline char *cy_bytes_writer_data(const CyBytesWriter *w) {
+    return (char *)PyBytesWriter_GetData(w->pub);
+}
+
+/* Grow the logical size by extra (may be negative) and return a pointer to the
+   start of the newly reserved region. Any pointer captured before a later
+   grow/write is invalid: the buffer may be reallocated. */
+static inline char *cy_bytes_writer_grow(CyBytesWriter *w, Py_ssize_t extra) {
+    return (char *)PyBytesWriter_GrowAndUpdatePointer(
+        w->pub, extra,
+        PyBytesWriter_GetData(w->pub) + PyBytesWriter_GetSize(w->pub));
+}
+
+/* CPython's FinishWithSize discards the writer on a bad size; validate first so
+   a rejected call leaves the writer usable. */
+static inline PyObject *cy_bytes_writer_finish_with_size(CyBytesWriter *w,
+                                                         Py_ssize_t size) {
+    Py_ssize_t used = PyBytesWriter_GetSize(w->pub);
+    if (size < 0 || size > used) {
+        PyErr_Format(PyExc_ValueError, "size must be between 0 and %zd", used);
+        return NULL;
+    }
+    PyObject *result = PyBytesWriter_FinishWithSize(w->pub, size);
+    free(w);
+    return result;
 }
 
 static inline PyObject *cy_bytes_writer_finish(CyBytesWriter *w) {
@@ -166,7 +203,41 @@ static inline int cy_bytes_writer_write(CyBytesWriter *w, const char *data,
     }
     memcpy(w->pos, data, (size_t)size);
     w->pos += size;
+    w->written += size;
     return 0;
+}
+
+static inline Py_ssize_t cy_bytes_writer_size(const CyBytesWriter *w) { return w->written; }
+static inline char *cy_bytes_writer_data(const CyBytesWriter *w) { return w->pos - w->written; }
+
+static inline char *cy_bytes_writer_grow(CyBytesWriter *w, Py_ssize_t extra) {
+    if (extra < 0) {
+        if (w->written + extra < 0) {
+            PyErr_SetString(PyExc_ValueError, "grow would make the writer size negative");
+            return NULL;
+        }
+        w->pos += extra;
+        w->written += extra;
+        return w->pos;
+    }
+    char *str = (char *)_PyBytesWriter_Prepare(&w->internal, w->pos, extra);
+    if (str == NULL) {
+        return NULL;
+    }
+    w->pos = str + extra;
+    w->written += extra;
+    return str;
+}
+
+static inline PyObject *cy_bytes_writer_finish_with_size(CyBytesWriter *w,
+                                                         Py_ssize_t size) {
+    if (size < 0 || size > w->written) {
+        PyErr_Format(PyExc_ValueError, "size must be between 0 and %zd", w->written);
+        return NULL;
+    }
+    PyObject *result = _PyBytesWriter_Finish(&w->internal, (w->pos - w->written) + size);
+    free(w);
+    return result;
 }
 
 static inline PyObject *cy_bytes_writer_finish(CyBytesWriter *w) {

@@ -1,5 +1,6 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
 from picop.cybytes cimport bytes_contains, bytes_eq, bytes_len, bytes_check, bytes_check_exact, BytesWriter
+from libc.string cimport memcpy
 include "_sink.pxi"
 
 cpdef bint baseline_bcontains(bytes haystack, bytes needle, Py_ssize_t n):
@@ -92,6 +93,67 @@ cpdef object cypy_bwriter(bytes part, Py_ssize_t n):
     tb_sink_obj(out)
     return out
 
+
+cpdef object cypy_bwriter_hint(bytes part, Py_ssize_t n):
+    cdef Py_ssize_t k
+    cdef BytesWriter writer = BytesWriter(n * len(part))
+    cdef bytes out
+    for k in range(n):
+        writer.write(tb_obj(part, k))
+    out = writer.finish()
+    tb_sink_obj(out)
+    return out
+
+cpdef object cypy_bwriter_grow(bytes part, Py_ssize_t n):
+    cdef Py_ssize_t k
+    cdef Py_ssize_t plen = len(part)
+    cdef char *src = part
+    cdef char *p
+    cdef BytesWriter writer = BytesWriter(n * plen)
+    cdef bytes out
+    for k in range(n):
+        p = writer.grow(plen)
+        memcpy(p, src, plen)
+    out = writer.finish()
+    tb_sink_obj(out)
+    return out
+
+cpdef object cypy_bwriter_grow_no_hint(bytes part, Py_ssize_t n):
+    cdef Py_ssize_t k
+    cdef Py_ssize_t plen = len(part)
+    cdef char *src = part
+    cdef char *p
+    cdef BytesWriter writer = BytesWriter()
+    cdef bytes out
+    for k in range(n):
+        p = writer.grow(plen)
+        memcpy(p, src, plen)
+    out = writer.finish()
+    tb_sink_obj(out)
+    return out
+
+cpdef object cypy_bwriter_reserve(bytes part, Py_ssize_t n):
+    cdef Py_ssize_t k
+    cdef Py_ssize_t plen = len(part)
+    cdef char *src = part
+    cdef char *p
+    cdef BytesWriter writer = BytesWriter(n * plen)
+    cdef bytes out
+    p = writer.grow(n * plen)
+    for k in range(n):
+        memcpy(p + k * plen, src, plen)
+    out = writer.finish()
+    tb_sink_obj(out)
+    return out
+
+cpdef object baseline_bytearray_fill(bytes part, Py_ssize_t n):
+    cdef Py_ssize_t k
+    cdef Py_ssize_t plen = len(part)
+    cdef bytearray out = bytearray(n * plen)
+    for k in range(n):
+        out[k * plen:(k + 1) * plen] = part
+    tb_sink_obj(out)
+    return out
 cpdef object baseline_bjoin(bytes part, Py_ssize_t n):
     cdef Py_ssize_t k
     cdef list parts = []

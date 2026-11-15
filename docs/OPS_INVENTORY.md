@@ -52,7 +52,7 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 | `array_resize` | tierA | Tier A `session.compare` present |
 | `array_resize_smart` | tierA | Tier A `session.compare` present |
 | `array_zero` | tierA | Tier A `session.compare` present |
-| `BytesWriter` | tierB | Tier A+B compare labels present (builder vs join/bytearray/`+=`) |
+| `BytesWriter` | tierB | Tier A+B compare labels present (builder vs join/bytearray/`+=`); Order 080 adds public `size()` plus cimport-only `grow`/`data`/`finish_with_size` (Tier A/B evidence: [`docs/modules/002_cybytes.md`](modules/002_cybytes.md)) |
 | `bool_check` | tierB | Tier A+B compare labels present |
 | `bool_eq` | tierB | Tier A+B compare labels present |
 | `bool_false` | tierA | Tier A `session.compare` present |

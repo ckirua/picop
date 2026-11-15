@@ -37,7 +37,7 @@ Method: set-diff of `PyAPI_FUNC`/`PyAPI_DATA`/opaque typedefs between CPython **
 
 ## Queue
 
-080 BytesWriter getters/Grow (002) — no other 3.15 gap currently blocks the queue.
+080 BytesWriter getters/Grow (002) — shipped.
 
 ## Fresh scan — 2026-11-13
 
@@ -54,7 +54,7 @@ New promotable candidates (all `cpython/bytesobject.h`, all `PyAPI_FUNC`, all co
 
 | API | Symbol(s) | Verdict | Next action |
 |-----|-----------|---------|-------------|
-| BytesWriter getters / low-level growth | `GetSize`, `GetData`, `Grow`, `GrowAndUpdatePointer`, `FinishWithSize`, `FinishWithPointer`, `Format` | **Order 080** (extends 002) | `writer_size()` / `writer_data()` accessors, `grow(n)` for chunked producers, `finish_with_size(n)` for pre-computed lengths; bench `Grow`-based writes vs `bytearray` and vs `b"".join`. `Format` is varargs — wrap only if a bench case justifies it |
+| BytesWriter getters / low-level growth | `GetSize`, `GetData`, `Grow`, `GrowAndUpdatePointer`, `FinishWithSize`, `FinishWithPointer`, `Format` | **Order 080** (extends 002) — shipped | public `size()`; cimport-only `grow()` / `data()` / `finish_with_size()`; `Format` is varargs and rejected |
 
 Corrections to the 2026-11-12 scan:
 

@@ -28,6 +28,19 @@ def main() -> None:
     session.compare("bytes_check_exact", tb.cypy_bcheck_exact, tb.baseline_bcheck_exact, HAY, N, param="bytes")
     session.section("BytesWriter vs list.append + join  [Tier B builder]")
     session.compare("BytesWriter", tb.cypy_bwriter, tb.baseline_bjoin, b"ab", 2_000_000, param="N=2,000,000 parts")
+    session.section("BytesWriter direct fill: grow()+memcpy vs write()  [Order 080]")
+    part = b"ab"
+    expected = part * 10
+    assert tb.cypy_bwriter_hint(part, 10) == expected
+    assert tb.cypy_bwriter_grow(part, 10) == expected
+    assert tb.cypy_bwriter_grow_no_hint(part, 10) == expected
+    assert tb.cypy_bwriter_reserve(part, 10) == expected
+    assert tb.baseline_bytearray_fill(part, 10) == expected
+    session.compare("BytesWriter", tb.cypy_bwriter_grow, tb.cypy_bwriter_hint, b"ab", 2_000_000, param="grow+memcpy vs write(), both hinted")
+    session.compare("BytesWriter", tb.cypy_bwriter_grow_no_hint, tb.cypy_bwriter_grow, b"ab", 2_000_000, param="no hint vs hint (grow path)")
+    session.compare("BytesWriter", tb.cypy_bwriter_reserve, tb.cypy_bwriter_grow, b"ab", 2_000_000, param="grow once vs grow per chunk")
+    session.compare("BytesWriter", tb.cypy_bwriter_grow, tb.baseline_bytearray_fill, b"ab", 2_000_000, param="grow+memcpy vs bytearray slice fill")
+    session.compare("BytesWriter", tb.cypy_bwriter_grow, tb.cypy_bwriter_hint, b"ab", 200_000, param="scale: 200k parts")
     session.summary()
     print("Markdown (paste under ### Tier B):")
     print(markdown_table(session._rows))

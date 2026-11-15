@@ -301,6 +301,7 @@ cpdef bint check_bytes_writer():
     p = partial.grow(16)
     p[0] = 0x78
     assert partial.finish_with_size(1) == b"x"
+    assert BytesWriter().finish_with_size(0) == b""
 
     try:
         BytesWriter().finish_with_size(5)

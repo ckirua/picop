@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [3.10.0] — 2026-11-15 — BytesWriter direct fill and a 3.14 PickleBuffer fix
 
 ### Changed
 - **Perf-parity docs (Order 082):** `docs/PERF_PARITY.md` and the `.pyi` parity notes are regenerated from the CI dumps (3.14, 3.14t, 3.15, 3.15t — 2,848 Tier A cases), so `scripts/perf_parity_drift.py` reports no drift against the CI dumps: 31 helpers always slower, 64 mixed. `scripts/perf_parity_report.py --sync-stubs` now summarises mixed helpers per interpreter instead of listing every case.

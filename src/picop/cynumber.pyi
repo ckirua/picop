@@ -15,13 +15,7 @@ def num_index_check(o: object) -> bool:
     ...
 
 def num_eq(a: object, b: object) -> bool:
-    """Return True if ``a == b`` via richcompare (abstract number; NaN parity).
-
-    Notes
-    -----
-    Mixed Tier A parity: 0.71x (3.15: int↔float), 0.77x (3.15: ne), 0.82x (3.14:
-    ne), 1.06x (3.14: int↔float); protocol bridge for unknown number types.
-    """
+    """Return True if ``a == b`` via richcompare (abstract number; NaN parity)."""
     ...
 
 def num_floordiv(o1: object, o2: object) -> object:
@@ -29,19 +23,13 @@ def num_floordiv(o1: object, o2: object) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``a // b`` (Tier A 1.06–1.07x); protocol
-    bridge for unknown number types.
+    Mixed Tier A parity: 0.96x (3.14), 1.05x (3.14t), 1.01x (3.15), 1.01x (3.15t);
+    protocol bridge for unknown number types.
     """
     ...
 
 def num_sub(o1: object, o2: object) -> object:
-    """Return ``o1 - o2`` via ``PyNumber_Subtract``.
-
-    Notes
-    -----
-    Mixed Tier A parity: 0.54x (3.14: 9-4), 1.08x (3.15: 9-4); protocol bridge for
-    unknown number types.
-    """
+    """Return ``o1 - o2`` via ``PyNumber_Subtract``."""
     ...
 
 def num_matmul(o1: object, o2: object) -> object:
@@ -49,39 +37,21 @@ def num_matmul(o1: object, o2: object) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``a @ b`` (Tier A 1.06–1.09x); protocol
-    bridge for unknown number types.
-    """
-    ...
-
-def num_divmod(o1: object, o2: object) -> object:
-    """Return ``divmod(o1, o2)`` via ``PyNumber_Divmod``.
-
-    Notes
-    -----
-    Slower than the plain-Python equivalent ``divmod(a, b)`` (Tier A 1.05–1.07x);
+    Mixed Tier A parity: 0.75x (3.14), 1.04x (3.14t), 0.99x (3.15), 1.03x (3.15t);
     protocol bridge for unknown number types.
     """
     ...
 
-def num_pos(o: object) -> object:
-    """Return ``+o`` via ``PyNumber_Positive``.
+def num_divmod(o1: object, o2: object) -> object:
+    """Return ``divmod(o1, o2)`` via ``PyNumber_Divmod``."""
+    ...
 
-    Notes
-    -----
-    Slower than the plain-Python equivalent ``+a`` (Tier A 1.07–1.09x); protocol
-    bridge for unknown number types.
-    """
+def num_pos(o: object) -> object:
+    """Return ``+o`` via ``PyNumber_Positive``."""
     ...
 
 def num_invert(o: object) -> object:
-    """Return ``~o`` via ``PyNumber_Invert``.
-
-    Notes
-    -----
-    Slower than the plain-Python equivalent ``~a`` (Tier A 1.04–1.06x); protocol
-    bridge for unknown number types.
-    """
+    """Return ``~o`` via ``PyNumber_Invert``."""
     ...
 
 def num_lshift(o1: object, o2: object) -> object:
@@ -89,7 +59,7 @@ def num_lshift(o1: object, o2: object) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``a << b`` (Tier A 1.03–1.06x); protocol
+    Slower than the plain-Python equivalent ``a << b`` (Tier A 1.04–1.47x); protocol
     bridge for unknown number types.
     """
     ...
@@ -99,8 +69,8 @@ def num_rshift(o1: object, o2: object) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``a >> b`` (Tier A 1.06–1.08x); protocol
-    bridge for unknown number types.
+    Mixed Tier A parity: 1.06x (3.14), 1.08x (3.14t), 0.99x (3.15), 1.38x (3.15t);
+    protocol bridge for unknown number types.
     """
     ...
 
@@ -109,19 +79,13 @@ def num_xor(o1: object, o2: object) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``a ^ b`` (Tier A 1.09–1.10x); protocol
-    bridge for unknown number types.
+    Mixed Tier A parity: 0.98x (3.14), 1.02x (3.14t), 0.99x (3.15), 1.01x (3.15t);
+    protocol bridge for unknown number types.
     """
     ...
 
 def num_or(o1: object, o2: object) -> object:
-    """Return ``o1 | o2`` via ``PyNumber_Or``.
-
-    Notes
-    -----
-    Slower than the plain-Python equivalent ``a | b`` (Tier A 1.04–1.08x); protocol
-    bridge for unknown number types.
-    """
+    """Return ``o1 | o2`` via ``PyNumber_Or``."""
     ...
 
 def num_inplace_add(o1: object, o2: object) -> object:
@@ -133,8 +97,8 @@ def num_inplace_sub(o1: object, o2: object) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``a -= b`` (Tier A 1.04–1.16x); protocol
-    bridge for unknown number types.
+    Mixed Tier A parity: 1.02x (3.14), 0.94x (3.14t), 1.00x (3.15), 1.00x (3.15t);
+    protocol bridge for unknown number types.
     """
     ...
 
@@ -143,13 +107,19 @@ def num_inplace_mul(o1: object, o2: object) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``a *= b`` (Tier A 1.05–1.07x); protocol
-    bridge for unknown number types.
+    Mixed Tier A parity: 1.03x (3.14), 1.04x (3.14t), 1.00x (3.15), 0.98x (3.15t);
+    protocol bridge for unknown number types.
     """
     ...
 
 def num_inplace_matmul(o1: object, o2: object) -> object:
-    """Return in-place ``o1 @= o2`` result via ``PyNumber_InPlaceMatrixMultiply``."""
+    """Return in-place ``o1 @= o2`` result via ``PyNumber_InPlaceMatrixMultiply``.
+
+    Notes
+    -----
+    Mixed Tier A parity: 0.90x (3.14), 1.08x (3.14t), 1.00x (3.15), 1.00x (3.15t);
+    protocol bridge for unknown number types.
+    """
     ...
 
 def num_inplace_floordiv(o1: object, o2: object) -> object:
@@ -157,7 +127,7 @@ def num_inplace_floordiv(o1: object, o2: object) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``a //= b`` (Tier A 1.03–1.23x);
+    Mixed Tier A parity: 1.02x (3.14), 1.00x (3.14t), 1.02x (3.15), 0.99x (3.15t);
     protocol bridge for unknown number types.
     """
     ...
@@ -167,8 +137,8 @@ def num_inplace_truediv(o1: object, o2: object) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``a /= b`` (Tier A 1.02–1.04x); protocol
-    bridge for unknown number types.
+    Mixed Tier A parity: 1.02x (3.14), 1.02x (3.14t), 0.99x (3.15), 0.98x (3.15t);
+    protocol bridge for unknown number types.
     """
     ...
 
@@ -177,8 +147,8 @@ def num_inplace_mod(o1: object, o2: object) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``a %= b`` (Tier A 1.04–1.04x); protocol
-    bridge for unknown number types.
+    Mixed Tier A parity: 0.97x (3.14), 1.22x (3.14t), 0.99x (3.15), 0.98x (3.15t);
+    protocol bridge for unknown number types.
     """
     ...
 
@@ -191,39 +161,21 @@ def num_inplace_lshift(o1: object, o2: object) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``a <<= b`` (Tier A 1.03–1.12x);
+    Mixed Tier A parity: 1.01x (3.14), 1.02x (3.14t), 1.05x (3.15), 1.00x (3.15t);
     protocol bridge for unknown number types.
     """
     ...
 
 def num_inplace_rshift(o1: object, o2: object) -> object:
-    """Return in-place ``o1 >>= o2`` result via ``PyNumber_InPlaceRshift``.
-
-    Notes
-    -----
-    Slower than the plain-Python equivalent ``a >>= b`` (Tier A 1.04–1.05x);
-    protocol bridge for unknown number types.
-    """
+    """Return in-place ``o1 >>= o2`` result via ``PyNumber_InPlaceRshift``."""
     ...
 
 def num_inplace_and(o1: object, o2: object) -> object:
-    """Return in-place ``o1 &= o2`` result via ``PyNumber_InPlaceAnd``.
-
-    Notes
-    -----
-    Slower than the plain-Python equivalent ``a &= b`` (Tier A 1.03–1.05x); protocol
-    bridge for unknown number types.
-    """
+    """Return in-place ``o1 &= o2`` result via ``PyNumber_InPlaceAnd``."""
     ...
 
 def num_inplace_xor(o1: object, o2: object) -> object:
-    """Return in-place ``o1 ^= o2`` result via ``PyNumber_InPlaceXor``.
-
-    Notes
-    -----
-    Mixed Tier A parity: 0.98x (3.14: ^=), 1.05x (3.15: ^=); protocol bridge for
-    unknown number types.
-    """
+    """Return in-place ``o1 ^= o2`` result via ``PyNumber_InPlaceXor``."""
     ...
 
 def num_inplace_or(o1: object, o2: object) -> object:
@@ -231,8 +183,8 @@ def num_inplace_or(o1: object, o2: object) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``a |= b`` (Tier A 1.04–1.04x); protocol
-    bridge for unknown number types.
+    Mixed Tier A parity: 1.01x (3.14), 1.02x (3.14t), 1.01x (3.15), 0.99x (3.15t);
+    protocol bridge for unknown number types.
     """
     ...
 
@@ -241,19 +193,13 @@ def num_float(o: object) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``float(x)`` (Tier A 1.02–1.06x);
+    Slower than the plain-Python equivalent ``float(x)`` (Tier A 1.03–1.06x);
     protocol bridge for unknown number types.
     """
     ...
 
 def num_abs(o: object) -> object:
-    """Return ``abs(o)`` via ``PyNumber_Absolute``.
-
-    Notes
-    -----
-    Slower than the plain-Python equivalent ``abs(x)`` (Tier A 1.08–1.09x); protocol
-    bridge for unknown number types.
-    """
+    """Return ``abs(o)`` via ``PyNumber_Absolute``."""
     ...
 
 def num_add(o1: object, o2: object) -> object:
@@ -261,8 +207,8 @@ def num_add(o1: object, o2: object) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``a + b`` (Tier A 1.06–1.10x); protocol
-    bridge for unknown number types.
+    Mixed Tier A parity: 0.99x (3.14), 1.06x (3.14t), 1.00x (3.15), 1.03x (3.15t);
+    protocol bridge for unknown number types.
     """
     ...
 
@@ -271,8 +217,8 @@ def num_and(o1: object, o2: object) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``a & b`` (Tier A 1.07–1.07x); protocol
-    bridge for unknown number types.
+    Mixed Tier A parity: 0.95x (3.14), 1.03x (3.14t), 0.99x (3.15), 0.97x (3.15t);
+    protocol bridge for unknown number types.
     """
     ...
 
@@ -282,18 +228,12 @@ def num_as_ssize(o: object, exc: object | None = None) -> int:
     Notes
     -----
     Slower than the plain-Python equivalent ``operator.index(x)`` (Tier A
-    1.16–1.21x); protocol bridge for unknown number types.
+    1.03–1.13x); protocol bridge for unknown number types.
     """
     ...
 
 def num_index(o: object) -> object:
-    """Return the index integer of ``o`` (``PyNumber_Index``).
-
-    Notes
-    -----
-    Slower than the plain-Python equivalent ``operator.index(x)`` (Tier A
-    1.06–1.08x); protocol bridge for unknown number types.
-    """
+    """Return the index integer of ``o`` (``PyNumber_Index``)."""
     ...
 
 def num_long(o: object) -> object:
@@ -301,7 +241,7 @@ def num_long(o: object) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.05–1.12x); protocol
+    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.04–1.09x); protocol
     bridge for unknown number types.
     """
     ...
@@ -311,8 +251,8 @@ def num_mod(o1: object, o2: object) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``a % b`` (Tier A 1.08–1.09x); protocol
-    bridge for unknown number types.
+    Mixed Tier A parity: 0.97x (3.14), 1.08x (3.14t), 1.00x (3.15), 0.98x (3.15t);
+    protocol bridge for unknown number types.
     """
     ...
 
@@ -321,19 +261,13 @@ def num_mul(o1: object, o2: object) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``a * b`` (Tier A 1.09–1.09x); protocol
-    bridge for unknown number types.
+    Mixed Tier A parity: 0.95x (3.14), 1.07x (3.14t), 1.00x (3.15), 0.99x (3.15t);
+    protocol bridge for unknown number types.
     """
     ...
 
 def num_neg(o: object) -> object:
-    """Return ``-o`` via ``PyNumber_Negative``.
-
-    Notes
-    -----
-    Mixed Tier A parity: 1.02x (3.15: -42), 1.05x (3.14: -42); protocol bridge for
-    unknown number types.
-    """
+    """Return ``-o`` via ``PyNumber_Negative``."""
     ...
 
 def num_pow(o1: object, o2: object, o3: object | None = None) -> object:
@@ -341,17 +275,11 @@ def num_pow(o1: object, o2: object, o3: object | None = None) -> object:
 
     Notes
     -----
-    Mixed Tier A parity: 1.01x (3.14: 2**10), 1.05x (3.15: 2**10); protocol bridge
-    for unknown number types.
+    Mixed Tier A parity: 0.95x (3.14), 1.07x (3.14t), 1.00x (3.15), 1.00x (3.15t);
+    protocol bridge for unknown number types.
     """
     ...
 
 def num_truediv(o1: object, o2: object) -> object:
-    """Return ``o1 / o2`` via ``PyNumber_TrueDivide``.
-
-    Notes
-    -----
-    Slower than the plain-Python equivalent ``a / b`` (Tier A 1.05–1.09x); protocol
-    bridge for unknown number types.
-    """
+    """Return ``o1 / o2`` via ``PyNumber_TrueDivide``."""
     ...

@@ -21,8 +21,7 @@ def uintern(s: str) -> str:
 
     Notes
     -----
-    Mixed Tier A parity: 0.99x (3.15: short), 1.01x (3.15: already), 1.02x (3.15:
-    non-ascii), 1.05x (3.14: short), 1.07x (3.14: non-ascii), 1.63x (3.14: already);
+    Mixed Tier A parity: 0.95x (3.14), 0.99x (3.14t), 1.00x (3.15), 0.91x (3.15t);
     interning on the typed Cython path.
     """
     ...

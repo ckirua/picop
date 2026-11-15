@@ -85,11 +85,5 @@ def map_setitem_cstr(o: object, key: bytes, v: object) -> int:
     ...
 
 def map_len(o: object) -> int:
-    """Return the size of mapping ``o`` (``PyMapping_Length``).
-
-    Notes
-    -----
-    Slower than the plain-Python equivalent ``len(x)`` (Tier A 1.13–1.14x); the
-    typed Cython call site.
-    """
+    """Return the size of mapping ``o`` (``PyMapping_Length``)."""
     ...

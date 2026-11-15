@@ -5,15 +5,8 @@ def hash_buffer(data: object, start: int = 0, end: int = -1) -> int:
 
     Notes
     -----
-    Mixed Tier A parity: 0.39x (3.15: array.array('B') n=6), 0.42x (3.14:
-    array.array('B') n=6), 0.45x (3.15: bytearray n=64), 0.48x (3.14: bytearray
-    n=64), 0.50x (3.14: memoryview n=256 range 64:128), 0.51x (3.15: memoryview
-    n=256 range 64:128), 0.57x (3.14: bytes n=2048 range 64:128), 0.58x (3.15: bytes
-    n=2048 range 64:128), 0.77x (3.15: bytearray n=2048), 0.78x (3.14: bytearray
-    n=2048), 1.46x (3.14: bytes n=8 (cached)), 1.63x (3.15: bytes n=8 (cached)),
-    2.85x (3.14: memoryview n=256 (cached)), 3.08x (3.15: memoryview n=256
-    (cached)); re-hashes the buffer every call, while ``bytes``/``memoryview`` cache
-    theirs.
+    Mixed Tier A parity: 0.76x (3.14), 0.89x (3.14t), 0.78x (3.15), 0.78x (3.15t);
+    re-hashes the buffer every call, while ``bytes``/``memoryview`` cache theirs.
 
     Accepts any simple buffer object (``bytes``, ``bytearray``, ``memoryview`` and
     exporters such as arrays); ``str`` is not a buffer and raises ``TypeError``.

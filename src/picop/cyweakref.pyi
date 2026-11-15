@@ -25,8 +25,8 @@ def weakref_new_proxy(ob: object, callback: object = None) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``weakref.proxy(x)`` (Tier A
-    1.11–1.19x); weak-reference creation from C.
+    Mixed Tier A parity: 1.01x (3.14), 1.01x (3.14t), 1.08x (3.15), 1.04x (3.15t);
+    weak-reference creation from C.
     """
     ...
 

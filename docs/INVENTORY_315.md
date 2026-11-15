@@ -38,6 +38,7 @@ Method: set-diff of `PyAPI_FUNC`/`PyAPI_DATA`/opaque typedefs between CPython **
 ## Queue
 
 080 BytesWriter getters/Grow (002) — shipped.
+081 `cypicklebuf` 3.14 guard removal (066) — shipped.
 
 ## Fresh scan — 2026-11-13
 
@@ -62,5 +63,6 @@ Corrections to the 2026-11-12 scan:
 2. **`PyBytesWriter_Resize` semantics.** It resizes the writer to `size` bytes (grow or shrink; newly allocated bytes uninitialized) — it sets the *logical* size, it is not a pure reservation. Order 075's shipped trick is `Create(hint)` + `Resize(0)`: allocate with the hint, rewind the size. `Grow(writer, n)` adds `n` to the current size (may be negative).
 3. **`PyDict_SetDefaultRef`** is not new as a symbol (present in 3.14); it is merely promoted to the Limited API in 3.15. picop already links it.
 4. **`PyObject_Dump`** (3.15) replaces the deprecated `_PyObject_Dump`; `_PyObject_GetAttrId` is now `Py_DEPRECATED(3.15)`; `_PyBytes_Join`/`_PyBytes_Resize` are soft-deprecated in favour of the writer API. No picop code touches any of them.
+5. **`PyPickleBuffer_*` is not 3.15-only.** `cpython/picklebufobject.h` declares `FromObject`, `GetBuffer`, `Release` and the `Check` macro in 3.14.7 as well, and the 3.14.7 binary exports all of them. Order 066's shim guard (`PY_VERSION_HEX >= 0x030F0000`) was therefore wrong; Order 081 removed it.
 
 Negative checks: `PyModule_GetSlots` and `PyModule_GetWarningsModule` are declared nowhere in 3.15; `_PyStructSequence_NewType` stays internal (`internal/pycore_structseq.h`). Everything else in the 50-symbol delta is either token/GC-traversal-gated, embedding-only, debug-only, or already mirrored by existing helpers.

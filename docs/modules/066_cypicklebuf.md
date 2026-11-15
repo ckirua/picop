@@ -106,3 +106,4 @@ Why the helper loses to `memoryview`: PickleBuffer construction adds protocol-sp
 - [x] Tier A/Tier B and depth probes written under Experiment conclusions
 - [x] Bench results table filled in this file
 - [x] Public PEP 257 summaries and version/performance caveat in `.pyi`; `.pxd` lean
+- [x] Iteration 2: guard removed, example and tests run on 3.14 and 3.15, SAFETY bullet for the borrowed buffer pointer

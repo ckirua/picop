@@ -84,6 +84,13 @@ That does not remove trusted-caller preconditions:
 - `tuple_from_array` INCREFs every array element (the caller keeps its own
   references), so it is safe over borrowed-reference arrays; negative sizes raise
   `ValueError` before any allocation.
+- `pickle_buffer_get_buffer` (cimport-only) returns a pointer into the PickleBuffer's
+  own export: valid only while that PickleBuffer is alive and unreleased. After
+  `pickle_buffer_release()` CPython returns NULL and a fresh `memoryview()` on the
+  object raises `ValueError`; previously acquired views keep their own export until
+  released. The helpers are available on every supported interpreter — the
+  3.15-only guard in `cypicklebuf_shim.h` was a misread of `cpython/picklebufobject.h`
+  and is gone.
 - `interpreter_guard()` (CPython 3.15+) prevents interpreter finalization while
   open; an unclosed guard is closed at dealloc, and a guard is never reused after
   `__exit__`. `threadstate_ensure`/`threadstate_release` must be paired on the

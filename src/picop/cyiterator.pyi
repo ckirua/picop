@@ -14,5 +14,11 @@ def iter_eq(a: object, b: object) -> bool:
     ...
 
 def iter_next(o: object) -> object:
-    """Return the next item of iterator ``o`` (``PyIter_Next``); ``None`` when exhausted."""
+    """Return the next item of iterator ``o`` (``PyIter_Next``); ``None`` when exhausted.
+
+    Notes
+    -----
+    Mixed Tier A parity: 1.02x (3.15: count-iter), 1.09x (3.14: count-iter);
+    iterator-protocol bridge.
+    """
     ...

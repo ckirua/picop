@@ -13,6 +13,9 @@ def set_add(s: set, value: object) -> int:
 
     Notes
     -----
+    Slower than the plain-Python equivalent ``s.add(v)`` (Tier A 1.03–1.06x);
+    unchecked set mutation.
+
     Returns ``0`` on success; errors raise. Do not use the status int as a
     bool.
     """
@@ -39,8 +42,8 @@ def set_clear(s: set) -> int:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``s.clear()`` (Tier A 1.03x); unchecked
-    set mutation.
+    Slower than the plain-Python equivalent ``s.clear()`` (Tier A 1.03–1.04x);
+    unchecked set mutation.
 
     Returns ``0`` on success; errors raise. Do not use the status int as a
     bool.
@@ -60,6 +63,9 @@ def set_discard(s: set, value: object) -> int:
 
     Notes
     -----
+    Slower than the plain-Python equivalent ``s.discard(v)`` (Tier A 1.05–1.06x);
+    unchecked set mutation.
+
     Returns ``1`` if removed, ``0`` if absent (no ``KeyError``). Errors raise.
     Do not treat the status int as a plain bool for success/failure.
     """
@@ -116,6 +122,9 @@ def set_update(s: set, iterable: object) -> int:
 
     Notes
     -----
+    Mixed Tier A parity: 1.02x (3.15: list3), 1.05x (3.14: list3); unchecked set
+    mutation.
+
     Returns ``0`` on success; errors raise. Do not use the status int as a
     bool.
     """
@@ -126,7 +135,7 @@ def set_pop(s: set) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``s.pop()`` (Tier A 1.09x); unchecked
-    set mutation.
+    Slower than the plain-Python equivalent ``s.pop()`` (Tier A 1.08–1.10x);
+    unchecked set mutation.
     """
     ...

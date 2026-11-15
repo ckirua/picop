@@ -5,5 +5,11 @@ def guards_supported() -> bool:
     ...
 
 def interpreter_guard() -> object:
-    """Context manager preventing interpreter finalization (CPython 3.15+)."""
+    """Context manager preventing interpreter finalization (CPython 3.15+).
+
+    Notes
+    -----
+    Slower than the plain-Python equivalent ``lambda: None`` (Tier A 3.85x); the
+    typed Cython call site.
+    """
     ...

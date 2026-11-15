@@ -24,6 +24,10 @@ def buf_eq(a: object, b: object) -> bool:
 
     Notes
     -----
+    Mixed Tier A parity: 0.76x (3.15: mv↔mv), 0.76x (3.14: mv↔mv), 0.76x (3.15:
+    bytes↔ba), 0.78x (3.14: bytes↔ba), 1.03x (3.15: ne), 1.07x (3.14: ne); buffer-
+    protocol comparison.
+
     C-contiguous buffers use ``memcmp``; otherwise memoryview richcompare.
     Format/size mismatch yields ``False``.
     """

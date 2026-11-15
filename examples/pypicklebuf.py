@@ -2,14 +2,9 @@
 
 Run: python examples/pypicklebuf.py
 """
-import sys
 
 
 def main() -> None:
-    if sys.version_info < (3, 15):
-        print("PickleBuffer C APIs require CPython 3.15 or newer; skipping")
-        return
-
     from picop import pickle_buffer_check, pickle_buffer_from_object, pickle_buffer_release
 
     payload = bytearray(b"serialized payload")

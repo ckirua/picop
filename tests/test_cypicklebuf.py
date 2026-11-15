@@ -1,9 +1,6 @@
 import pickle
 
 import pytest
-import sys
-
-pytestmark = pytest.mark.skipif(sys.version_info < (3, 15), reason="PickleBuffer C API requires CPython 3.15")
 
 from picop import (
     pickle_buffer_check,

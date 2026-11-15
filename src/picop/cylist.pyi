@@ -121,6 +121,9 @@ def list_set_item(l: list, i: int, value: object) -> int:
 
     Notes
     -----
+    Mixed Tier A parity: 0.90x (3.15: set), 1.03x (3.14: set); unchecked ``PyList``
+    mutation on a known list.
+
     INCREFs ``value`` then steals the new reference into the list slot. Returns
     ``0`` on success and ``-1`` on error; errors raise. Do not use the status
     int as a bool.

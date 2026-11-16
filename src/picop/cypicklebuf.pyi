@@ -5,7 +5,7 @@ def pickle_buffer_from_object(obj: object) -> object:
 
     Notes
     -----
-    Mixed Tier A parity: 2.17x (bytearray n=248), 1.28x (bytearray n=4096), 1.75x
+    Mixed Tier A parity: 1.96x (bytearray n=248), 1.14x (bytearray n=4096), 1.51x
     (bytearray n=6), 0.10x (pickle.dumps buffer-backed record n=248); the typed
     Cython call site.
 

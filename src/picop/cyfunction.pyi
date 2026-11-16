@@ -51,7 +51,7 @@ def func_set_closure(op: object, closure: object) -> int:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``lambda fn, c: 0`` (Tier A 1.06x);
+    Slower than the plain-Python equivalent ``lambda fn, c: 0`` (Tier A 1.09x);
     function defaults without the Python attribute machinery.
 
     Returns ``0`` on success; errors raise — do not use the status as a bool.

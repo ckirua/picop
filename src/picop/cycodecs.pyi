@@ -46,7 +46,7 @@ def codec_incremental_encoder(encoding: bytes, errors: bytes | None = None) -> o
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``_inc_enc`` (Tier A 1.05x);
+    Slower than the plain-Python equivalent ``_inc_enc`` (Tier A 1.12x);
     codec/error-handler bridge for extension authors.
 
     ``encoding`` / ``errors`` must be ``bytes`` when provided, not ``str``.
@@ -59,7 +59,7 @@ def codec_incremental_decoder(encoding: bytes, errors: bytes | None = None) -> o
     Notes
     -----
     Slower than the plain-Python equivalent ``codecs.incremental_decoder(enc)``
-    (Tier A 1.12x); codec/error-handler bridge for extension authors.
+    (Tier A 1.19x); codec/error-handler bridge for extension authors.
 
     ``encoding`` / ``errors`` must be ``bytes`` when provided, not ``str``.
     """
@@ -108,7 +108,7 @@ def codec_strict_errors(exc: object) -> object:
     Notes
     -----
     Slower than the plain-Python equivalent ``codecs.lookup(enc).decode(b,
-    'strict')`` (Tier A 14.59x); codec/error-handler bridge for extension authors.
+    'strict')`` (Tier A 15.88x); codec/error-handler bridge for extension authors.
     """
     ...
 
@@ -138,7 +138,7 @@ def codec_decode(o: object, encoding: bytes, errors: bytes | None = None) -> obj
     Notes
     -----
     Slower than the plain-Python equivalent ``lambda b, e, err: b.decode(e.decode(),
-    (err or b'strict').decode())`` (Tier A 1.60x); codec/error-handler bridge for
+    (err or b'strict').decode())`` (Tier A 1.70x); codec/error-handler bridge for
     extension authors.
     """
     ...
@@ -149,7 +149,7 @@ def codec_encode(o: object, encoding: bytes, errors: bytes | None = None) -> obj
     Notes
     -----
     Slower than the plain-Python equivalent ``lambda s, e, err: s.encode(e.decode(),
-    (err or b'strict').decode())`` (Tier A 1.42x); codec/error-handler bridge for
+    (err or b'strict').decode())`` (Tier A 1.35x); codec/error-handler bridge for
     extension authors.
     """
     ...

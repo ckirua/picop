@@ -5,9 +5,9 @@ def hash_buffer(data: object, start: int = 0, end: int = -1) -> int:
 
     Notes
     -----
-    Mixed Tier A parity: 0.37x (array.array('B') n=6), 0.80x (bytearray n=2048),
-    0.46x (bytearray n=64), 0.52x (bytes n=2048 range 64:128), 1.19x (bytes n=8
-    (cached)), 2.34x (memoryview n=256 (cached)), 0.47x (memoryview n=256 range
+    Mixed Tier A parity: 0.36x (array.array('B') n=6), 0.82x (bytearray n=2048),
+    0.48x (bytearray n=64), 0.52x (bytes n=2048 range 64:128), 1.19x (bytes n=8
+    (cached)), 2.25x (memoryview n=256 (cached)), 0.45x (memoryview n=256 range
     64:128); re-hashes the buffer every call, while ``bytes``/``memoryview`` cache
     theirs.
 

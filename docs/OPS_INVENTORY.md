@@ -175,6 +175,8 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 | `dict_get` | tierB | Tier A+B compare labels present |
 | `dict_get_ref` | tierA | Tier A `session.compare` present |
 | `dict_get_with_error` | tierA | Tier A `session.compare` present |
+| `dict_items_check` | tierB | Tier A+B compare labels present |
+| `dict_keys_check` | tierB | Tier A+B compare labels present |
 | `dict_len` | tierB | Tier A+B compare labels present |
 | `dict_merge` | tierA | Tier A `session.compare` present |
 | `dict_merge_from_seq2` | tierA | Tier A `session.compare` present |
@@ -186,6 +188,8 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 | `dict_setdefault_ref` | tierA | Tier A `session.compare` present |
 | `dict_size` | tierA | Tier A `session.compare` present |
 | `dict_update` | tierA | Tier A `session.compare` present |
+| `dict_values_check` | tierB | Tier A+B compare labels present |
+| `dict_view_check` | tierB | Tier A+B compare labels present |
 | `dt_date_check` | tierB | Tier A+B compare labels present |
 | `dt_date_check_exact` | tierA | Tier A `session.compare` present |
 | `dt_date_day` | tierA | Tier A `session.compare` present |

@@ -5,6 +5,7 @@
 ### Added
 - **`cylong` narrow typed conversions (Order 087):** public `long_is_zero` / `long_is_negative` / `long_is_positive` over CPython's `PyLong_IsZero` / `IsNegative` / `IsPositive` (non-integer input raises `TypeError` instead of silently reporting a truthy `-1`); cimport-only `long_get_sign`, `long_as_int32` / `long_as_int64` / `long_as_uint32` / `long_as_uint64` (range-checked, C-typed results) and `long_from_int32` / `int64` / `uint32` / `uint64`. `PyLong_AsInt` is not wrapped — it is `PyLong_AsInt32` on every supported platform. `PyLongWriter_*` (direct-fill digit writer) is deferred to its own Order.
 - **`cycellobject` cell swap (Order 088):** public `cell_swap(cell, value)` returns the previous contents in a **single** `Py_BEGIN_CRITICAL_SECTION` instead of the two sections of `cell_get` + `cell_set`, and `cell_empty()` builds a genuinely empty cell (`PyCell_New(NULL)`) rather than a cell holding `None`. The take-ref variants (`PyCell_GetRef`, `PyCell_SetTakeRef`, `PyCell_SwapTakeRef`) are not wrapped: they live in `internal/pycore_cell.h`, which `#error`s without `Py_BUILD_CORE`.
+- **`cydict` view predicates (Order 089):** public `dict_keys_check`, `dict_values_check`, `dict_items_check`, `dict_view_check` over the 3.12+ `PyDict*_Check` macros. `dict_view_check` matches **keys and items only**, not values — documented in the stub.
 
 ### Fixed
 - `cell_get` raises `ValueError` for an empty cell rather than propagating NULL without an exception; borrowed contents are promoted while the cell critical section remains held.

@@ -10,6 +10,10 @@ cdef extern from "Python.h":
     void Py_DECREF(PyObject *o)
     bint PyDict_Check(object p) noexcept
     bint PyDict_CheckExact(object p) noexcept
+    bint PyDictKeys_Check(object p) noexcept
+    bint PyDictValues_Check(object p) noexcept
+    bint PyDictItems_Check(object p) noexcept
+    bint PyDictViewSet_Check(object p) noexcept
     dict PyDict_New()
     object PyDictProxy_New(object mapping)
     void PyDict_Clear(object mp) noexcept
@@ -263,6 +267,18 @@ cpdef inline bint dict_check(object p) noexcept:
 
 cpdef inline bint dict_check_exact(object p) noexcept:
     return dcheck_exact(p)
+
+cpdef inline bint dict_keys_check(object obj) noexcept:
+    return PyDictKeys_Check(obj)
+
+cpdef inline bint dict_values_check(object obj) noexcept:
+    return PyDictValues_Check(obj)
+
+cpdef inline bint dict_items_check(object obj) noexcept:
+    return PyDictItems_Check(obj)
+
+cpdef inline bint dict_view_check(object obj) noexcept:
+    return PyDictViewSet_Check(obj)
 
 cpdef inline void dict_clear(dict d) noexcept:
     dclear(d)

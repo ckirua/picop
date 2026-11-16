@@ -10,6 +10,10 @@ import sys
 from pathlib import Path
 from types import MappingProxyType
 
+dict_keys = type({}.keys())
+dict_values = type({}.values())
+dict_items = type({}.items())
+
 _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
@@ -36,6 +40,7 @@ from picop import (
     dict_size,
     dict_update,
 )
+from picop.cydict import dict_keys_check, dict_values_check, dict_items_check, dict_view_check
 
 from _bench_util import BenchSession
 
@@ -75,6 +80,22 @@ def py_dcheck(p: object) -> bool:
 
 def py_dcheck_exact(p: object) -> bool:
     return type(p) is dict
+
+
+def py_keys_check(obj: object) -> bool:
+    return isinstance(obj, dict_keys)
+
+
+def py_values_check(obj: object) -> bool:
+    return isinstance(obj, dict_values)
+
+
+def py_items_check(obj: object) -> bool:
+    return isinstance(obj, dict_items)
+
+
+def py_view_set_check(obj: object) -> bool:
+    return isinstance(obj, (dict_keys, dict_items))
 
 
 def py_dnew() -> dict:
@@ -171,6 +192,19 @@ def main() -> None:
     session.compare("dict_check_exact", dict_check_exact, py_dcheck_exact, D_HIT, param="exact")
     session.compare("dict_new", dict_new, py_dnew, param="empty")
     session.compare("dict_proxy", dict_proxy, py_dproxy, D_HIT, param="proxy")
+
+    session.section("dict view predicates (hit and miss)")
+    views = {"keys": D_HIT.keys(), "values": D_HIT.values(), "items": D_HIT.items()}
+    session.compare("dict_keys_check", dict_keys_check, py_keys_check, views["keys"], param="hit")
+    session.compare("dict_keys_check", dict_keys_check, py_keys_check, (), param="miss")
+    session.compare("dict_values_check", dict_values_check, py_values_check, views["values"], param="hit")
+    session.compare("dict_values_check", dict_values_check, py_values_check, (), param="miss")
+    session.compare("dict_items_check", dict_items_check, py_items_check, views["items"], param="hit")
+    session.compare("dict_items_check", dict_items_check, py_items_check, (), param="miss")
+    session.compare("dict_view_check", dict_view_check, py_view_set_check, views["keys"], param="keys")
+    session.compare("dict_view_check", dict_view_check, py_view_set_check, views["items"], param="items")
+    # PyDictViewSet_Check is deliberately keys/items, not values.
+    session.compare("dict_view_check", dict_view_check, py_view_set_check, views["values"], param="values miss")
 
     session.section("mutators (fresh dict each call via wrapper)")
 

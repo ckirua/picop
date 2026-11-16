@@ -5,6 +5,7 @@ Run: python examples/pycellobject.py
 import types
 
 from picop import cell_check, cell_eq, cell_new, cell_get, cell_set
+from picop.cycellobject import cell_empty, cell_swap
 
 
 def main() -> None:
@@ -13,6 +14,16 @@ def main() -> None:
     assert cell_get(c) is None
     cell_set(c, 42)
     assert cell_get(c) == 42
+    old = cell_swap(c, 43)
+    assert old == 42 and cell_get(c) == 43
+    empty = cell_empty()
+    assert cell_check(empty)
+    try:
+        cell_get(empty)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("cell_empty must produce an empty cell")
     a = cell_new(1)
     b = cell_new(1)
     assert cell_eq(a, b) and not cell_eq(a, cell_new(2))

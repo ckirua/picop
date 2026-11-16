@@ -14,7 +14,7 @@ def cell_new(ob: object) -> object:
     ...
 
 def cell_get(cell: object) -> object:
-    """Return the contents of ``cell`` via ``PyCell_Get``."""
+    """Return the contents of ``cell`` (``PyCell_GET``); an empty cell raises ``ValueError``."""
     ...
 
 def cell_set(cell: object, value: object) -> int:
@@ -24,6 +24,15 @@ def cell_set(cell: object, value: object) -> int:
     -----
     Returns ``0`` on success; errors raise — do not use the status as a bool.
     """
+    ...
+
+def cell_empty() -> object:
+    """Return a genuinely empty cell; unlike ``cell_new(None)``, contents access raises."""
+    ...
+
+
+def cell_swap(cell: object, value: object) -> object:
+    """Replace contents; returns None when the cell was genuinely empty."""
     ...
 
 def cell_eq(a: object, b: object) -> bool:

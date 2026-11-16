@@ -41,9 +41,20 @@ return out
 The opposite direction matters just as much: macro getters such as `PyCell_GET`
 return a **borrowed** pointer, so they must stay `PyObject *` and be promoted with
 an `<object>` cast. Declaring them as `object` increfs a reference nobody owns and
-drives the target's refcount down by one per call. Both directions are pinned by
-`test_object_getters_hand_back_exactly_one_reference` in
+drives the target's refcount down by one per call. `cy_cell_swap` in
+`cycellobject_shim.h` sits on the other side of that line: it increfs the incoming
+value, swaps it in one critical section, and hands back the previous contents as a
+**new** reference (`Py_None` for an empty cell, never NULL), which is why the
+extern is declared `object` and carries no error sentinel. Both directions are
+pinned by `test_object_getters_hand_back_exactly_one_reference` in
 [`tests/test_systems.py`](../tests/test_systems.py).
+
+A NULL return is not always an error. A CPython 3.14.7 probe shows `PyCell_Get`
+returns NULL for an empty cell **without setting an exception**, so an extern declared
+`object PyCell_Get(object cell)` makes Cython raise with no exception object and
+crash inside the traceback machinery. `cell_get` reads the borrowed `PyCell_GET`
+pointer instead and raises `ValueError("cell is empty")` itself, matching the
+`cell_contents` getter that Python users expect.
 
 ## Free-threaded callers
 

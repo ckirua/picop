@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [3.12.0] — 2026-11-16 — Narrow integers, cell swap and format helpers
 
 ### Added
 - **`cylong` narrow typed conversions (Order 087):** public `long_is_zero` / `long_is_negative` / `long_is_positive` over CPython's `PyLong_IsZero` / `IsNegative` / `IsPositive` (non-integer input raises `TypeError` instead of silently reporting a truthy `-1`); cimport-only `long_get_sign`, `long_as_int32` / `long_as_int64` / `long_as_uint32` / `long_as_uint64` (range-checked, C-typed results) and `long_from_int32` / `int64` / `uint32` / `uint64`. `PyLong_AsInt` is not wrapped — it is `PyLong_AsInt32` on every supported platform. `PyLongWriter_*` (direct-fill digit writer) is deferred to its own Order.

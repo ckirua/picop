@@ -16,6 +16,22 @@ def dict_check_exact(p: object) -> bool:
     """Return True if ``type(p) is dict`` (``PyDict_CheckExact``)."""
     ...
 
+
+def dict_keys_check(obj: object) -> bool:
+    """Return whether ``obj`` is a ``dict_keys`` view."""
+    ...
+
+def dict_values_check(obj: object) -> bool:
+    """Return whether ``obj`` is a ``dict_values`` view."""
+    ...
+
+def dict_items_check(obj: object) -> bool:
+    """Return whether ``obj`` is a ``dict_items`` view."""
+    ...
+
+def dict_view_check(obj: object) -> bool:
+    """Return ``PyDictViewSet_Check``: true for keys and items, not values."""
+    ...
 def dict_clear(d: dict) -> None:
     """Clear ``d`` via ``PyDict_Clear``."""
     ...

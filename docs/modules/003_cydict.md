@@ -20,6 +20,10 @@ Hot-path get/set/pop/merge/len for typed exact `dict` + `str` keys, plus full in
 |--------|-------|------|--------|-------|
 | dcheck | cypy | cpdef | public | `PyDict_Check` |
 | dcheck_exact | cypy | cpdef | public | `PyDict_CheckExact` |
+| dict_keys_check | cypy | cpdef | public | `PyDictKeys_Check` |
+| dict_values_check | cypy | cpdef | public | `PyDictValues_Check` |
+| dict_items_check | cypy | cpdef | public | `PyDictItems_Check` |
+| dict_view_check | cypy | cpdef | public | `PyDictViewSet_Check` — keys and items only, not values |
 | dnew | cypy | cpdef | public | `PyDict_New` |
 | dproxy | cypy | cpdef | public | `PyDictProxy_New` |
 | dget | cypy | cpdef | public | borrowed `PyDict_GetItem` |
@@ -83,6 +87,8 @@ Hot-path get/set/pop/merge/len for typed exact `dict` + `str` keys, plus full in
 | dclear / dcopy | APPROVED | **0.91x** / **0.85x** |
 | dnext | APPROVED (cimport) | borrowed iteration; no Python baseline |
 | dkeys / dvalues / ditems | APPROVED (cimport) | ad-hoc: lose to `list(d.keys())` (~1.36x); not public |
+| dict_keys_check / dict_values_check / dict_items_check | APPROVED | Exact view-type macros; hit and miss Tier A rows and typed-loop Tier B rows added |
+| dict_view_check | APPROVED | `PyDictViewSet_Check` intentionally recognizes keys/items only; values excluded |
 | dset_string / ddel_string / dget_string* / dcontains_string / dpop_string | APPROVED (cimport) | C-string keys; temp unicode cost |
 | PyDict_Watch* (dict watchers) | APPROVED (cimport) | Order 072: `dict_add_watcher` / `dict_clear_watcher` / `dict_watch` / `dict_unwatch`; dispatch cost ~1% on watched sets (Tier B) |
 | `_PyDict_*` | REJECTED | private ABI — no wrap |
@@ -152,6 +158,30 @@ P26-11-12 — Order 072 dict watchers: cimport wrappers, Tier B dispatch cost, 3
 | dcopy | small | 3.21±0.05ms | 3.27ms | 0.85x | 0.84x | pass |
 
 Summary: 24/25 faster · 23/25 ≥5% gate · mean ratio **0.73x** · median **0.69x**.
+
+### Order 089 — Tier A view predicates
+
+CPython 3.14.7 / 3.15 · Tier A: 80,000 iterations × 5 runs; ratio = picop / `isinstance` using each concrete view type.
+
+| helper | case | 3.14 ratio | 3.15 ratio |
+|--------|------|------------|------------|
+| dict_keys_check | hit / miss | 0.53x / 0.42x | 0.49x / 0.40x |
+| dict_values_check | hit / miss | 0.50x / 0.43x | 0.48x / 0.41x |
+| dict_items_check | hit / miss | 0.51x / 0.43x | 0.49x / 0.40x |
+| dict_view_check | keys / items / values miss | 0.36x / 0.31x / 0.31x | 0.35x / 0.31x / 0.28x |
+
+All four predicates beat their Tier A baseline in every measured case; the four API clarity additions remain APPROVED. `dict_view_check` is correctly false on values, and the measured values-miss row tests that asymmetry against the keys/items Python baseline.
+
+### Order 089 — Tier B typed-loop predicates
+
+CPython 3.14.7 / 3.15 · N=2,000,000 × 5 runs; ratio = C-API predicate loop / typed Cython `isinstance` loop.
+
+| helper | case | 3.14 ratio | 3.15 ratio |
+|--------|------|------------|------------|
+| dict_keys_check | keys hit | 0.22x | 0.37x |
+| dict_values_check | values hit / keys miss | 0.43x / 0.16x | 0.38x / 0.14x |
+| dict_items_check | items hit | 0.21x | 0.39x |
+| dict_view_check | keys / items hit / values miss | 0.22x / 0.19x / 0.16x | 0.21x / 0.19x / 0.14x |
 
 ## Experiment — `cydict-monkey` (archived)
 
@@ -227,6 +257,7 @@ Ratio = cypy `cdef` loop / typed Cython baseline `==` loop (opaque + sink). **In
 | Exact `dict` typing | Cython `dict` params reject subtypes (`TypeError`); use `dsize` / `dcheck` for subclasses |
 | `dlen` vs `dsize` | Same speed on exact dict; prefer `dlen` typed; `dsize` for `object` / subtypes |
 | Views | `PyDict_Keys` etc. allocate lists and **lose** to `list(d.keys())` (~1.36x ad-hoc) and crush vs `.keys()` views → **cdef only** |
+| Dict-view predicates (Order 089) | `d.keys()` returns a fresh view object on every call (identity differs), so `dict_keys_check` tests the view type rather than a cached view. `dict_values_check` and `dict_items_check` test their own view types. `PyDictViewSet_Check` is intentionally asymmetric: keys and items match, values do not. These checks do not materialize a view themselves; repeated `d.keys()` calls do. The macro path is a direct C type test, avoiding Python-level `isinstance` dispatch, while borrowed/steal/refcount ownership is irrelevant because the input object is neither retained nor modified. The helpers execute under the caller's GIL state and rely on CPython's public C-API macro ABI; Tier A and typed-loop results measure different call surfaces and are recorded separately. |
 | C-string keys | `*String*` builds a temporary unicode per call — fine when the key is already `const char*` in Cython; prefer `str` objects on hot Python paths |
 | `dupdate` / `dmerge` | Both aliased (`Update` ≡ `Merge(..., 1)`); `dmerge(..., override=False)` keeps existing keys |
 | Watchers (Order 072) | cimport-only (C function-pointer callback); `RuntimeError` on table exhaustion, `ValueError` for unknown/cleared ids or non-dicts. Ids **2..7** are user slots (0–1 reserved for CPython). Verified identical on 3.14, 3.15, and true no-GIL 3.15t (`sys._is_gil_enabled() == False`) |

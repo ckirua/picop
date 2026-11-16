@@ -372,6 +372,8 @@ from .cydict import (
     dict_get,
     dict_get_ref,
     dict_get_with_error,
+    dict_items_check,
+    dict_keys_check,
     dict_len,
     dict_eq,
     dict_merge,
@@ -384,6 +386,8 @@ from .cydict import (
     dict_setdefault_ref,
     dict_size,
     dict_update,
+    dict_values_check,
+    dict_view_check,
 )
 from .cyfrozendict import (
     anydict_check,

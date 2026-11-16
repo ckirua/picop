@@ -1,5 +1,5 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False
-from picop.cydict cimport dict_get, dict_contains, dict_len, dict_check
+from picop.cydict cimport dict_get, dict_contains, dict_len, dict_check, dict_keys_check, dict_values_check, dict_items_check, dict_view_check
 include "_sink.pxi"
 
 cpdef object baseline_dget(dict d, str key, Py_ssize_t n):
@@ -63,6 +63,47 @@ cpdef bint cypy_dcheck(object p, Py_ssize_t n):
     cdef bint r = False
     for k in range(n):
         r = dict_check(tb_obj(p, k))
+        tb_sink_bint(r)
+    return r
+
+cpdef bint baseline_view_check(object p, object view_type, Py_ssize_t n):
+    cdef Py_ssize_t k
+    cdef bint r = False
+    for k in range(n):
+        r = isinstance(tb_obj(p, k), view_type)
+        tb_sink_bint(r)
+    return r
+
+
+cpdef bint cypy_dict_keys_check(object p, object view_type, Py_ssize_t n):
+    cdef Py_ssize_t k
+    cdef bint r = False
+    for k in range(n):
+        r = dict_keys_check(tb_obj(p, k))
+        tb_sink_bint(r)
+    return r
+
+cpdef bint cypy_dict_values_check(object p, object view_type, Py_ssize_t n):
+    cdef Py_ssize_t k
+    cdef bint r = False
+    for k in range(n):
+        r = dict_values_check(tb_obj(p, k))
+        tb_sink_bint(r)
+    return r
+
+cpdef bint cypy_dict_items_check(object p, object view_type, Py_ssize_t n):
+    cdef Py_ssize_t k
+    cdef bint r = False
+    for k in range(n):
+        r = dict_items_check(tb_obj(p, k))
+        tb_sink_bint(r)
+    return r
+
+cpdef bint cypy_dict_view_check(object p, object view_type, Py_ssize_t n):
+    cdef Py_ssize_t k
+    cdef bint r = False
+    for k in range(n):
+        r = dict_view_check(tb_obj(p, k))
         tb_sink_bint(r)
     return r
 

@@ -16,6 +16,7 @@ from picop import (
     dict_setdefault,
     dict_update,
 )
+from picop.cydict import dict_keys_check, dict_values_check, dict_items_check, dict_view_check
 
 PAYLOAD: dict[str, object] = {
     "symbol": "BTCUSDT",
@@ -26,6 +27,12 @@ PAYLOAD: dict[str, object] = {
 }
 
 def main() -> None:
+    assert dict_keys_check(PAYLOAD.keys())
+    assert dict_values_check(PAYLOAD.values())
+    assert dict_items_check(PAYLOAD.items())
+    assert dict_view_check(PAYLOAD.keys()) and dict_view_check(PAYLOAD.items())
+    assert not dict_view_check(PAYLOAD.values())
+    assert PAYLOAD.keys() is not PAYLOAD.keys()
     assert dict_eq({"a": 1}, {"a": 1}) and not dict_eq({"a": 1}, {"a": 2}) and dict_eq({}, {})
     assert dict_eq({"a": {"b": 1}}, {"a": {"b": 1}}) and not dict_eq({"a": 1}, {"b": 1})
     print(f"dict_len(payload) -> {dict_len(PAYLOAD)!r}")

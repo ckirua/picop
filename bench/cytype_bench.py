@@ -12,7 +12,8 @@ _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
 
-from picop import type_check, type_check_exact, type_is_subtype
+from picop.cytype import type_check, type_check_exact, type_is_subtype
+from picop.cytype import type_get_name, type_get_qualname, type_get_dict
 
 from _bench_util import BenchSession
 
@@ -45,6 +46,11 @@ def main() -> None:
     )
     session.compare("type_is_subtype", type_is_subtype, issubclass, bool, int, param="bool<int")
     session.compare("type_is_subtype", type_is_subtype, issubclass, int, bool, param="int!<bool")
+    session.section("type metadata accessors")
+    session.compare("type_get_name", type_get_name, lambda t: t.__name__, int, param="int")
+    session.compare("type_get_qualname", type_get_qualname, lambda t: t.__qualname__, int, param="int")
+    session.compare("type_get_dict", type_get_dict, lambda t: t.__dict__, int, param="int")
+    session.compare("type_get_name", type_get_name, lambda t: t.__name__, Sub, param="Sub")
 
     session.summary()
 

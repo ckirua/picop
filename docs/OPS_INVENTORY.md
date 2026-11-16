@@ -21,11 +21,11 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 
 | Metric | Count |
 |--------|------:|
-| Public barrel helpers | 517 |
-| `tierA` | 354 |
-| `tierB` | 144 |
+| Public barrel helpers | 540 |
+| `tierA` | 366 |
+| `tierB` | 154 |
 | `pending` | 0 |
-| `n/a` | 19 |
+| `n/a` | 20 |
 
 ## Checklist
 
@@ -553,6 +553,9 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 | `type_check` | tierB | Tier A+B compare labels present |
 | `type_check_exact` | tierA | Tier A `session.compare` present |
 | `type_eq` | tierB | Tier A+B compare labels present |
+| `type_get_dict` | tierB | Tier A+B compare labels present |
+| `type_get_name` | tierB | Tier A+B compare labels present |
+| `type_get_qualname` | tierB | Tier A+B compare labels present |
 | `type_is_subtype` | tierA | Tier A `session.compare` present |
 | `UnicodeWriter` | tierB | Tier A+B compare labels present (builder vs join/`+=`) |
 | `uintern` | tierB | Tier A+B compare labels present |

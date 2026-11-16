@@ -20,3 +20,15 @@ def type_eq(a: object, b: object) -> bool:
 def type_is_subtype(a: object, b: object) -> bool:
     """Return True if ``a`` is a subtype of ``b`` (``PyType_IsSubtype``)."""
     ...
+
+def type_get_name(typ: type) -> str:
+    """Return the type's name from ``tp_name``."""
+    ...
+
+def type_get_qualname(typ: type) -> str:
+    """Return the type's qualified name."""
+    ...
+
+def type_get_dict(typ: type) -> dict:
+    """Return the underlying type dictionary (not a mappingproxy). Read-only."""
+    ...

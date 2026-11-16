@@ -125,6 +125,9 @@ from .cytype import (
     type_check,
     type_check_exact,
     type_eq,
+    type_get_dict,
+    type_get_name,
+    type_get_qualname,
     type_is_subtype,
 )
 from .cyfunction import (

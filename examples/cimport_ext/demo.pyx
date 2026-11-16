@@ -71,7 +71,10 @@ from picop.cydescr cimport descr_name, descr_objclass
 from cpython.object cimport PyObject
 from libc.stddef cimport size_t
 from cpython.buffer cimport Py_buffer
-from libc.stdint cimport uint64_t
+from libc.stdint cimport uint64_t, int32_t, int64_t, uint32_t
+import struct
+cdef extern from "Python.h":
+    unsigned long Py_TPFLAGS_HEAPTYPE
 from picop.cytraceback cimport tb_check, tb_lineno, tb_next_borrow
 from picop.cypicklebuf cimport (
     pickle_buffer_from_object,
@@ -201,6 +204,22 @@ from picop.cythread cimport (
 from picop.cyversion cimport PY_MINOR_VERSION, PY_VERSION_HEX
 from picop.cyhash cimport hash_buffer, hash_buffer_raw, hash_generic, hash_pointer
 from picop.cywarnings cimport warn_ex, warnings_module
+from picop.cylong cimport (
+    long_as_int32,
+    long_as_int64,
+    long_as_uint32,
+    long_as_uint64,
+    long_from_int32,
+    long_from_uint64,
+    long_get_sign,
+    long_is_negative,
+    long_is_positive,
+    long_is_zero,
+)
+from picop.cytype cimport type_get_dict, type_get_flags, type_get_name, type_get_qualname
+from picop.cyfloat cimport float_pack2, float_pack4, float_pack8, float_unpack2, float_unpack4, float_unpack8
+from picop.cycellobject cimport cell_empty, cell_swap
+from picop.cydict cimport dict_items_check, dict_keys_check, dict_values_check, dict_view_check
 import gc
 import weakref
 
@@ -1040,3 +1059,82 @@ cpdef bint check_pickle_buffer():
     except ValueError:
         return True
     return False
+
+
+cpdef bint check_narrow_ints():
+    cdef int32_t small = long_as_int32(-7)
+    cdef uint32_t wide = long_as_uint32(4294967295)
+    cdef int64_t big = long_as_int64(2 ** 40)
+    cdef uint64_t ubig = long_as_uint64(2 ** 63)
+    if small != -7 or wide != 4294967295 or big != 1099511627776 or ubig != 9223372036854775808:
+        return False
+    if long_get_sign(0) != 0 or long_get_sign(-3) != -1 or long_get_sign(3) != 1:
+        return False
+    if not (long_is_zero(0) and long_is_negative(-1) and long_is_positive(1)):
+        return False
+    if long_from_int32(-1) != -1 or long_from_uint64(2 ** 64 - 1) != 2 ** 64 - 1:
+        return False
+    try:
+        long_as_int32(2 ** 32)
+    except OverflowError:
+        pass
+    else:
+        return False
+    try:
+        long_as_uint32(-1)
+    except ValueError:
+        pass
+    else:
+        return False
+    return True
+
+
+cpdef bint check_type_metadata():
+    cdef object payload = {"a": 1}
+    cdef object heap = type("SmokeType", (), {})
+    cdef unsigned long int_flags = type_get_flags(int)
+    cdef unsigned long heap_flags = type_get_flags(heap)
+    if int_flags == 0 or (heap_flags & Py_TPFLAGS_HEAPTYPE) == 0:
+        return False
+    if type_get_name(int) != "int" or type_get_qualname(int) != "int":
+        return False
+    if type_get_name(heap) != "SmokeType" or "SmokeType" not in type_get_qualname(heap):
+        return False
+    cdef object real_dict = type_get_dict(int)
+    if type(real_dict) is not dict or "bit_length" not in real_dict:
+        return False
+    if not (dict_keys_check(payload.keys()) and dict_values_check(payload.values())
+            and dict_items_check(payload.items())):
+        return False
+    if not dict_view_check(payload.keys()) or dict_view_check(payload.values()):
+        return False
+    return True
+
+
+cpdef bint check_float_pack():
+    cdef object packed = float_pack8(1.5)
+    if packed != struct.pack("<d", 1.5) or float_unpack8(packed) != 1.5:
+        return False
+    if float_pack4(1.5) != struct.pack("<f", 1.5) or float_unpack4(float_pack4(1.5)) != 1.5:
+        return False
+    if float_unpack2(float_pack2(0.5)) != 0.5:
+        return False
+    if float_pack8(1.5, False) != struct.pack(">d", 1.5):
+        return False
+    try:
+        float_unpack8(b"ab")
+    except ValueError:
+        pass
+    else:
+        return False
+    return True
+
+
+cpdef bint check_cell_swap():
+    cdef object cell = cell_empty()
+    if cell_swap(cell, "first") is not None:
+        return False
+    cdef object old = cell_swap(cell, "second")
+    if old != "first":
+        return False
+    return True

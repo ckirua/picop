@@ -39,7 +39,7 @@ jobs:
     name: Wheel build check (windows x86_64)
     runs-on: windows-latest
     env:
-      CIBW_BUILD: "cp315-windows_amd64"
+      CIBW_BUILD: "cp315-win_amd64"
     steps:
       - uses: actions/checkout@v4
         with:

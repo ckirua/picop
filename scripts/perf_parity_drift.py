@@ -8,7 +8,7 @@ Tier A ratios jitter by several percent between runs - a helper whose *minimum*
 case sits at 1.01x one run and 1.04x the next - so the gates use margins and only
 fire on contradictions that survive every dump:
 
-* a helper documented as always slower whose **mean** ratio is ``<= 0.90`` in
+* a helper documented as always slower whose case ratios average ``<= 0.90`` in
   every dump is stale: the wrapper is no longer losing to the builtin;
 * a helper absent from the table that averages ``>= 1.25`` in every dump is a
   real loss that needs a doc row and a stub note;

@@ -19,9 +19,11 @@ Usage::
 Ratios come from the ``BENCH_JSON`` line each bench prints when
 ``CPY_BENCH_JSON=1`` (set by this script), so no table parsing is involved.
 
-Ratio convention: ``mean(picop) / mean(builtin)`` — above ``1.00`` means the
-plain-Python call was faster. A helper counts as a loser only when every case
-for it exceeds ``--threshold`` (default 1.02).
+Ratio convention: ``median(picop) / median(builtin)`` per bench run (the mean is
+kept alongside as ``mean_ratio``). When several dumps are passed to
+``--from-json``, every (helper, case) pair is pooled by the median of the dumps.
+Above ``1.00`` means the plain-Python call was faster. A helper counts as a
+loser only when every case for it exceeds ``--threshold`` (default 1.02).
 """
 
 from __future__ import annotations
@@ -30,6 +32,7 @@ import argparse
 import ast
 import json
 import os
+import statistics
 import subprocess
 import sys
 import textwrap
@@ -100,6 +103,28 @@ def collect() -> tuple[dict[str, list[tuple[float, str]]], list[str]]:
         for name, ratio, case in _bench_rows(out.stdout):
             ratios.setdefault(name, []).append((ratio, case))
     return ratios, failures
+
+
+def load_dumps(paths: list[Path]) -> tuple[dict[str, list[tuple[float, str]]], list[str], str | None]:
+    """Merge several ``--json`` dumps into ``label -> [(ratio, case)]``.
+
+    Every (helper, case) pair is pooled by the **median** of the ratios across the
+    dumps, so one contended runner run cannot move a table row.
+    """
+    seen: dict[tuple[str, str], list[float]] = {}
+    failures: list[str] = []
+    config: str | None = None
+    for path in paths:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        for name, rows in data["ratios"].items():
+            for ratio, case in rows:
+                seen.setdefault((name, case), []).append(ratio)
+        failures.extend(data.get("failures", []))
+        config = data.get("config") or config
+    ratios: dict[str, list[tuple[float, str]]] = {}
+    for (name, case), values in seen.items():
+        ratios.setdefault(name, []).append((statistics.median(values), case))
+    return ratios, failures, config
 
 
 BUILTIN_LABELS = {
@@ -598,12 +623,11 @@ def main() -> int:
     pub = public_modules()
     config = None
     if args.from_json:
-        data = json.loads(args.from_json.read_text(encoding="utf-8"))
-        ratios, failures = data["ratios"], data["failures"]
-        config = data.get("config")
+        ratios, failures, config = load_dumps(args.from_json)
+        config = args.config or config
     else:
         ratios, failures = collect()
-        config = run_config()
+        config = args.config or run_config()
     if failures:
         print("bench failures:", file=sys.stderr)
         for line in failures:

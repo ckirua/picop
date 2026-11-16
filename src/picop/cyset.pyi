@@ -13,8 +13,8 @@ def set_add(s: set, value: object) -> int:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``s.add(v)`` (Tier A 1.03–1.06x);
-    unchecked set mutation.
+    Slower than the plain-Python equivalent ``s.add(v)`` (Tier A 1.04x); unchecked
+    set mutation.
 
     Returns ``0`` on success; errors raise. Do not use the status int as a
     bool.
@@ -42,9 +42,6 @@ def set_clear(s: set) -> int:
 
     Notes
     -----
-    Mixed Tier A parity: 1.09x (3.14), 1.02x (3.14t), 1.02x (3.15), 1.07x (3.15t);
-    unchecked set mutation.
-
     Returns ``0`` on success; errors raise. Do not use the status int as a
     bool.
     """
@@ -63,8 +60,7 @@ def set_discard(s: set, value: object) -> int:
 
     Notes
     -----
-    Mixed Tier A parity: 1.06x (3.14), 1.03x (3.14t), 1.01x (3.15), 1.04x (3.15t);
-    unchecked set mutation.
+    Mixed Tier A parity: 1.02x (hit), 1.03x (miss); unchecked set mutation.
 
     Returns ``1`` if removed, ``0`` if absent (no ``KeyError``). Errors raise.
     Do not treat the status int as a plain bool for success/failure.
@@ -100,13 +96,7 @@ def set_len(s: set) -> int:
     ...
 
 def set_eq(a: set, b: set) -> bool:
-    """Return True if typed sets are equal (identity/size short-circuit + richcompare).
-
-    Notes
-    -----
-    Mixed Tier A parity: 0.83x (3.14), 1.25x (3.14t), 0.79x (3.15), 1.03x (3.15t);
-    unchecked set mutation.
-    """
+    """Return True if typed sets are equal (identity/size short-circuit + richcompare)."""
     ...
 
 def set_new(iterable: object) -> set:
@@ -128,7 +118,7 @@ def set_update(s: set, iterable: object) -> int:
 
     Notes
     -----
-    Mixed Tier A parity: 1.05x (3.14), 1.10x (3.14t), 1.01x (3.15), 1.12x (3.15t);
+    Slower than the plain-Python equivalent ``s.update(it)`` (Tier A 1.07x);
     unchecked set mutation.
 
     Returns ``0`` on success; errors raise. Do not use the status int as a
@@ -141,7 +131,7 @@ def set_pop(s: set) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``s.pop()`` (Tier A 1.03–1.15x);
-    unchecked set mutation.
+    Slower than the plain-Python equivalent ``s.pop()`` (Tier A 1.09x); unchecked
+    set mutation.
     """
     ...

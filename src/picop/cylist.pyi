@@ -53,9 +53,6 @@ def list_extend(l: list, iterable: object) -> int:
 
     Notes
     -----
-    Mixed Tier A parity: 0.94x (3.14), 1.06x (3.14t), 0.93x (3.15), 0.97x (3.15t);
-    unchecked ``PyList`` mutation on a known list.
-
     Returns ``0`` on success and ``-1`` on error; errors raise. Do not use the
     status int as a bool.
     """
@@ -105,13 +102,7 @@ def list_len(l: list) -> int:
     ...
 
 def list_eq(a: list, b: list) -> bool:
-    """Return True if typed lists are equal (identity/len short-circuit + richcompare).
-
-    Notes
-    -----
-    Mixed Tier A parity: 0.80x (3.14), 1.07x (3.14t), 0.72x (3.15), 0.91x (3.15t);
-    unchecked ``PyList`` mutation on a known list.
-    """
+    """Return True if typed lists are equal (identity/len short-circuit + richcompare)."""
     ...
 
 
@@ -130,9 +121,6 @@ def list_set_item(l: list, i: int, value: object) -> int:
 
     Notes
     -----
-    Mixed Tier A parity: 0.99x (3.14), 1.01x (3.14t), 0.99x (3.15), 1.06x (3.15t);
-    unchecked ``PyList`` mutation on a known list.
-
     INCREFs ``value`` then steals the new reference into the list slot. Returns
     ``0`` on success and ``-1`` on error; errors raise. Do not use the status
     int as a bool.

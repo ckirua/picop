@@ -27,13 +27,7 @@ def mod_new(name: bytes) -> object:
     ...
 
 def mod_new_object(name: object) -> object:
-    """Return a new module named ``name`` via ``PyModule_NewObject``.
-
-    Notes
-    -----
-    Mixed Tier A parity: 0.96x (3.14), 1.11x (3.14t), 0.83x (3.15), 0.98x (3.15t);
-    module plumbing for embedding code.
-    """
+    """Return a new module named ``name`` via ``PyModule_NewObject``."""
     ...
 
 def mod_get_name(module: object) -> object:
@@ -41,13 +35,7 @@ def mod_get_name(module: object) -> object:
     ...
 
 def mod_get_filename(module: object) -> object:
-    """Return ``module.__file__`` via ``PyModule_GetFilenameObject``.
-
-    Notes
-    -----
-    Mixed Tier A parity: 0.85x (3.14), 1.09x (3.14t), 0.82x (3.15), 0.94x (3.15t);
-    module plumbing for embedding code.
-    """
+    """Return ``module.__file__`` via ``PyModule_GetFilenameObject``."""
     ...
 
 def mod_add_object_ref(module: object, name: bytes, value: object) -> int:
@@ -84,8 +72,8 @@ def mod_import_object(name: object) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``__import__(name)`` (Tier A
-    1.84–2.07x); module plumbing for embedding code.
+    Slower than the plain-Python equivalent ``__import__(name)`` (Tier A 1.96x);
+    module plumbing for embedding code.
     """
     ...
 

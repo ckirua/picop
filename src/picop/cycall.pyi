@@ -8,13 +8,7 @@ take raw borrowed argument vectors and cannot be called from Python.
 
 
 def call_noargs(callable: object) -> object:
-    """Call ``callable`` without constructing an argument tuple.
-
-    Notes
-    -----
-    Mixed Tier A parity: 1.01x (3.14), 1.07x (3.14t), 0.97x (3.15), 0.97x (3.15t);
-    the typed Cython call site.
-    """
+    """Call ``callable`` without constructing an argument tuple."""
     ...
 
 
@@ -24,11 +18,5 @@ def call_onearg(callable: object, arg: object) -> object:
 
 
 def call_twoargs(callable: object, arg0: object, arg1: object) -> object:
-    """Call ``callable(arg0, arg1)`` through CPython vectorcall.
-
-    Notes
-    -----
-    Mixed Tier A parity: 1.09x (3.14), 1.03x (3.14t), 1.02x (3.15), 1.03x (3.15t);
-    the typed Cython call site.
-    """
+    """Call ``callable(arg0, arg1)`` through CPython vectorcall."""
     ...

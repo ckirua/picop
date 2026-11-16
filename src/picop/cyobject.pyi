@@ -98,8 +98,8 @@ def obj_as_fd(o: object) -> int:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``x.fileno()`` (Tier A 1.31–1.47x);
-    last-resort bridge for unknown objects.
+    Slower than the plain-Python equivalent ``x.fileno()`` (Tier A 1.41x); last-
+    resort bridge for unknown objects.
 
     On error raises — do not treat the result as a boolean success flag.
     """
@@ -110,23 +110,11 @@ def obj_dir(o: object) -> object:
     ...
 
 def obj_iter(o: object) -> object:
-    """Return ``iter(o)`` via ``PyObject_GetIter``.
-
-    Notes
-    -----
-    Mixed Tier A parity: 0.97x (3.14), 1.02x (3.14t), 0.99x (3.15), 1.00x (3.15t);
-    last-resort bridge for unknown objects.
-    """
+    """Return ``iter(o)`` via ``PyObject_GetIter``."""
     ...
 
 def obj_format(obj: object, format_spec: object) -> object:
-    """Return ``format(obj, format_spec)`` via ``PyObject_Format``.
-
-    Notes
-    -----
-    Mixed Tier A parity: 1.05x (3.14), 0.95x (3.14t), 1.02x (3.15), 1.02x (3.15t);
-    last-resort bridge for unknown objects.
-    """
+    """Return ``format(obj, format_spec)`` via ``PyObject_Format``."""
     ...
 
 def obj_setattr_cstr(o: object, name: bytes, v: object) -> int:
@@ -154,13 +142,7 @@ def obj_callable(o: object) -> bool:
     ...
 
 def obj_getattr(o: object, name: object) -> object:
-    """Return ``getattr(o, name)`` via ``PyObject_GetAttr``.
-
-    Notes
-    -----
-    Mixed Tier A parity: 0.98x (3.14), 1.03x (3.14t), 0.97x (3.15), 1.01x (3.15t);
-    last-resort bridge for unknown objects.
-    """
+    """Return ``getattr(o, name)`` via ``PyObject_GetAttr``."""
     ...
 
 def obj_getattr_cstr(o: object, name: bytes) -> object:
@@ -168,13 +150,7 @@ def obj_getattr_cstr(o: object, name: bytes) -> object:
     ...
 
 def obj_getitem(o: object, key: object) -> object:
-    """Return ``o[key]`` via ``PyObject_GetItem``.
-
-    Notes
-    -----
-    Mixed Tier A parity: 1.01x (3.14), 1.02x (3.14t), 1.00x (3.15), 1.08x (3.15t);
-    last-resort bridge for unknown objects.
-    """
+    """Return ``o[key]`` via ``PyObject_GetItem``."""
     ...
 
 def obj_hasattr(o: object, name: object) -> bool:
@@ -182,8 +158,8 @@ def obj_hasattr(o: object, name: object) -> bool:
 
     Notes
     -----
-    Mixed Tier A parity: 1.03x (3.14), 1.05x (3.14t), 1.00x (3.15), 1.01x (3.15t);
-    last-resort bridge for unknown objects.
+    Slower than the plain-Python equivalent ``hasattr(x, name)`` (Tier A
+    1.02–1.03x); last-resort bridge for unknown objects.
     """
     ...
 
@@ -204,19 +180,13 @@ def obj_istrue(o: object) -> bool:
 
     Notes
     -----
-    Mixed Tier A parity: 1.06x (3.14), 1.06x (3.14t), 1.04x (3.15), 1.01x (3.15t);
-    last-resort bridge for unknown objects.
+    Slower than the plain-Python equivalent ``bool(x)`` (Tier A 1.07–1.07x); last-
+    resort bridge for unknown objects.
     """
     ...
 
 def obj_len(o: object) -> int:
-    """Return ``len(o)`` via ``PyObject_Length``.
-
-    Notes
-    -----
-    Mixed Tier A parity: 0.99x (3.14), 1.01x (3.14t), 0.97x (3.15), 1.04x (3.15t);
-    last-resort bridge for unknown objects.
-    """
+    """Return ``len(o)`` via ``PyObject_Length``."""
     ...
 
 def obj_size(o: object) -> int:
@@ -228,8 +198,8 @@ def obj_str(o: object) -> object:
 
     Notes
     -----
-    Mixed Tier A parity: 1.03x (3.14), 1.01x (3.14t), 1.04x (3.15), 1.03x (3.15t);
-    last-resort bridge for unknown objects.
+    Slower than the plain-Python equivalent ``str(x)`` (Tier A 1.02x); last-resort
+    bridge for unknown objects.
     """
     ...
 
@@ -238,7 +208,7 @@ def obj_type(o: object) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``type(x)`` (Tier A 1.07–1.12x); last-
-    resort bridge for unknown objects.
+    Slower than the plain-Python equivalent ``type(x)`` (Tier A 1.09x); last-resort
+    bridge for unknown objects.
     """
     ...

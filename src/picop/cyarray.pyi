@@ -48,21 +48,12 @@ def array_eq(a: array, b: array) -> bool:
 
     Notes
     -----
-    Mixed Tier A parity: 0.59x (3.14), 1.00x (3.14t), 0.56x (3.15), 0.78x (3.15t);
-    the typed Cython call site.
-
     Compares typecode/len then ``memcmp``.
     """
     ...
 
 def array_ne(a: array, b: array) -> bool:
-    """Return True if typed ``array.array`` values differ (``not array_eq``).
-
-    Notes
-    -----
-    Mixed Tier A parity: 0.56x (3.14), 0.93x (3.14t), 0.53x (3.15), 0.74x (3.15t);
-    the typed Cython call site.
-    """
+    """Return True if typed ``array.array`` values differ (``not array_eq``)."""
     ...
 
 def array_resize(a: array, n: int) -> int:

@@ -645,6 +645,12 @@ from .cyfloat cimport (
     float_from_cstr,
     float_as_double,
     float_as_double_unchecked,
+    float_pack2,
+    float_pack4,
+    float_pack8,
+    float_unpack2,
+    float_unpack4,
+    float_unpack8,
 )
 from .cyerr cimport (
     err_clear,

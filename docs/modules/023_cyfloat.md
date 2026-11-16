@@ -23,6 +23,10 @@ Float type checks and C `double` bridge. From Python, `float()` often wins; help
 | float_from_double / from_string / as_double | public | |
 | float_as_double_unchecked | cimport | `AS_DOUBLE` macro |
 
+
+| float_pack2/4/8, float_unpack2/4/8 | APPROVED | C format conversion; Tier A parity against `struct` |
+| PyFloat_GetInfo | REJECTED | `sys.float_info` is the same object; no hot path |
+
 ## Workflow status
 
 | Function | Status | Why |
@@ -57,13 +61,17 @@ P26-07-22 — `*_eq` inventory Tier A (`cyeq_inventory_bench`)|
 
 | operation | case | ratio | verdict |
 |-----------|------|-------|---------|
-| float_check | float / int | 0.52x / 0.41x | pass |
-| float_check_exact | float | 0.57x | pass |
-| float_from_double | 2.5 | 1.35x | API |
-| float_from_string | '2.5' | 1.03x | API |
-| float_as_double | pi / int | 1.53x / 1.30x | API |
-
-Summary: 3/7 gate · mean **0.96x**.
+| float_check | float / int | 0.49x / 0.43x | pass |
+| float_check_exact | float | 0.52x | pass |
+| float_from_double | 2.5 | 1.21x | API (slower, documented) |
+| float_from_string | '2.5' | 1.01x | API |
+| float_as_double | pi / int | 1.28x / 1.34x | API (slower, documented) |
+| float_pack8/unpack8 | little/big, 3.14 | 0.48/0.36x; 0.83/0.66x | pass |
+| float_pack4/unpack4 | little/big, 3.14 | 0.49/0.33x; 0.80/0.64x | pass |
+| float_pack2/unpack2 | little/big, 3.14 | 0.51/0.39x; 0.85/0.69x | pass |
+| float_pack8/unpack8 | little/big, 3.15 | 0.52/0.33x; 0.80/0.64x | pass |
+| float_pack4/unpack4 | little/big, 3.15 | 0.46/0.35x; 0.82/0.64x | pass |
+| float_pack2/unpack2 | little/big, 3.15 | 0.51/0.35x; 0.78/0.65x | pass |
 
 ### Tier B (Cython baseline)
 
@@ -72,9 +80,12 @@ Ratio = cypy `cdef` loop / typed Cython baseline loop (opaque + sink). **Informa
 
 | operation | case | cypy mean±σ | p99 | cy-base mean±σ | ratio | p99× | note |
 |-----------|------|-------------|-----|----------------|-------|------|------|
-| float_check | hit | 2.86±0.11ms | 3.02ms | 2.86±0.19ms | **1.00x** | 0.99x | ~tie |
-
-**Tier B takeaway:** primary `float_check` **1.00x** vs typed Cython baseline (hit).
+| float_check | hit, 3.14 | 3.07±0.02ms | 3.10ms | 2.98±0.00ms | **1.03x** | 1.04x | baseline faster |
+| float_pack8 | little, 3.14 | 46.69±8.58ms | 58.83ms | 188.57±23.18ms | **0.25x** | 0.27x | cypy faster |
+| float_unpack8 | little, 3.14 | 6.39±0.10ms | 6.52ms | 153.86±3.50ms | **0.04x** | 0.04x | cypy faster |
+| float_check | hit, 3.15 | 3.08±0.02ms | 3.10ms | 3.09±0.05ms | **1.00x** | 0.98x | ~tie |
+| float_pack8 | little, 3.15 | 46.60±12.09ms | 66.81ms | 191.62±1.94ms | **0.24x** | 0.34x | cypy faster |
+| float_unpack8 | little, 3.15 | 6.15±1.22ms | 8.23ms | 182.37±14.23ms | **0.03x** | 0.04x | cypy faster |
 
 
 
@@ -115,6 +126,7 @@ Ratio = cypy `cdef` loop / typed Cython baseline `==` loop (opaque + sink). **In
 | Safety | AsDouble on non-float uses number protocol — may call `__float__` and set errors |
 | Scale | String parse ~tie with `float('2.5')` (1.04x) |
 | `float_eq` | Float/float: C `double ==` (NaN != NaN, `+0.0 == -0.0`). Mixed: `PyObject_RichCompare` — **not** `RichCompareBool` (identity-shortcuts same-object NaN → True). Leave off `hot` |
+**Pack/unpack depth:** Tier A measured all six helpers against `struct` in both byte orders; the recorded ratios span 0.33x–0.85x. The C API's raw-pointer unpack has no bounds check, so each wrapper checks `PyBytes_Check` and verifies length before obtaining the pointer; short input therefore raises `ValueError`, while longer input consumes exactly the encoded 2, 4, or 8 bytes. Half precision maps `0.1` to `0.0999755859375` (the actual IEEE binary16 rounding), and 4-byte packing truncates to float precision. `inf` and `nan` retain IEEE behavior. No borrowed buffer or reference stealing is involved: pack creates bytes from a stack buffer, and unpack reads synchronously while the input bytes remain alive. These are format conversions, not GIL-free operations; measured speed reflects avoiding `struct` call/tuple overhead, with the allocation threshold still present for output bytes. Big-endian parity was measured byte-for-byte against `struct.pack`.
 
 
 ## Done when

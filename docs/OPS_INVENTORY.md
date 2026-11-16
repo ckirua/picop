@@ -233,6 +233,12 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 | `float_eq` | tierB | Tier A+B compare labels present |
 | `float_from_cstr` | tierA | Tier A `session.compare` present |
 | `float_from_double` | tierA | Tier A `session.compare` present |
+| `float_pack2` | tierA | Tier A `session.compare` present |
+| `float_pack4` | tierA | Tier A `session.compare` present |
+| `float_pack8` | tierB | Tier A+B compare labels present |
+| `float_unpack2` | tierA | Tier A `session.compare` present |
+| `float_unpack4` | tierA | Tier A `session.compare` present |
+| `float_unpack8` | tierB | Tier A+B compare labels present |
 | `frame_back` | tierB | Tier A+B compare labels present |
 | `frame_builtins` | tierA | Tier A `session.compare` present |
 | `frame_check` | tierB | Tier A+B compare labels present |

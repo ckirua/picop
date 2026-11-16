@@ -70,6 +70,7 @@ Scanner hot paths plus full include try-all. Depth showed pure `memmem` **loses*
 | BytesWriter.grow / data / finish_with_size | APPROVED (cimport) | Order 080: direct fill beats `write()` in a `cdef` loop (**0.61x**, 3.14 / see Bench); no Python-side win → cimport only |
 | FinishWithPointer | REJECTED | Order 080: no capability `grow()` + `finish_with_size()` don't already give (`FinishWithPointer` = `FinishWithSize(buf - GetData())`) |
 | `PyBytesWriter_Format` | REJECTED | Order 080: C varargs; `("%d" % n).encode()` + `write()` has no bench case |
+| `cy_bytes_writer_grow` pointer arithmetic | APPROVED (build fix) | Order 083: `GetData(...) + GetSize(...)` is `void *` arithmetic — gcc/clang accept it as a GNU extension, MSVC rejects it (`error C2036`), which broke the Windows wheels of `picop-v3.10.0`. Cast to `char *` before the offset; `scripts/check_shims_pedantic.py` now compiles every shim with `-std=c11 -pedantic-errors -Werror` in the release preflight and on every PR, and `wheels.yml` builds a `cp315-win_amd64` wheel as the MSVC probe |
 | bas_string* / from_string* | APPROVED (cimport) | C pointers / builders |
 | bnew | APPROVED (cimport) | uninit ≠ `bytes(n)`; unsafe as public |
 | bconcat / bconcat_and_del / bresize | APPROVED (cimport) | ownership/`*pv` semantics — cdef |
@@ -82,8 +83,8 @@ Scanner hot paths plus full include try-all. Depth showed pure `memmem` **loses*
 | Field | Value |
 |-------|--------|
 | Freeze | **1.0 Core** — public + documented cimport; see COVERAGE § 1.0 freeze |
-| Iteration | 10 |
-| Last pass | 2026-11-15 — Order 080 `BytesWriter` direct fill (`grow` / `data` / `finish_with_size` / `size`), Tier B on 3.14 + 3.15 |
+| Iteration | 11 |
+| Last pass | 2026-11-16 — Order 083 build follow-up to 080: MSVC-safe `grow` pointer cast, strict-C11 shim gate, Windows wheel check on PRs. Earlier: Order 080 `BytesWriter` direct fill (`grow` / `data` / `finish_with_size` / `size`), Tier B on 3.14 + 3.15 |
 | Next action | — |
 
 ## Decision log

@@ -2,12 +2,25 @@
 # ``int`` / long helpers. Public docs in ``cylong.pyi``.
 # Pointer/overflow out-params and FromString: cdef (+ tuple wrappers where useful).
 
+from libc.stdint cimport int32_t, int64_t, uint32_t, uint64_t
 from libc.stddef cimport size_t
 from cpython.object cimport PyObject_RichCompareBool, Py_EQ
 
 
 cdef extern from "Python.h":
     ctypedef long long PY_LONG_LONG
+    int PyLong_IsZero(object value) except -1
+    int PyLong_IsNegative(object value) except -1
+    int PyLong_IsPositive(object value) except -1
+    int PyLong_GetSign(object value, int *sign) except -1
+    int PyLong_AsInt32(object obj, int32_t *out) except -1
+    int PyLong_AsInt64(object obj, int64_t *out) except -1
+    int PyLong_AsUInt32(object obj, uint32_t *out) except -1
+    int PyLong_AsUInt64(object obj, uint64_t *out) except -1
+    object PyLong_FromInt32(int32_t value)
+    object PyLong_FromInt64(int64_t value)
+    object PyLong_FromUInt32(uint32_t value)
+    object PyLong_FromUInt64(uint64_t value)
     ctypedef unsigned long long uPY_LONG_LONG "unsigned long long"
 
     bint PyLong_Check(object p) noexcept
@@ -34,6 +47,54 @@ cdef extern from "Python.h":
     void *PyLong_AsVoidPtr(object pylong) except? NULL
 
 
+
+cpdef inline bint long_is_zero(object value) except -1:
+    return PyLong_IsZero(value)
+
+cpdef inline bint long_is_negative(object value) except -1:
+    return PyLong_IsNegative(value)
+
+cpdef inline bint long_is_positive(object value) except -1:
+    return PyLong_IsPositive(value)
+
+cdef inline int long_get_sign(object value) except? -1:
+    # ``-1`` is a legitimate sign, so the error sentinel must be checked
+    # against ``PyErr_Occurred`` rather than assumed.
+    cdef int sign = 0
+    PyLong_GetSign(value, &sign)
+    return sign
+
+cdef inline int32_t long_as_int32(object value) except? 0:
+    cdef int32_t out = 0
+    PyLong_AsInt32(value, &out)
+    return out
+
+cdef inline int64_t long_as_int64(object value) except? 0:
+    cdef int64_t out = 0
+    PyLong_AsInt64(value, &out)
+    return out
+
+cdef inline uint32_t long_as_uint32(object value) except? 0:
+    cdef uint32_t out = 0
+    PyLong_AsUInt32(value, &out)
+    return out
+
+cdef inline uint64_t long_as_uint64(object value) except? 0:
+    cdef uint64_t out = 0
+    PyLong_AsUInt64(value, &out)
+    return out
+
+cdef inline object long_from_int32(int32_t value):
+    return PyLong_FromInt32(value)
+
+cdef inline object long_from_int64(int64_t value):
+    return PyLong_FromInt64(value)
+
+cdef inline object long_from_uint32(uint32_t value):
+    return PyLong_FromUInt32(value)
+
+cdef inline object long_from_uint64(uint64_t value):
+    return PyLong_FromUInt64(value)
 cpdef inline bint long_check(object p) noexcept:
     return PyLong_Check(p)
 

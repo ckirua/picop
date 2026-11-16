@@ -484,6 +484,9 @@ from .cylong import (
     long_as_ulong_mask,
     long_as_ulonglong_mask,
     long_as_double,
+    long_is_negative,
+    long_is_positive,
+    long_is_zero,
 )
 from .cylist import (
     list_as_tuple,

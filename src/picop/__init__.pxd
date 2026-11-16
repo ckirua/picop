@@ -710,6 +710,18 @@ from .cylong cimport (
     long_from_voidptr,
     long_as_voidptr,
     long_as_longlong_overflow,
+    long_is_zero,
+    long_is_negative,
+    long_is_positive,
+    long_get_sign,
+    long_as_int32,
+    long_as_int64,
+    long_as_uint32,
+    long_as_uint64,
+    long_from_int32,
+    long_from_int64,
+    long_from_uint32,
+    long_from_uint64,
 )
 from .cylist cimport (
     list_as_tuple,

@@ -135,6 +135,24 @@ if [[ "$SKIP_CHECKS" -eq 0 ]]; then
   "$PYTHON" scripts/check_exports.py
   "$PYTHON" scripts/grade_trackers.py
   "$PYTHON" scripts/check_shims_pedantic.py
+  # Header delta diffs the target interpreter (3.15) against the 3.14 baseline.
+  HEADER_PY="${PYTHON315:-}"
+  if [[ -z "$HEADER_PY" ]]; then
+    for candidate in python3.15 python3.15t "$PYTHON"; do
+      if command -v "$candidate" >/dev/null 2>&1 \
+         && "$candidate" -c 'import sys; raise SystemExit(sys.version_info[:2] != (3, 15))' 2>/dev/null; then
+        HEADER_PY="$candidate"
+        break
+      fi
+    done
+  fi
+  if [[ -z "$HEADER_PY" ]]; then
+    info "no CPython 3.15 interpreter found — header delta skipped (CI runs it; set PYTHON315=...)"
+  else
+    "$HEADER_PY" scripts/header_delta.py \
+      --baseline "${HEADER_BASELINE:-scripts/header_baseline_314.json}" \
+      --fail-on-unaccounted
+  fi
 else
   info "skipping preflight checks"
 fi

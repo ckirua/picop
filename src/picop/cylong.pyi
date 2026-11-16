@@ -174,3 +174,15 @@ def long_from_ssize(v: int) -> object:
     a C integer type.
     """
     ...
+
+def long_is_zero(value: object) -> bool:
+    """Return whether an integer is zero (``PyLong_IsZero``)."""
+    ...
+
+def long_is_negative(value: object) -> bool:
+    """Return whether an integer is negative (``PyLong_IsNegative``)."""
+    ...
+
+def long_is_positive(value: object) -> bool:
+    """Return whether an integer is positive (``PyLong_IsPositive``)."""
+    ...

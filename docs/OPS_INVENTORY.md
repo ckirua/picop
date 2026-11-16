@@ -315,6 +315,9 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 | `long_from_ssize` | tierA | Tier A `session.compare` present |
 | `long_from_ulong` | tierA | Tier A `session.compare` present |
 | `long_from_ulonglong` | tierA | Tier A `session.compare` present |
+| `long_is_negative` | tierA | Tier A `session.compare` present |
+| `long_is_positive` | tierA | Tier A `session.compare` present |
+| `long_is_zero` | tierA | Tier A `session.compare` present |
 | `map_check` | tierB | Tier A+B compare labels present |
 | `map_del` | tierA | Tier A `session.compare` present |
 | `map_del_cstr` | tierA | Tier A `session.compare` present |

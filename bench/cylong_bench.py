@@ -13,6 +13,7 @@ _BENCH_ROOT = Path(__file__).resolve().parent
 if str(_BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(_BENCH_ROOT))
 
+from picop.cylong import long_is_negative, long_is_positive, long_is_zero
 from picop import (
     long_as_double,
     long_as_long,
@@ -30,9 +31,25 @@ from _bench_util import BenchSession
 N = 42
 
 
+
 def main() -> None:
     session = BenchSession("cylong — public helpers vs plain Python (tier A)")
     session.header()
+    session.section("narrow sign predicates")
+    py_zero = lambda x: x == 0
+    py_negative = lambda x: x < 0
+    py_positive = lambda x: x > 0
+    for value in (0, 1, -1, 42):
+        session.compare("long_is_zero", long_is_zero, py_zero, value, param=f"small n={value}")
+        session.compare("long_is_negative", long_is_negative, py_negative, value, param=f"small n={value}")
+        session.compare("long_is_positive", long_is_positive, py_positive, value, param=f"small n={value}")
+    for value in (2**100, -(2**100)):
+        session.compare("long_is_zero", long_is_zero, py_zero, value, param=f"large n={value.bit_length()}")
+        session.compare("long_is_negative", long_is_negative, py_negative, value, param=f"large n={value.bit_length()}")
+        session.compare("long_is_positive", long_is_positive, py_positive, value, param=f"large n={value.bit_length()}")
+    session.compare("long_is_zero", long_is_zero, py_zero, 42, param="scale n=42")
+    session.compare("long_is_negative", long_is_negative, py_negative, 42, param="scale n=42")
+    session.compare("long_is_positive", long_is_positive, py_positive, 42, param="scale n=42")
 
     session.section("long_check  [primary: long_as_long]")
     session.compare("long_check", long_check, lambda o: isinstance(o, int), N, param="int")

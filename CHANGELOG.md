@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- **`cylong` direct-fill integer writer (Order 092):** cimport-only `long_native_layout`, `long_writer_create`, `long_writer_finish`, and `long_writer_discard`, with `PyLongLayout` / `PyLongWriter` types available from the package barrel. Callers fill a fixed-size native digit buffer before finishing; finish normalizes high zero digits and consumes the writer. No raw buffer is exposed to Python callers.
+
 ## [3.12.0] — 2026-11-16 — Narrow integers, cell swap and format helpers
 
 ### Added

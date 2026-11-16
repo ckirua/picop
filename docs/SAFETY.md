@@ -108,6 +108,20 @@ That does not remove trusted-caller preconditions:
   out-of-range size), so a rejected call leaves the writer open. Calling
   `finish_with_size()`, `finish()` or `discard()` after close raises
   `RuntimeError`, never UB.
+  
+`PyLongWriter` is a raw, cimport-only digit-buffer API. `long_writer_create`
+requires a positive digit count and returns an uninitialized fixed-size buffer;
+initialize every slot before finish, and use `long_native_layout()` metadata
+(`bits_per_digit`, `digit_size`, `digits_order`, and `digit_endianness`) to
+encode it. Check digit values fit the declared bit width and keep all writes
+within the allocated digit count and per-digit size. The buffer is exclusively
+owned for writing: do not retain/use aliases, resize it, or assume finish will
+truncate excess high zero digits. `long_writer_finish` consumes the handle even
+if it raises; never discard it afterward. Otherwise, call `long_writer_discard`
+exactly once on every allocated handle that is not finished. Discard accepts
+NULL, but closing the same non-NULL handle twice is unsafe. These calls require
+an attached thread state.
+
 - `tuple_from_array` INCREFs every array element (the caller keeps its own
   references), so it is safe over borrowed-reference arrays; negative sizes raise
   `ValueError` before any allocation.

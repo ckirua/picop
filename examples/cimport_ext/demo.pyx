@@ -218,6 +218,14 @@ from picop.cylong cimport (
 )
 from picop.cytype cimport type_get_dict, type_get_flags, type_get_name, type_get_qualname
 from picop.cyfloat cimport float_pack2, float_pack4, float_pack8, float_unpack2, float_unpack4, float_unpack8
+from picop cimport (
+    PyLongWriter,
+    PyLongLayout,
+    long_native_layout,
+    long_writer_create,
+    long_writer_finish,
+    long_writer_discard,
+)
 from picop.cycellobject cimport cell_empty, cell_swap
 from picop.cydict cimport dict_items_check, dict_keys_check, dict_values_check, dict_view_check
 import gc
@@ -1136,5 +1144,59 @@ cpdef bint check_cell_swap():
         return False
     cdef object old = cell_swap(cell, "second")
     if old != "first":
+        return False
+    return True
+cpdef bint check_long_writer():
+    cdef const PyLongLayout *layout = long_native_layout()
+    cdef PyLongWriter *writer = NULL
+    cdef void *raw_digits = NULL
+    cdef unsigned char *digits
+    cdef unsigned long long limbs[3]
+    cdef unsigned long long part
+    cdef Py_ssize_t i, j, slot
+    cdef object result
+    cdef object base = 1
+
+    if (layout == NULL or layout.bits_per_digit == 0
+            or layout.bits_per_digit > 64 or layout.digit_size == 0
+            or layout.digits_order not in (-1, 1)
+            or layout.digit_endianness not in (-1, 1)):
+        return False
+
+    # Build a value with three nonzero limbs without assuming native digit
+    # width, byte order, or which end of the buffer holds the low limb.
+    limbs[0] = 7
+    limbs[1] = 0x123
+    limbs[2] = 1
+    writer = long_writer_create(True, 3, &raw_digits)
+    digits = <unsigned char *>raw_digits
+    for i in range(3):
+        slot = i if layout.digits_order == -1 else 2 - i
+        part = limbs[i]
+        for j in range(layout.digit_size):
+            if layout.digit_endianness == -1:
+                digits[slot * layout.digit_size + j] = <unsigned char>(part & 0xff)
+            else:
+                digits[slot * layout.digit_size + layout.digit_size - 1 - j] = <unsigned char>(part & 0xff)
+            part >>= 8
+        if part != 0 or (layout.bits_per_digit < 64 and
+                         (limbs[i] >> layout.bits_per_digit) != 0):
+            long_writer_discard(writer)
+            return False
+    result = long_writer_finish(writer)
+    writer = NULL
+    base <<= layout.bits_per_digit
+    if result != -(base * base + 0x123 * base + 7):
+        return False
+
+    # Exercise caller-side exception cleanup after a successful allocation.
+    writer = long_writer_create(False, 3, &raw_digits)
+    try:
+        raise ValueError("writer cleanup probe")
+    except ValueError:
+        long_writer_discard(writer)
+        writer = NULL
+    if writer != NULL:
+        long_writer_discard(writer)
         return False
     return True

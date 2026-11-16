@@ -36,7 +36,7 @@ def long_from_size(v: int) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.07x); hands Cython
+    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.08x); hands Cython
     a C integer type.
     """
     ...
@@ -46,7 +46,7 @@ def long_from_longlong(v: int) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.48x); hands Cython
+    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.58x); hands Cython
     a C integer type.
     """
     ...
@@ -56,7 +56,7 @@ def long_from_ulonglong(v: int) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.53x); hands Cython
+    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.59x); hands Cython
     a C integer type.
     """
     ...
@@ -70,7 +70,7 @@ def long_as_ulong(pylong: object) -> int:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.13x); hands Cython
+    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.12x); hands Cython
     a C integer type.
     """
     ...
@@ -80,7 +80,7 @@ def long_as_longlong(pylong: object) -> int:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.78x); hands Cython
+    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.83x); hands Cython
     a C integer type.
     """
     ...
@@ -90,7 +90,7 @@ def long_as_ulonglong(pylong: object) -> int:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.84x); hands Cython
+    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.83x); hands Cython
     a C integer type.
     """
     ...
@@ -130,7 +130,7 @@ def long_as_long(pylong: object) -> int:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.11x); hands Cython
+    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.12x); hands Cython
     a C integer type.
     """
     ...
@@ -140,7 +140,7 @@ def long_as_ssize(pylong: object) -> int:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.12x); hands Cython
+    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.13x); hands Cython
     a C integer type.
     """
     ...
@@ -150,7 +150,7 @@ def long_from_double(v: float) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.03x); hands Cython
+    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.04x); hands Cython
     a C integer type.
     """
     ...
@@ -170,7 +170,7 @@ def long_from_ssize(v: int) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.08x); hands Cython
+    Slower than the plain-Python equivalent ``int(x)`` (Tier A 1.09x); hands Cython
     a C integer type.
     """
     ...

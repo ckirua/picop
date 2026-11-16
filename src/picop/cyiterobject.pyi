@@ -23,7 +23,7 @@ def seqiter_new(seq: object) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``iter(x)`` (Tier A 1.23x); the typed
+    Slower than the plain-Python equivalent ``iter(x)`` (Tier A 1.25x); the typed
     Cython call site.
     """
     ...

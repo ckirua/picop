@@ -54,7 +54,7 @@ def seq_index(o: object, value: object) -> int:
     Notes
     -----
     Slower than the plain-Python equivalent ``lambda o, v: o.index(v)`` (Tier A
-    1.12x); works on any sequence, not just ``list``.
+    1.14x); works on any sequence, not just ``list``.
     """
     ...
 
@@ -97,7 +97,7 @@ def seq_slice(o: object, i1: int, i2: int) -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``x[a:b]`` (Tier A 1.05x); works on any
+    Slower than the plain-Python equivalent ``x[a:b]`` (Tier A 1.08x); works on any
     sequence, not just ``list``.
     """
     ...
@@ -107,7 +107,7 @@ def seq_tuple(o: object) -> tuple:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``tuple(x)`` (Tier A 1.06x); works on
+    Slower than the plain-Python equivalent ``tuple(x)`` (Tier A 1.04x); works on
     any sequence, not just ``list``.
     """
     ...
@@ -118,7 +118,7 @@ def seq_count(o: object, value: object) -> int:
     Notes
     -----
     Slower than the plain-Python equivalent ``lambda o, v: o.count(v)`` (Tier A
-    1.27x); works on any sequence, not just ``list``.
+    1.26x); works on any sequence, not just ``list``.
     """
     ...
 

@@ -33,6 +33,7 @@ assert demo.check_narrow_ints()
 assert demo.check_type_metadata()
 assert demo.check_float_pack()
 assert demo.check_cell_swap()
+assert demo.check_long_writer()
 assert demo.check_sentinels()
 assert demo.check_locks()
 import threading

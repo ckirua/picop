@@ -146,7 +146,7 @@ Ratio = cypy `cdef` loop / typed Cython baseline `==` loop (opaque + sink). **In
 | `PyLong_FromInt32/Int64/UInt32/UInt64` | APPROVED (cimport) | Fixed-width C arguments avoid a generic C-long conversion path. |
 | `PyLong_AsInt` | REJECTED | Same 32-bit `int` semantics as `PyLong_AsInt32` on supported LP64/Windows targets; no second wrapper. |
 | `PyLong_GetInfo` | REJECTED | One-shot limits dictionary has no hot-path demand; `sys.maxsize` and infinity cover normal queries. |
-| `PyLongWriter_Create/Finish/Discard` | REJECTED (queued Order 092) | Direct-fill digit writer mirrors Order 080's `BytesWriter` pattern and needs a dedicated digit-buffer growth and Finish-truncation depth probe. |
+| `PyLongWriter_Create/Finish/Discard` | APPROVED (cimport), Order 092 | Fixed-capacity native digit construction; ownership and measurements below. There is no writer growth or finish-truncation API. |
 
 ### Order 087 Bench results
 
@@ -171,5 +171,64 @@ Tier A scale row (`n=42`): 3.14 ratios 0.62x / 0.65x / 0.62x; 3.15 ratios 0.61x 
 
 ## Order 087 Experiment conclusions
 
-The three sign predicates beat their equivalent Python comparisons on both ABIs: measured ratios span 0.49x–0.73x and every Tier A case clears the ≤1.02x gate. Their integer-type checks are part of the CPython contract, not an isinstance-free arbitrary-object test: `bool` is accepted as an `int`, while a non-integer raises `TypeError` (verified on both ABIs). Narrow conversion probes confirm `long_as_int32(2**32)` raises `OverflowError`, while `long_as_uint32(-1)` raises `ValueError` on these CPython builds; bool input converts successfully and non-int input raises `TypeError`. The small-int probe confirms value parity with `long_as_long`; the measured 4.02x/4.70x Tier B ratios show the checked narrow conversion is slower than the `int()` loop, and its value is the range-checked fixed-width C result rather than raw speed. `PyLong_AsInt` duplicates the 32-bit width and semantics; `PyLong_GetInfo` is a one-shot metadata query, and the direct digit writer is independently queued for Order 092 because growth and truncation need a separate ABI/refcount/threshold probe.
+The three sign predicates beat their equivalent Python comparisons on both ABIs: measured ratios span 0.49x–0.73x and every Tier A case clears the ≤1.02x gate. Their integer-type checks are part of the CPython contract, not an isinstance-free arbitrary-object test: `bool` is accepted as an `int`, while a non-integer raises `TypeError` (verified on both ABIs). Narrow conversion probes confirm `long_as_int32(2**32)` raises `OverflowError`, while `long_as_uint32(-1)` raises `ValueError` on these CPython builds; bool input converts successfully and non-int input raises `TypeError`. The small-int probe confirms value parity with `long_as_long`; the measured 4.02x/4.70x Tier B ratios show the checked narrow conversion is slower than the `int()` loop, and its value is the range-checked fixed-width C result rather than raw speed. `PyLong_AsInt` duplicates the 32-bit width and semantics; `PyLong_GetInfo` is a one-shot metadata query. The direct digit writer is covered separately by Order 092 below.
+
+
+## Order 092 — direct-fill integer writer
+
+| Candidate | Status | Mechanism |
+|-----------|--------|-----------|
+| `PyLong_GetNativeLayout` → `long_native_layout` | APPROVED (cimport) | Returns the process-wide layout pointer; exposes bits per digit, byte size, digit order and byte endianness without allocating a Python tuple. |
+| `PyLongWriter_Create` → `long_writer_create` | APPROVED (cimport) | Allocates the final integer's digit storage directly; rejects NULL output pointers before CPython dereferences them and preserves CPython's count/allocation errors. |
+| `PyLongWriter_Finish` → `long_writer_finish` | APPROVED (cimport) | Consumes the writer, normalizes high zero digits and returns an owned Python integer; Cython takes the new reference without an extra INCREF. |
+| `PyLongWriter_Discard` → `long_writer_discard` | APPROVED (cimport) | Releases an unfinished writer without reading its uninitialized digits; NULL-safe cleanup sibling is included. |
+
+### Order 092 Experiment conclusions
+
+The [public writer contract](https://docs.python.org/3/c-api/long.html#pylongwriter-api)
+is available from Python 3.14; 3.15 additionally places it in the Stable ABI.
+The [3.14 implementation](https://github.com/python/cpython/blob/3.14/Objects/longobject.c)
+uses the newly allocated integer itself as the opaque writer, not an intermediate
+buffer: `Create` returns its storage, `Finish` normalizes it and may replace a
+compact result with a cached integer, and `Discard` decrefs it. Both close paths
+assert unique ownership in debug builds. No existing Python-held integer is
+modified and no caller-side unique-ref test is needed.
+
+This is fixed-capacity construction, not a growable writer or a truncating finish.
+Every slot must contain a legal digit before finish, including explicit zeros in
+unused high slots. A raw handle and its storage become invalid after either close
+path; finish consumes even on error. Consumers must not expose the unfinished
+object, share its buffer concurrently, or close it twice. Hence all four helpers
+and both types are cimport-only; Python exports, stubs and Core remain unchanged.
+Native layout metadata is used rather than deprecated private `digit` definitions.
+
+### Order 092 Bench results
+
+Linux x86_64, CPython 3.14.7 / 3.15, five runs, no warmup.
+`bench/tier_b/cylong.py`: typed shift/OR accumulation versus native writer fill;
+each sample builds `2_000_000 // limbs` integers. Ratio = writer / baseline.
+These are whole-loop timings, not per-integer timings; Tier A is n/a because
+the raw-pointer API is cimport-only.
+
+| ABI | Limbs | Writer mean±σ | Writer p99 | Baseline mean±σ | Ratio | p99 ratio | Verdict |
+|-----|-------|---------------|------------|----------------|-------|-----------|---------|
+| 3.14 | 1 | 41.97±0.43ms | 42.43ms | 31.16±1.04ms | 1.35x | 1.29x | baseline faster |
+| 3.14 | 32 | 11.00±0.26ms | 11.39ms | 156.07±0.92ms | 0.07x | 0.07x | writer faster |
+| 3.14 | 256 | 9.72±0.13ms | 9.85ms | 370.99±7.31ms | 0.03x | 0.03x | writer faster |
+| 3.15 | 1 | 46.19±4.87ms | 53.55ms | 30.79±0.31ms | 1.50x | 1.72x | baseline faster |
+| 3.15 | 32 | 10.94±0.09ms | 11.08ms | 153.46±16.48ms | 0.07x | 0.06x | writer faster |
+| 3.15 | 256 | 9.85±0.13ms | 10.03ms | 348.94±1.91ms | 0.03x | 0.03x | writer faster |
+
+Direct fill avoids repeated Python integer allocations and copying during
+shift/OR accumulation. It loses for a single small limb: allocation and finish
+overhead exceed the small-integer baseline. Prefer existing scalar constructors
+for that case; this API is for native multi-limb producers, not a replacement for
+`int.from_bytes` (which was not the benchmark baseline).
+
+Both ABI runs passed positive/negative result parity at every benchmark size,
+zero and negative zero, leading-zero normalization, maximum legal digits,
+multi-limb assembly, zero-count and NULL-output rejection, NULL discard and
+exceptional fill cleanup. Both installed-consumer barrel/direct cimport smoke
+runs also passed. The consumer uses all four native layout fields. Local builds
+have the standard layout; alternate 15-bit and big-endian builds were not run.
 

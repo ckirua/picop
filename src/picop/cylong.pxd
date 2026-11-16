@@ -2,7 +2,7 @@
 # ``int`` / long helpers. Public docs in ``cylong.pyi``.
 # Pointer/overflow out-params and FromString: cdef (+ tuple wrappers where useful).
 
-from libc.stdint cimport int32_t, int64_t, uint32_t, uint64_t
+from libc.stdint cimport int32_t, int64_t, uint32_t, uint64_t, uint8_t, int8_t
 from libc.stddef cimport size_t
 from cpython.object cimport PyObject_RichCompareBool, Py_EQ
 
@@ -45,6 +45,37 @@ cdef extern from "Python.h":
     uPY_LONG_LONG PyLong_AsUnsignedLongLongMask(object io) noexcept
     double PyLong_AsDouble(object pylong) except? -1.0
     void *PyLong_AsVoidPtr(object pylong) except? NULL
+    ctypedef struct PyLongLayout:
+        uint8_t bits_per_digit
+        uint8_t digit_size
+        int8_t digits_order
+        int8_t digit_endianness
+    const PyLongLayout *PyLong_GetNativeLayout() noexcept
+    ctypedef struct PyLongWriter:
+        pass
+    PyLongWriter *PyLongWriter_Create(int negative, Py_ssize_t ndigits, void **digits) except NULL
+    object PyLongWriter_Finish(PyLongWriter *writer)
+    void PyLongWriter_Discard(PyLongWriter *writer) noexcept
+
+
+cdef inline const PyLongLayout *long_native_layout() noexcept:
+    return PyLong_GetNativeLayout()
+
+
+cdef inline PyLongWriter *long_writer_create(bint negative, Py_ssize_t ndigits, void **digits) except NULL:
+    if digits == NULL:
+        raise ValueError("digits output pointer must not be NULL")
+    return PyLongWriter_Create(negative, ndigits, digits)
+
+
+cdef inline object long_writer_finish(PyLongWriter *writer):
+    # Consumes a live writer and invalidates its buffer, including on failure.
+    return PyLongWriter_Finish(writer)
+
+
+cdef inline void long_writer_discard(PyLongWriter *writer) noexcept:
+    # NULL-safe; a non-NULL handle must still be live and exclusively owned.
+    PyLongWriter_Discard(writer)
 
 
 

@@ -702,6 +702,12 @@ from .cylongintrepr cimport (
     sdigit,
 )
 from .cylong cimport (
+    PyLongLayout,
+    PyLongWriter,
+    long_native_layout,
+    long_writer_create,
+    long_writer_finish,
+    long_writer_discard,
     long_check,
     long_check_exact,
     long_eq,

@@ -97,6 +97,115 @@ These win on most cases and lose on a narrow band. Keep them; know the crossover
 | `pickle_buffer_from_object` | 0.10x (`pickle.dumps buffer-backed record n=248`) | 2.17x (`bytearray n=248`) |
 | `BytesWriter` | 0.03x (`no hint vs += `) | 6.00x (`no hint vs join`) |
 
+## Tier B (picop helper vs typed Cython cdef loop)
+
+Only the cases that do **not** beat a typed Cython `cdef` loop are tabulated; they still pay the wrapper cost inside Cython.
+
+| Helper | Module | Ratio | Case |
+|---|---|---|---|
+| `tb_lineno` | `cytraceback` | 15.74x | default case |
+| `buf_eq` | `cybuffer` | 9.95x | ne |
+| `buf_eq` | `cybuffer` | 5.72x | bytes↔ba |
+| `num_eq` | `cynumber` | 4.24x | int↔float |
+| `map_check` | `cymapping` | 3.82x | hit |
+| `UnicodeWriter` | `cyunicode` | 3.59x | N=500,000 parts |
+| `obj_eq` | `cyobject` | 3.48x | nan is nan |
+| `seq_get` | `cysequence` | 3.47x | list[0] |
+| `list_get_checked` | `cylist` | 2.68x | index=0 |
+| `bytes_bytearray_eq` | `cybytes` | 2.38x | bytes→ba ne |
+| `bytearray_eq` | `cybytearray` | 2.26x | ne short |
+| `seq_len` | `cysequence` | 2.20x | n=4 |
+| `obj_eq` | `cyobject` | 2.12x | int eq |
+| `num_eq` | `cynumber` | 2.09x | ne |
+| `pickle_buffer_from_object` | `cypicklebuf` | 2.05x | default case |
+| `buf_check` | `cybuffer` | 1.99x | hit |
+| `long_eq` | `cylong` | 1.86x | ne |
+| `num_check` | `cynumber` | 1.64x | hit |
+| `bytes_eq` | `cybytes` | 1.62x | ne short |
+| `long_eq` | `cylong` | 1.60x | eq big |
+| `buf_eq` | `cybuffer` | 1.59x | mv↔mv |
+| `tuple_get_checked` | `cytuple` | 1.50x | index=0 |
+| `bytes_bytearray_eq` | `cybytes` | 1.45x | bytes→ba eq |
+| `bytes_bytearray_eq` | `cybytes` | 1.41x | ba→bytes eq |
+| `dict_get` | `cydict` | 1.37x | hit symbol |
+| `uintern` | `cyunicode` | 1.33x | already |
+| `obj_type` | `cyobject` | 1.29x | str |
+| `tuple_eq` | `cytuple` | 1.27x | eq n=64 |
+| `list_get` | `cylist` | 1.23x | index=0 |
+| `bytearray_eq` | `cybytearray` | 1.21x | eq short |
+| `seq_eq` | `cysequence` | 1.21x | tuple↔list eq |
+| `str_ge` | `cystr` | 1.21x | ge eq |
+| `seq_eq` | `cysequence` | 1.21x | list eq |
+| `seq_eq` | `cysequence` | 1.15x | list ne |
+| `bytearray_eq` | `cybytearray` | 1.13x | eq 1KiB |
+| `dt_date_check` | `cydatetime` | 1.11x | date |
+| `warn_ex` | `cywarnings` | 1.10x | default case |
+| `call_twoargs` | `cycall` | 1.08x | two args |
+| `memoryview_ne` | `cymemoryview` | 1.07x | ne short |
+| `bytearray_ne` | `cybytearray` | 1.05x | ne short |
+| `str_check` | `cystr` | 1.05x | str |
+| `set_eq` | `cyset` | 1.04x | ne small |
+| `map_eq` | `cymapping` | 1.04x | dict ne |
+| `bytes_check` | `cybytes` | 1.04x | bytes |
+| `dict_check` | `cydict` | 1.03x | dict |
+| `map_eq` | `cymapping` | 1.03x | dict eq |
+| `dict_eq` | `cydict` | 1.03x | eq small |
+| `frozendict_check` | `cyfrozendict` | 1.02x | dict miss |
+| `set_eq` | `cyset` | 1.02x | eq small |
+| `set_contains` | `cyset` | 1.02x | hit |
+| `dict_eq` | `cydict` | 1.02x | ne small |
+| `tuple_check` | `cytuple` | 1.01x | tuple |
+| `bytes_ne` | `cybytes` | 1.01x | ne 1KiB |
+| `BytesWriter` | `cybytes` | 1.01x | no hint vs hint (grow path) |
+| `list_eq` | `cylist` | 1.01x | eq small |
+| `codec_known` | `cycodecs` | 1.01x | utf-8 |
+| `obj_len` | `cyobject` | 1.01x | tuple |
+| `ansi_bold` | `cyansi` | 1.01x | on |
+| `gc_is_enabled` | `cygc` | 1.00x | flag read |
+| `bytearray_check` | `cybytearray` | 1.00x | bytearray |
+| `str_is` | `cystr` | 1.00x | exact |
+| `tuple_check_exact` | `cytuple` | 1.00x | tuple |
+| `complex_check` | `cycomplex` | 1.00x | hit |
+| `set_check` | `cyset` | 1.00x | set |
+| `list_check` | `cylist` | 1.00x | list |
+| `frozendict_check` | `cyfrozendict` | 1.00x | hit |
+| `bool_check` | `cybool` | 1.00x | hit |
+| `memoryview_check` | `cymemoryview` | 1.00x | hit |
+| `str_check_exact` | `cystr` | 1.00x | str |
+| `str_le` | `cystr` | 1.00x | le eq |
+| `tb_depth` | `cytraceback` | 1.00x | default case |
+| `slice_check` | `cyslice` | 1.00x | hit |
+| `list_eq` | `cylist` | 1.00x | ne small |
+| `float_check` | `cyfloat` | 1.00x | hit |
+| `tb_lasti` | `cytraceback` | 1.00x | default case |
+| `bytes_check_exact` | `cybytes` | 1.00x | bytes |
+| `tuple_eq` | `cytuple` | 1.00x | ne small |
+| `list_eq` | `cylist` | 1.00x | eq n=64 |
+| `dict_contains` | `cydict` | 1.00x | hit |
+| `str_lt` | `cystr` | 0.99x | lt |
+| `array_check` | `cyarray` | 0.99x | array |
+| `deque_eq` | `cydeque` | 0.99x | eq small |
+| `frozenset_eq` | `cyset` | 0.99x | ne |
+| `deque_eq` | `cydeque` | 0.99x | ne small |
+| `memoryview_eq` | `cymemoryview` | 0.99x | eq |
+| `long_check` | `cylong` | 0.99x | hit |
+| `tuple_get` | `cytuple` | 0.98x | index=2 |
+| `slice_eq` | `cyslice` | 0.98x | ne |
+| `deque_eq` | `cydeque` | 0.98x | eq n=64 |
+| `slice_eq` | `cyslice` | 0.98x | eq |
+| `call_onearg` | `cycall` | 0.98x | one arg |
+| `memoryview_eq` | `cymemoryview` | 0.97x | ne |
+| `range_eq` | `cyrange` | 0.97x | eq |
+| `context_eq` | `cycontextvars` | 0.97x | ne values |
+| `frozenset_eq` | `cyset` | 0.97x | eq |
+| `range_eq` | `cyrange` | 0.96x | ne |
+| `tuple_get` | `cytuple` | 0.96x | index=0 |
+| `cell_eq` | `cycellobject` | 0.96x | ne |
+| `range_eq` | `cyrange` | 0.96x | equiv span |
+| `context_eq` | `cycontextvars` | 0.95x | eq values |
+
+*127 of 227 Tier B cases win, median 0.36x (best: `dict_eq` 0.02x, `capsule_check_exact` 0.03x, `seqiter_check` 0.03x, `cell_check` 0.03x, `cell_eq` 0.05x).*
+
 ## Why not a runtime warning
 
 A per-call check (`warnings.warn`, a flag, a wrapper) costs more than the helper does —

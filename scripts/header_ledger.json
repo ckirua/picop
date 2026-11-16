@@ -1,0 +1,246 @@
+{
+ "PyArg_ParseArray*": {
+  "status": "skip",
+  "reason": "argument-parsing convenience outside hot-accessor scope"
+ },
+ "PyModule_Exec": {
+  "status": "skip",
+  "reason": "extension-authoring scaffolding; high churn and low demand"
+ },
+ "PyModule_FromSlotsAndSpec": {
+  "status": "skip",
+  "reason": "extension-authoring scaffolding; high churn and low demand"
+ },
+ "PyModule_GetStateSize": {
+  "status": "skip",
+  "reason": "extension-authoring scaffolding; high churn and low demand"
+ },
+ "PyType_FromSlots": {
+  "status": "skip",
+  "reason": "extension-authoring scaffolding; high churn and low demand"
+ },
+ "PyABIInfo": {
+  "status": "skip",
+  "reason": "extension-authoring scaffolding; high churn and low demand"
+ },
+ "PyModule_GetToken": {
+  "status": "skip",
+  "reason": "extension-authoring scaffolding; high churn and low demand"
+ },
+ "PyModule_GetState_DuringGC": {
+  "status": "skip",
+  "reason": "valid only inside GC traversal context"
+ },
+ "PyType_GetModule_DuringGC": {
+  "status": "skip",
+  "reason": "valid only inside GC traversal context"
+ },
+ "Py*_DuringGC": {
+  "status": "skip",
+  "reason": "valid only inside GC traversal context"
+ },
+ "PyObject_Dump": {
+  "status": "skip",
+  "reason": "debug aid; no benchmarkable win"
+ },
+ "PyUnstable_DumpTraceback*": {
+  "status": "skip",
+  "reason": "debug aid; no benchmarkable win"
+ },
+ "PyExc_ImportCycleError": {
+  "status": "skip",
+  "reason": "no exception-type constants wrapped"
+ },
+ "Py_IS_TYPE": {
+  "status": "skip",
+  "reason": "public macro already used internally; no wrapper needed"
+ },
+ "Py_SIZE": {
+  "status": "skip",
+  "reason": "public macro already used internally; no wrapper needed"
+ },
+ "Py_SET_SIZE": {
+  "status": "skip",
+  "reason": "public macro already used internally; no wrapper needed"
+ },
+ "_PyJit*": {
+  "status": "rejected",
+  "reason": "JIT executor internals change per release"
+ },
+ "_PyUOpInstruction": {
+  "status": "rejected",
+  "reason": "JIT executor internals change per release"
+ },
+ "_Py_Specialize_*": {
+  "status": "rejected",
+  "reason": "JIT executor internals change per release"
+ },
+ "_PyDictKeys_*": {
+  "status": "rejected",
+  "reason": "dict keys-split internals have no ABI contract"
+ },
+ "_PyDict_InsertSplitValue": {
+  "status": "rejected",
+  "reason": "dict keys-split internals have no ABI contract"
+ },
+ "_PyDict_*_LockHeld": {
+  "status": "rejected",
+  "reason": "dict keys-split internals have no ABI contract"
+ },
+ "_PyFrame_*": {
+  "status": "rejected",
+  "reason": "frame/stackref rewrite is version-coupled"
+ },
+ "_PyStackRef*": {
+  "status": "rejected",
+  "reason": "frame/stackref rewrite is version-coupled"
+ },
+ "_PyThreadState_PushFrame": {
+  "status": "rejected",
+  "reason": "frame/stackref rewrite is version-coupled"
+ },
+ "_PyCompactLong_*": {
+  "status": "rejected",
+  "reason": "renamed from _PyLong_* and private"
+ },
+ "_PyCode_GetTLBC": {
+  "status": "rejected",
+  "reason": "code address-range tables"
+ },
+ "_PyCode_InitAddressRange": {
+  "status": "rejected",
+  "reason": "code address-range tables"
+ },
+ "_PySlotIterator_*": {
+  "status": "rejected",
+  "reason": "unstable private slot-iterator internals"
+ },
+ "_PyUOpsAbstractFrame": {
+  "status": "rejected",
+  "reason": "JIT executor internals change per release"
+ },
+ "PyWeakref_GetObject": {
+  "status": "skip",
+  "reason": "never wrapped"
+ },
+ "PyUnicode_As*Codec*": {
+  "status": "skip",
+  "reason": "legacy codec API; never wrapped"
+ },
+ "Py_Get*": {
+  "status": "skip",
+  "reason": "program-path APIs; never wrapped"
+ },
+ "PySys_ResetWarnOptions": {
+  "status": "skip",
+  "reason": "never wrapped"
+ },
+ "PyImport_ImportModuleNoBlock": {
+  "status": "skip",
+  "reason": "never wrapped"
+ },
+ "_PyLong_Add": {
+  "status": "skip",
+  "reason": "never wrapped"
+ },
+ "_PyLong_Multiply": {
+  "status": "skip",
+  "reason": "never wrapped"
+ },
+ "_PyLong_Subtract": {
+  "status": "skip",
+  "reason": "never wrapped"
+ },
+ "_PyTuple_FromArray": {
+  "status": "skip",
+  "reason": "never wrapped"
+ },
+ "_PyCode_ConstantKey": {
+  "status": "skip",
+  "reason": "never wrapped"
+ },
+ "_PyDict_MergeEx": {
+  "status": "skip",
+  "reason": "never wrapped"
+ },
+ "_PyTime_AsLong": {
+  "status": "skip",
+  "reason": "never wrapped"
+ },
+ "_PyTime_FromLong": {
+  "status": "skip",
+  "reason": "never wrapped"
+ },
+ "PyABIInfo_Check": {
+  "status": "skip",
+  "reason": "extension-authoring ABI-info helper; indexed family, no hot-path demand"
+ },
+ "PyBytesWriter_FinishWithPointer": {
+  "status": "rejected",
+  "reason": "Order 080: FinishWithSize(buf - GetData()) already covers it"
+ },
+ "PyBytesWriter_Format": {
+  "status": "rejected",
+  "reason": "Order 080: C varargs; no benchmarkable call site"
+ },
+ "PyBytesWriter_Grow": {
+  "status": "skip",
+  "reason": "status-only sibling; cy_bytes_writer_grow wraps GrowAndUpdatePointer (Order 080)"
+ },
+ "PyFrozenDict_Type": {
+  "status": "skip",
+  "reason": "type object; cyfrozendict_shim.h uses the version-guarded check helpers, no wrapper needed"
+ },
+ "PyImport_CreateModuleFromInitfunc": {
+  "status": "skip",
+  "reason": "extension-authoring scaffolding; high churn, no demand"
+ },
+ "PyModule_GetToken_DuringGC": {
+  "status": "skip",
+  "reason": "valid only inside GC traversal; niche for picop consumers"
+ },
+ "PyObject_GetItemData_DuringGC": {
+  "status": "skip",
+  "reason": "valid only inside GC traversal; niche for picop consumers"
+ },
+ "PyObject_GetTypeData_DuringGC": {
+  "status": "skip",
+  "reason": "valid only inside GC traversal; niche for picop consumers"
+ },
+ "PyType_GetBaseByToken_DuringGC": {
+  "status": "skip",
+  "reason": "valid only inside GC traversal; niche for picop consumers"
+ },
+ "PyType_GetModuleByToken": {
+  "status": "skip",
+  "reason": "slot/token module lookup; embedding-side helper, no hot-path demand"
+ },
+ "PyType_GetModuleByToken_DuringGC": {
+  "status": "skip",
+  "reason": "valid only inside GC traversal; niche for picop consumers"
+ },
+ "PyType_GetModuleState_DuringGC": {
+  "status": "skip",
+  "reason": "valid only inside GC traversal; niche for picop consumers"
+ },
+ "_PyEval_UnpackIndices": {
+  "status": "rejected",
+  "reason": "internal helper exposed in a public header; no ABI contract"
+ },
+ "_PyInterpreterState_IsSpecializationEnabled": {
+  "status": "rejected",
+  "reason": "specialization/JIT internal; version-coupled"
+ },
+ "_PyInterpreterState_SetEvalFrameAllowSpecialization": {
+  "status": "rejected",
+  "reason": "specialization/JIT internal; version-coupled"
+ },
+ "_PyStats_GetLocal": {
+  "status": "rejected",
+  "reason": "internal stats accessor; no stable contract"
+ },
+ "_Py_InitializeMain": {
+  "status": "rejected",
+  "reason": "embedding internal; not a stable entry point"
+ }
+}

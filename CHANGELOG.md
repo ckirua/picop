@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Added
+- **Header delta gate (Order 086):** `scripts/header_delta.py` diffs the target interpreter's public `PyAPI_FUNC` / `PyAPI_DATA` declarations against the committed `scripts/header_baseline_314.json` and classifies every added symbol as *linked* (referenced in `src/picop/**` or `examples/cimport_ext/**`) or *ledger-listed* with a mechanism reason in `scripts/header_ledger.json`. Nothing may be silently skipped: `--fail-on-unaccounted` exits 1 on an unaccounted symbol, and it runs on 3.15 in `picop-smoke.yml` and in the `scripts/release.sh` preflight. `docs/INVENTORY_315.md` is now generated from this classification (3.14.7 → 3.15.2: 65 added, 32 linked, 34 ledgered, 0 unaccounted; 15 removed, 0 still referenced).
+
 ### Changed
 - **Perf-parity Tier B (Order 085):** `scripts/perf_parity_report.py --tier-b` collects the Tier B matrix — every public helper against a typed Cython `cdef` loop — and the weekly `picop perf parity` workflow runs it on 3.14 and 3.15. `docs/PERF_PARITY.md` gains a Tier B section listing only the cases that do **not** win, and `scripts/perf_parity_drift.py` fails when a helper loses by 1.10x or more in every Tier B dump but has no row. `bench/tier_b/build.py` only reuses an already-built `*_tb` extension when it was built for the running interpreter.
 - **CI toolchain (Order 084):** CPython 3.15 is final, so `allow-prereleases` and `CIBW_ENABLE: cpython-prerelease` are gone from the six workflows that pin 3.15 / 3.15t. Every symbol referenced by `src/picop/*_shim.h` was matched against the 3.15.2 headers; nothing regressed.

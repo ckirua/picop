@@ -23,6 +23,17 @@ jobs:
       - name: Compile every shim header with -std=c11 -pedantic-errors -Werror
         run: python scripts/check_shims_pedantic.py
 
+  header-delta:
+    name: Header delta vs the 3.14 baseline
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.15"
+      - name: Every new public symbol is linked, ledgered, or rejected
+        run: python scripts/header_delta.py --baseline scripts/header_baseline_314.json --fail-on-unaccounted
+
   build-sdist:
     runs-on: ubuntu-latest
     steps:

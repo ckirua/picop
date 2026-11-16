@@ -192,10 +192,12 @@ from .cygenobject import (
 )
 from .cycellobject import (
     cell_check,
+    cell_empty,
     cell_eq,
     cell_new,
     cell_get,
     cell_set,
+    cell_swap,
 )
 from .cydescr import descr_is_data, descr_name, descr_objclass
 from .cycodecs import (

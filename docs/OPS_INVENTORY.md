@@ -95,10 +95,12 @@ Related: [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_IN
 | `capsule_eq` | tierB | Tier A+B compare labels present |
 | `capsule_is_valid` | tierA | Tier A `session.compare` present |
 | `cell_check` | tierB | Tier A+B compare labels present |
+| `cell_empty` | tierA | Tier A `session.compare` present |
 | `cell_eq` | tierB | Tier A+B compare labels present |
 | `cell_get` | tierA | Tier A `session.compare` present |
 | `cell_new` | tierA | Tier A `session.compare` present |
 | `cell_set` | tierA | Tier A `session.compare` present |
+| `cell_swap` | tierB | Tier A+B compare labels present |
 | `cfunction_check` | tierB | Tier A+B compare labels present |
 | `cfunction_check_exact` | tierB | Tier A+B compare labels present |
 | `cfunction_get_self` | tierB | Tier A+B compare labels present |

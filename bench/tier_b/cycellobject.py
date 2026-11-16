@@ -1,6 +1,7 @@
 """Tier B: cycellobject vs typed Cython cdef loops."""
 from __future__ import annotations
 from bench.tier_b._tb_util import N, ensure_ext, markdown_table, tier_b_session
+
 def _outer():
     x = 1
     def _inner():
@@ -8,6 +9,7 @@ def _outer():
     return _inner.__closure__[0]
 
 PAYLOAD = _outer()
+VALUE = object()
 
 def main() -> None:
     tb = ensure_ext("cycellobject")
@@ -15,6 +17,8 @@ def main() -> None:
     session.header(); print(f"inner loop N={N:,}"); print()
     session.section("cell_check  [primary]")
     session.compare("cell_check", tb.cypy_cell_check, tb.baseline_cell_check, PAYLOAD, N, param="cell")
+    session.section("cell_swap")
+    session.compare("cell_swap", tb.cypy_cell_swap, tb.baseline_cell_swap, PAYLOAD, VALUE, N, param="get+set")
     session.summary(); print("Markdown (paste under ### Tier B):"); print(markdown_table(session._rows)); print()
 
 if __name__ == "__main__":

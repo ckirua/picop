@@ -6,10 +6,23 @@ from cpython.object cimport PyObject, PyObject_RichCompareBool, Py_EQ
 import cython
 
 
+cdef extern from "cycellobject_shim.h":
+    object cy_cell_swap(PyObject *cell, PyObject *value)
+    object cy_cell_empty()
+
+cpdef inline object cell_empty():
+    return cy_cell_empty()
+
+
+cpdef inline object cell_swap(object cell, object value):
+    if not PyCell_Check(cell):
+        raise TypeError("expected a cell object")
+    return cy_cell_swap(<PyObject *>cell, <PyObject *>value)
+
+
 cdef extern from "Python.h":
     bint PyCell_Check(object ob) noexcept
     object PyCell_New(object ob)
-    object PyCell_Get(object cell)
     # ``PyCell_GET`` is the macro form: it returns a *borrowed* pointer, so it
     # must be promoted with an ``<object>`` cast, never declared as ``object``.
     PyObject *PyCell_GET(PyObject *cell) noexcept
@@ -26,7 +39,16 @@ cpdef inline object cell_new(object ob):
 
 
 cpdef inline object cell_get(object cell):
-    return PyCell_Get(cell)
+    # ``PyCell_Get`` returns NULL for an empty cell *without setting an
+    # exception* (CPython 3.14/3.15), so an ``object``-typed extern wrapper
+    # would raise with no exception object and crash in the traceback
+    # machinery. Read the borrowed pointer and raise explicitly instead.
+    cdef PyObject *ref
+    with cython.critical_section(cell):
+        ref = PyCell_GET(<PyObject *>cell)
+        if ref == NULL:
+            raise ValueError("cell is empty")
+        return <object>ref
 
 
 cpdef inline int cell_set(object cell, object value) except -1:

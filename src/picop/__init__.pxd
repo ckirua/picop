@@ -278,11 +278,13 @@ from .cypicklebuf cimport (
 )
 from .cycellobject cimport (
     cell_check,
+    cell_empty,
     cell_eq,
     celleq,
     cell_new,
     cell_get,
     cell_set,
+    cell_swap,
     cell_get_unchecked,
     cell_set_unchecked,
 )

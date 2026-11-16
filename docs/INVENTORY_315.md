@@ -70,8 +70,8 @@ The prose tables below are the human-readable annotation of that classification;
 |-------|------|--------|
 | 080 | BytesWriter getters / `Grow` (002) | shipped |
 | 081 | `cypicklebuf` 3.14 guard removal (066) | shipped |
-| 084 | Stable 3.15 toolchain: drop prerelease opt-ins | pending |
-| 085 | Tier B (Cython cdef-loop) parity in CI | pending |
+| 084 | Stable 3.15 toolchain: drop prerelease opt-ins | shipped |
+| 085 | Tier B (Cython cdef-loop) parity in CI | shipped |
 | 086 | `scripts/header_delta.py` — machine-derived inventory | shipped by this Order |
 
 ## Notes from the manual scans (2026-11-12 / 2026-11-13)

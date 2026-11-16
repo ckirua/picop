@@ -9,7 +9,7 @@ def interpreter_guard() -> object:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``lambda: None`` (Tier A 3.40–4.03x);
-    the typed Cython call site.
+    Slower than the plain-Python equivalent ``lambda: None`` (Tier A 4.21x); the
+    typed Cython call site.
     """
     ...

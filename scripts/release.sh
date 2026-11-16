@@ -134,6 +134,7 @@ if [[ "$SKIP_CHECKS" -eq 0 ]]; then
   info "preflight checks"
   "$PYTHON" scripts/check_exports.py
   "$PYTHON" scripts/grade_trackers.py
+  "$PYTHON" scripts/check_shims_pedantic.py
 else
   info "skipping preflight checks"
 fi

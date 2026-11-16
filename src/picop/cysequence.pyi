@@ -54,18 +54,12 @@ def seq_index(o: object, value: object) -> int:
     Notes
     -----
     Slower than the plain-Python equivalent ``lambda o, v: o.index(v)`` (Tier A
-    1.06–1.16x); works on any sequence, not just ``list``.
+    1.12x); works on any sequence, not just ``list``.
     """
     ...
 
 def seq_inplace_concat(o1: object, o2: object) -> object:
-    """Return ``o1 += o2`` result via ``PySequence_InPlaceConcat``.
-
-    Notes
-    -----
-    Mixed Tier A parity: 1.00x (3.14), 1.03x (3.14t), 0.99x (3.15), 1.02x (3.15t);
-    works on any sequence, not just ``list``.
-    """
+    """Return ``o1 += o2`` result via ``PySequence_InPlaceConcat``."""
     ...
 
 def seq_inplace_repeat(o: object, count: int) -> object:
@@ -103,8 +97,8 @@ def seq_slice(o: object, i1: int, i2: int) -> object:
 
     Notes
     -----
-    Mixed Tier A parity: 0.97x (3.14), 1.00x (3.14t), 1.12x (3.15), 1.17x (3.15t);
-    works on any sequence, not just ``list``.
+    Slower than the plain-Python equivalent ``x[a:b]`` (Tier A 1.05x); works on any
+    sequence, not just ``list``.
     """
     ...
 
@@ -113,8 +107,8 @@ def seq_tuple(o: object) -> tuple:
 
     Notes
     -----
-    Slower than the plain-Python equivalent ``tuple(x)`` (Tier A 1.02–1.11x); works
-    on any sequence, not just ``list``.
+    Slower than the plain-Python equivalent ``tuple(x)`` (Tier A 1.06x); works on
+    any sequence, not just ``list``.
     """
     ...
 
@@ -124,7 +118,7 @@ def seq_count(o: object, value: object) -> int:
     Notes
     -----
     Slower than the plain-Python equivalent ``lambda o, v: o.count(v)`` (Tier A
-    1.18–1.32x); works on any sequence, not just ``list``.
+    1.27x); works on any sequence, not just ``list``.
     """
     ...
 

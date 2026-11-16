@@ -31,3 +31,18 @@ jobs:
           path: ./wheelhouse/*.whl
           if-no-files-found: error
           retention-days: 7
+
+  # MSVC is stricter than gcc/clang: it rejects arithmetic on `void *` and the
+  # shims are header-only, so one Windows wheel build catches the class of
+  # breakage that only shows up in the release wheels.
+  windows:
+    name: Wheel build check (windows x86_64)
+    runs-on: windows-latest
+    env:
+      CIBW_BUILD: "cp315-win_amd64"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v4.3.5

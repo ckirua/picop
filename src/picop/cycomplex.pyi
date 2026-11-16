@@ -31,8 +31,8 @@ def complex_real_as_double(op: object) -> float:
 
     Notes
     -----
-    Mixed Tier A parity: 1.10x (3.14), 1.18x (3.14t), 1.09x (3.15), 1.18x (3.15t);
-    unpacks a ``complex`` into C doubles.
+    Mixed Tier A parity: 0.63x (Z.real), 1.72x (int 7); unpacks a ``complex`` into C
+    doubles.
     """
     ...
 

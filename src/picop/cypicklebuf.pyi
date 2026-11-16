@@ -5,8 +5,9 @@ def pickle_buffer_from_object(obj: object) -> object:
 
     Notes
     -----
-    Mixed Tier A parity: 1.50x (3.14), 2.27x (3.14t), 1.31x (3.15), 1.80x (3.15t);
-    the typed Cython call site.
+    Mixed Tier A parity: 2.17x (bytearray n=248), 1.28x (bytearray n=4096), 1.75x
+    (bytearray n=6), 0.10x (pickle.dumps buffer-backed record n=248); the typed
+    Cython call site.
 
     Tier A shows this is slower than the plain-Python equivalent
     `memoryview(obj)` construction; use when pickle protocol semantics are required.

@@ -2,6 +2,7 @@
 #define CYCEL_CYFRAME_SHIM_H
 
 #include <Python.h>
+#include <frameobject.h>  /* PyFrame_New is not pulled in by Python.h */
 
 /*
  * ``PyFrame_GetCode``/``GetBack``/``GetGenerator``/``GetVar``/``PyFrame_New``

@@ -97,9 +97,6 @@ def ansi_wrap(prefix: str, text: str, suffix: str | None = ...) -> str:
 
     Notes
     -----
-    Mixed Tier A parity: 0.84x (3.14), 1.42x (3.14t), 0.81x (3.15), 0.89x (3.15t);
-    the typed Cython call site.
-
     Default ``suffix`` is the ANSI reset sequence.
     """
     ...

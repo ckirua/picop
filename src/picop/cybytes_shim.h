@@ -133,9 +133,10 @@ static inline char *cy_bytes_writer_data(const CyBytesWriter *w) {
    start of the newly reserved region. Any pointer captured before a later
    grow/write is invalid: the buffer may be reallocated. */
 static inline char *cy_bytes_writer_grow(CyBytesWriter *w, Py_ssize_t extra) {
+    /* MSVC rejects arithmetic on `void *`, so cast before adding. */
     return (char *)PyBytesWriter_GrowAndUpdatePointer(
         w->pub, extra,
-        PyBytesWriter_GetData(w->pub) + PyBytesWriter_GetSize(w->pub));
+        (char *)PyBytesWriter_GetData(w->pub) + PyBytesWriter_GetSize(w->pub));
 }
 
 /* CPython's FinishWithSize discards the writer on a bad size; validate first so

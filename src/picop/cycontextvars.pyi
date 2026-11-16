@@ -68,7 +68,7 @@ def ctxvar_reset(var: object, token: object) -> int:
 
     Notes
     -----
-    Mixed Tier A parity: 0.98x (3.14), 1.01x (3.14t), 1.02x (3.15), 1.05x (3.15t);
+    Slower than the plain-Python equivalent ``var.reset(token)`` (Tier A 1.04x);
     context-variable token plumbing.
 
     Returns ``0`` on success; errors raise — do not use the status as a bool.

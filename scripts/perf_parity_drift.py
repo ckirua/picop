@@ -8,7 +8,7 @@ Tier A ratios jitter by several percent between runs - a helper whose *minimum*
 case sits at 1.01x one run and 1.04x the next - so the gates use margins and only
 fire on contradictions that survive every dump:
 
-* a helper documented as always slower whose **mean** ratio is ``<= 0.90`` in
+* a helper documented as always slower whose case ratios average ``<= 0.90`` in
   every dump is stale: the wrapper is no longer losing to the builtin;
 * a helper absent from the table that averages ``>= 1.25`` in every dump is a
   real loss that needs a doc row and a stub note;
@@ -44,6 +44,11 @@ MIXED_ROW_RE = re.compile(r"^\|\s*`([A-Za-z_][A-Za-z0-9_]*)`\s*\|\s*([0-9.]+)x[^
 STALE_BELOW = 0.90
 NEW_ABOVE = 1.25
 MIXED_KEEP = 1.02
+# A mixed row only counts as stale when the measured worst case is at or below the
+# crossover threshold *and* the documented worst is clearly out of range. Runner
+# jitter moves a borderline case by a few percent between runs, so a 1.04x row
+# measured at 1.01x is not worth rewriting.
+MIXED_STALE_TOL = 0.15
 INFO_DRIFT = 0.20
 GIL_TO_FREE = 0.30
 
@@ -141,7 +146,7 @@ def main() -> int:
             best, worst = mixed[name]
             worst_now = dump_worst(name)
             best_now = dump_best(name)
-            if worst_now and max(worst_now) <= MIXED_KEEP:
+            if worst_now and max(worst_now) <= MIXED_KEEP and worst - max(worst_now) >= MIXED_STALE_TOL:
                 problems.append(
                     f"`{name}` is documented as mixed (worst {worst:.2f}x) but no dump has a "
                     f"case above {MIXED_KEEP:.2f}x (worst {min(worst_now):.2f}-{max(worst_now):.2f}x)"

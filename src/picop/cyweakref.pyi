@@ -21,13 +21,7 @@ def weakref_new_ref(ob: object, callback: object = None) -> object:
     ...
 
 def weakref_new_proxy(ob: object, callback: object = None) -> object:
-    """Return a weak proxy via ``PyWeakref_NewProxy``.
-
-    Notes
-    -----
-    Mixed Tier A parity: 1.01x (3.14), 1.01x (3.14t), 1.08x (3.15), 1.04x (3.15t);
-    weak-reference creation from C.
-    """
+    """Return a weak proxy via ``PyWeakref_NewProxy``."""
     ...
 
 def weakref_get_object(ref: object) -> object:

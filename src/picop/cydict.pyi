@@ -17,13 +17,7 @@ def dict_check_exact(p: object) -> bool:
     ...
 
 def dict_clear(d: dict) -> None:
-    """Clear ``d`` via ``PyDict_Clear``.
-
-    Notes
-    -----
-    Mixed Tier A parity: 1.13x (3.14), 0.89x (3.14t), 0.90x (3.15), 0.90x (3.15t);
-    unchecked ``PyDict`` mutation on a known dict.
-    """
+    """Clear ``d`` via ``PyDict_Clear``."""
     ...
 
 def dict_contains(d: dict, key: str) -> bool:
@@ -79,13 +73,7 @@ def dict_len(d: dict) -> int:
     ...
 
 def dict_eq(a: dict, b: dict) -> bool:
-    """Return True if typed dicts are equal (identity/size short-circuit + richcompare).
-
-    Notes
-    -----
-    Mixed Tier A parity: 0.73x (3.14), 0.97x (3.14t), 0.70x (3.15), 0.81x (3.15t);
-    unchecked ``PyDict`` mutation on a known dict.
-    """
+    """Return True if typed dicts are equal (identity/size short-circuit + richcompare)."""
     ...
 
 def dict_merge(d: dict, other: object, override: bool = True) -> int:

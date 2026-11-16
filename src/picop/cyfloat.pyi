@@ -51,3 +51,27 @@ def float_from_cstr(s: object) -> object:
     Cython a C ``double``.
     """
     ...
+
+def float_pack8(value: float, little_endian: bool = True) -> bytes:
+    """Pack a C double into 8 bytes using the selected byte order."""
+    ...
+
+def float_pack4(value: float, little_endian: bool = True) -> bytes:
+    """Pack a C double into 4 bytes (rounded to float precision)."""
+    ...
+
+def float_pack2(value: float, little_endian: bool = True) -> bytes:
+    """Pack a C double into IEEE half precision."""
+    ...
+
+def float_unpack8(data: bytes, little_endian: bool = True) -> float:
+    """Unpack exactly 8 bytes; reject short buffers before raw-pointer access."""
+    ...
+
+def float_unpack4(data: bytes, little_endian: bool = True) -> float:
+    """Unpack exactly 4 bytes; reject short buffers before raw-pointer access."""
+    ...
+
+def float_unpack2(data: bytes, little_endian: bool = True) -> float:
+    """Unpack exactly 2 bytes; reject short buffers before raw-pointer access."""
+    ...

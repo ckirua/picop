@@ -13,6 +13,22 @@ Prefer:
 
 See also the ownership matrix in [`.cursor/skills/use-cypy/SKILL.md`](../.cursor/skills/use-cypy/SKILL.md).
 
+## Fixed-size reads have no length argument
+
+`PyFloat_Unpack2/4/8` take a raw `const char *` and read 2, 4 or 8 bytes — the C
+API has no way to know the buffer is shorter. `float_unpack2/4/8` therefore check
+`PyBytes_Check` and the length **before** the pointer is touched and raise
+`ValueError` on a short buffer; without that check, `float_unpack8(b"ab")` would be
+an out-of-bounds read rather than an error. The buffers are also read exactly `n`
+bytes: extra trailing bytes are ignored, not consumed.
+
+The same reasoning applies to `long_as_int32` / `long_as_uint64` and siblings:
+they raise `OverflowError` when the value does not fit the target width instead of
+truncating, `TypeError` for a non-integer, and `ValueError` ("Cannot convert
+negative int") when a negative value is read into an unsigned target — CPython's
+own narrow converters raise that one, not `OverflowError`. The explicit
+wrap-around variants are `long_as_ulong_mask` / `long_as_ulonglong_mask`.
+
 ## Borrowed pointers
 
 C-string / UTF-8 borrow helpers (`uutf8`, `bas_string`, `bytes_as_string`, …) return pointers that **must not outlive** the owning Python object. Do not store them past the lifetime of `s` / `b`, and do not free them.

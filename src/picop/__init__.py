@@ -451,6 +451,12 @@ from .cyfloat import (
     float_eq,
     float_from_double,
     float_from_cstr,
+    float_pack2,
+    float_pack4,
+    float_pack8,
+    float_unpack2,
+    float_unpack4,
+    float_unpack8,
 )
 from .cygc import (
     gc_collect,

@@ -12,9 +12,30 @@ cdef extern from "Python.h":
     bint PyType_HasFeature(type o, unsigned long feature) noexcept
     bint PyType_IS_GC(type o) noexcept
     bint PyType_IsSubtype(type a, type b) noexcept
+    unsigned long PyType_GetFlags(type typ) noexcept
+    object PyType_GetName(type typ)
+    object PyType_GetQualName(type typ)
+    object PyType_GetDict(type typ)
     object PyType_GenericAlloc(type typ, Py_ssize_t nitems)
     object PyType_GenericNew(type typ, object args, object kwds)
     int PyType_Ready(type typ) except -1
+
+
+
+cdef inline unsigned long type_get_flags(object typ) noexcept:
+    return PyType_GetFlags(<type>typ)
+
+
+cpdef inline object type_get_name(object typ):
+    return PyType_GetName(<type>typ)
+
+
+cpdef inline object type_get_qualname(object typ):
+    return PyType_GetQualName(<type>typ)
+
+
+cpdef inline object type_get_dict(object typ):
+    return PyType_GetDict(<type>typ)
 
 
 cpdef inline bint type_check(object o) noexcept:

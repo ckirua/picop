@@ -170,6 +170,13 @@ def load_dumps(paths: list[Path]) -> tuple[dict[str, list[tuple[float, str]]], d
                 seen_b.setdefault((name, case), []).append(ratio)
         failures.extend(data.get("failures", []))
         config = data.get("config") or config
+    if len(paths) > 1:
+        labels = ", ".join(
+            dict.fromkeys(
+                path.stem.removeprefix("parity-").removeprefix("tb-") for path in paths
+            )
+        )
+        config = f"{len(paths)} CI dumps ({labels}), pooled by the median of the runs"
     ratios: dict[str, list[tuple[float, str]]] = {}
     for (name, case), values in seen.items():
         ratios.setdefault(name, []).append((statistics.median(values), case))

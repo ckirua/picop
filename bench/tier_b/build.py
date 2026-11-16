@@ -40,11 +40,18 @@ def build(modules: list[str] | None = None) -> list[str]:
         print("no *_tb.pyx files to build", file=sys.stderr)
         raise SystemExit(1)
 
-    # Prefer already-built .so when sources are older (fast re-run).
+    # Prefer already-built .so when sources are older (fast re-run). Only
+    # extensions built for this interpreter count: bench/tier_b/ accumulates
+    # ``*_tb.cpython-314-…`` and ``*_tb.cpython-315-…`` side by side.
+    abi = f"{sys.implementation.name}-{sys.version_info[0]}{sys.version_info[1]}"
     todo: list[str] = []
     for name in names:
         pyx = HERE / f"{name}_tb.pyx"
-        sos = list(HERE.glob(f"{name}_tb*.so")) + list(HERE.glob(f"{name}_tb*.pyd"))
+        sos = [
+            so
+            for so in list(HERE.glob(f"{name}_tb*.so")) + list(HERE.glob(f"{name}_tb*.pyd"))
+            if so.suffix == ".pyd" or abi in so.name
+        ]
         if sos and all(so.stat().st_mtime >= pyx.stat().st_mtime for so in sos):
             print(f"up-to-date: {name}_tb")
             continue

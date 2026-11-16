@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regenerate the perf-parity tables from the Tier A benches.
+"""Regenerate perf-parity tables from Tier A and optional Tier B benches.
 
 Runs every ``bench/*_bench.py`` (Tier A, plain-Python baseline) with the
 package installed, collects every ``session.compare`` ratio, and prints the
@@ -8,22 +8,26 @@ two tables that ``docs/PERF_PARITY.md`` is built from:
 * helpers that lose to the builtin in **every** measured case, and
 * helpers that win on some inputs and lose on others.
 
+``--tier-b`` runs the Tier B drivers (``bench/tier_b/*.py``, picop helper vs
+a typed Cython ``cdef`` loop) instead; ``--with-tier-b`` collects both in one
+pass. Tier B is informational — it never reopens the Tier A gate.
+
 Usage::
 
     python scripts/perf_parity_report.py                     # tables to stdout
     python scripts/perf_parity_report.py --update-doc        # rewrite docs/PERF_PARITY.md
     python scripts/perf_parity_report.py --sync-stubs        # rewrite the parity notes in the .pyi stubs
-    python scripts/perf_parity_report.py --json > /tmp/parity.json   # machine-readable rows
+    python scripts/perf_parity_report.py --with-tier-b --json > /tmp/parity.json
     python scripts/perf_parity_report.py --from-json /tmp/parity.json
 
 Ratios come from the ``BENCH_JSON`` line each bench prints when
 ``CPY_BENCH_JSON=1`` (set by this script), so no table parsing is involved.
 
-Ratio convention: ``median(picop) / median(builtin)`` per bench run (the mean is
-kept alongside as ``mean_ratio``). When several dumps are passed to
+Ratio convention: ``median(picop) / median(baseline)`` per bench run (the mean
+is kept alongside as ``mean_ratio``). When several dumps are passed to
 ``--from-json``, every (helper, case) pair is pooled by the median of the dumps.
-Above ``1.00`` means the plain-Python call was faster. A helper counts as a
-loser only when every case for it exceeds ``--threshold`` (default 1.02).
+Above ``1.00`` means the baseline was faster. A helper counts as a loser only
+when every case for it exceeds ``--threshold`` (default 1.02).
 """
 
 from __future__ import annotations
@@ -59,12 +63,12 @@ def public_modules() -> dict[str, str]:
     return out
 
 
-def _bench_rows(stdout: str) -> list[tuple[str, float, str]]:
+def _bench_rows(stdout: str, default_case: str = "default case") -> list[tuple[str, float, str]]:
     """Pull ``(label, ratio, case)`` from the ``BENCH_JSON`` line a bench prints."""
     for line in stdout.splitlines():
         if line.startswith(JSON_MARKER):
             return [
-                (row["label"], float(row["ratio"]), row.get("case") or "default case")
+                (row["label"], float(row["ratio"]), row.get("case") or default_case)
                 for row in json.loads(line[len(JSON_MARKER):])
             ]
     return []
@@ -76,6 +80,46 @@ def bench_files() -> list[Path]:
         for path in BENCH_DIR.glob("*.py")
         if path.name != "__init__.py" and not path.name.startswith("_")
     )
+
+
+def tier_b_bench_files() -> list[Path]:
+    only = os.environ.get("CPY_TIERB_ONLY")
+    selected = set(only.split(",")) if only else None
+    excluded = {"__init__.py", "build.py", "_tb_util.py"}
+    return sorted(
+        path
+        for path in (BENCH_DIR / "tier_b").glob("*.py")
+        if path.name not in excluded
+        and not path.name.startswith("_")
+        and (selected is None or path.stem in selected)
+    )
+
+
+def collect_tier_b() -> tuple[dict[str, list[tuple[float, str]]], list[str], dict[str, set[str]]]:
+    """Run Tier B benches, returning rows, failures, and drivers by helper."""
+    ratios: dict[str, list[tuple[float, str]]] = {}
+    failures: list[str] = []
+    drivers: dict[str, set[str]] = {}
+    for path in tier_b_bench_files():
+        env = dict(os.environ)
+        env["PYTHONPATH"] = os.pathsep.join((str(ROOT / "src"), str(ROOT)))
+        env["CPY_BENCH_JSON"] = "1"
+        env.setdefault("CPY_TIERB_N", "500_000")
+        try:
+            out = subprocess.run(
+                [sys.executable, str(path)], capture_output=True, text=True,
+                env=env, timeout=900,
+            )
+        except subprocess.TimeoutExpired:
+            failures.append(f"{path.name}: timeout")
+            continue
+        if out.returncode != 0:
+            failures.append(f"{path.name}: exit {out.returncode}")
+            continue
+        for name, ratio, case in _bench_rows(out.stdout, default_case=""):
+            ratios.setdefault(name, []).append((ratio, case))
+            drivers.setdefault(name, set()).add(path.stem)
+    return ratios, failures, drivers
 
 
 def collect() -> tuple[dict[str, list[tuple[float, str]]], list[str]]:
@@ -105,13 +149,15 @@ def collect() -> tuple[dict[str, list[tuple[float, str]]], list[str]]:
     return ratios, failures
 
 
-def load_dumps(paths: list[Path]) -> tuple[dict[str, list[tuple[float, str]]], list[str], str | None]:
+def load_dumps(paths: list[Path]) -> tuple[dict[str, list[tuple[float, str]]], dict[str, list[tuple[float, str]]] | None, list[str], str | None]:
     """Merge several ``--json`` dumps into ``label -> [(ratio, case)]``.
 
     Every (helper, case) pair is pooled by the **median** of the ratios across the
-    dumps, so one contended runner run cannot move a table row.
+    dumps, so one contended runner run cannot move a table row. Dumps that carry a
+    ``tier_b`` map are pooled the same way and returned as the second element.
     """
     seen: dict[tuple[str, str], list[float]] = {}
+    seen_b: dict[tuple[str, str], list[float]] = {}
     failures: list[str] = []
     config: str | None = None
     for path in paths:
@@ -119,12 +165,20 @@ def load_dumps(paths: list[Path]) -> tuple[dict[str, list[tuple[float, str]]], l
         for name, rows in data["ratios"].items():
             for ratio, case in rows:
                 seen.setdefault((name, case), []).append(ratio)
+        for name, rows in data.get("tier_b", {}).items():
+            for ratio, case in rows:
+                seen_b.setdefault((name, case), []).append(ratio)
         failures.extend(data.get("failures", []))
         config = data.get("config") or config
     ratios: dict[str, list[tuple[float, str]]] = {}
     for (name, case), values in seen.items():
         ratios.setdefault(name, []).append((statistics.median(values), case))
-    return ratios, failures, config
+    ratios_b: dict[str, list[tuple[float, str]]] | None = None
+    if seen_b:
+        ratios_b = {}
+        for (name, case), values in seen_b.items():
+            ratios_b.setdefault(name, []).append((statistics.median(values), case))
+    return ratios, ratios_b, failures, config
 
 
 BUILTIN_LABELS = {
@@ -438,6 +492,47 @@ def mixed_rows(ratios, pub, threshold: float) -> str:
         )
     return "\n".join(rows)
 
+TIER_B_HEADER = "## Tier B (picop helper vs typed Cython cdef loop)"
+TIER_B_NO_WIN = 0.95
+
+
+def tier_b_rows(ratios_b, pub, modules) -> str:
+    """Cases where the helper does *not* beat a typed Cython loop."""
+    pooled: dict[tuple[str, str], list[float]] = {}
+    for helper, cases in ratios_b.items():
+        if helper not in pub:
+            continue
+        for ratio, case in cases:
+            pooled.setdefault((helper, case), []).append(ratio)
+    medians = sorted(
+        (statistics.median(values), helper, case)
+        for (helper, case), values in pooled.items()
+    )
+    losses = [(ratio, helper, case) for ratio, helper, case in medians if ratio >= TIER_B_NO_WIN]
+    wins = [(ratio, helper, case) for ratio, helper, case in medians if ratio < TIER_B_NO_WIN]
+    rows = [
+        "Only the cases that do **not** beat a typed Cython `cdef` loop are tabulated; "
+        "they still pay the wrapper cost inside Cython.",
+        "",
+        "| Helper | Module | Ratio | Case |",
+        "|---|---|---|---|",
+    ]
+    for ratio, helper, case in sorted(losses, reverse=True):
+        rows.append(
+            f"| `{helper}` | `{modules.get(helper, module_of(helper))}` | "
+            f"{ratio:.2f}x | {case or 'default case'} |"
+        )
+    if wins:
+        best = ", ".join(f"`{helper}` {ratio:.2f}x" for ratio, helper, _ in sorted(wins)[:5])
+        rows.append(
+            f"\n*{len(wins)} of {len(medians)} Tier B cases win, median "
+            f"{statistics.median(ratio for ratio, _, _ in wins):.2f}x "
+            f"(best: {best}).*"
+        )
+    return "\n".join(rows)
+
+
+
 
 def _replace_section(text: str, header: str, body: str) -> str:
     start = text.index(header) + len(header)
@@ -445,19 +540,23 @@ def _replace_section(text: str, header: str, body: str) -> str:
     return text[:start] + "\n\n" + body.rstrip() + "\n" + text[end:]
 
 
-def update_doc(ratios, pub, baselines, threshold: float, config: str | None = None) -> str:
+def update_doc(ratios, pub, baselines, threshold: float, config: str | None = None, ratios_b=None) -> str:
     text = PARITY_DOC.read_text(encoding="utf-8")
-    modules = {name: pub[name] for name in ratios if name in pub}
-    start = text.index("Current run (")
-    end = text.index("\n\n", start)
-    text = text[:start] + stats_paragraph(ratios, pub, baselines, threshold, config) + text[end:]
-    text = _replace_section(text, ALWAYS_HEADER, always_rows(ratios, pub, baselines, modules, threshold))
-    text = _replace_section(
-        text,
-        MIXED_HEADER,
-        "These win on most cases and lose on a narrow band. Keep them; know the crossover.\n\n"
-        + mixed_rows(ratios, pub, threshold),
-    )
+    modules = {name: pub[name] for name in list(ratios) + list(ratios_b or ()) if name in pub}
+    if ratios:
+        start = text.index("Current run (")
+        end = text.index("\n\n", start)
+        text = text[:start] + stats_paragraph(ratios, pub, baselines, threshold, config) + text[end:]
+        text = _replace_section(text, ALWAYS_HEADER, always_rows(ratios, pub, baselines, modules, threshold))
+        text = _replace_section(
+            text, MIXED_HEADER,
+            "These win on most cases and lose on a narrow band. Keep them; know the crossover.\n\n"
+            + mixed_rows(ratios, pub, threshold),
+        )
+    if ratios_b is not None:
+        if TIER_B_HEADER not in text:
+            text = text.rstrip() + "\n\n" + TIER_B_HEADER + "\n"
+        text = _replace_section(text, TIER_B_HEADER, tier_b_rows(ratios_b, pub, modules))
     PARITY_DOC.write_text(text, encoding="utf-8")
     return text
 
@@ -594,6 +693,8 @@ def _rewrite_doc(doc: str, target: str, indent: str) -> str:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--tier-b", action="store_true", help="run only Tier B benches")
+    ap.add_argument("--with-tier-b", action="store_true", help="collect Tier B alongside Tier A")
     ap.add_argument("--threshold", type=float, default=1.02)
     ap.add_argument("--json", action="store_true", help="emit raw label/ratio rows")
     ap.add_argument(
@@ -622,11 +723,20 @@ def main() -> int:
 
     pub = public_modules()
     config = None
+    ratios_b = None
+    drivers = {}
     if args.from_json:
-        ratios, failures, config = load_dumps(args.from_json)
+        ratios, ratios_b, failures, config = load_dumps(args.from_json)
         config = args.config or config
+    elif args.tier_b:
+        ratios = {}
+        ratios_b, failures, drivers = collect_tier_b()
+        config = args.config or run_config()
     else:
         ratios, failures = collect()
+        if args.with_tier_b:
+            ratios_b, failures_b, drivers = collect_tier_b()
+            failures.extend(failures_b)
         config = args.config or run_config()
     if failures:
         print("bench failures:", file=sys.stderr)
@@ -634,15 +744,20 @@ def main() -> int:
             print("  " + line, file=sys.stderr)
 
     baselines = collect_baselines()
-    modules = {name: pub[name] for name in ratios if name in pub}
+    modules = {name: pub[name] for name in list(ratios) + list(ratios_b or ()) if name in pub}
 
     if args.update_doc:
-        update_doc(ratios, pub, baselines, args.threshold, config)
+        update_doc(ratios, pub, baselines, args.threshold, config, ratios_b)
         print(f"rewrote {PARITY_DOC.relative_to(ROOT)}")
     if args.sync_stubs:
         print(f"synced {sync_stub_notes(ratios, pub, baselines, args.threshold)} docstring notes")
     if args.json:
-        json.dump({"ratios": ratios, "failures": failures, "config": config}, sys.stdout, indent=2)
+        payload = {"ratios": ratios, "failures": failures, "config": config}
+        if ratios_b is not None:
+            payload["tier_b"] = ratios_b
+        if args.tier_b:
+            payload["tier"] = "B"
+        json.dump(payload, sys.stdout, indent=2)
     if not args.update_doc and not args.sync_stubs and not args.json:
         print(always_rows(ratios, pub, baselines, modules, args.threshold))
         print()

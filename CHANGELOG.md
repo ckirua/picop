@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+- **Perf-parity Tier B (Order 085):** `scripts/perf_parity_report.py --tier-b` collects the Tier B matrix — every public helper against a typed Cython `cdef` loop — and the weekly `picop perf parity` workflow runs it on 3.14 and 3.15. `docs/PERF_PARITY.md` gains a Tier B section listing only the cases that do **not** win, and `scripts/perf_parity_drift.py` fails when a helper loses by 1.10x or more in every Tier B dump but has no row. `bench/tier_b/build.py` only reuses an already-built `*_tb` extension when it was built for the running interpreter.
+- **CI toolchain (Order 084):** CPython 3.15 is final, so `allow-prereleases` and `CIBW_ENABLE: cpython-prerelease` are gone from the six workflows that pin 3.15 / 3.15t. Every symbol referenced by `src/picop/*_shim.h` was matched against the 3.15.2 headers; nothing regressed.
+
 ## [3.10.0] — 2026-11-15 — BytesWriter direct fill and a 3.14 PickleBuffer fix
 
 ### Changed

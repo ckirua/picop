@@ -39,9 +39,35 @@ jobs:
           path: parity-${{ matrix.python-version }}.json
           if-no-files-found: error
 
+  bench-tierb:
+    name: Tier B benches (${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.14", "3.15"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install build dependencies
+        run: python -m pip install setuptools wheel "Cython>=3.3.0" picobuild pyperf
+      - name: Install picop
+        run: python -m pip install -e . --no-build-isolation
+      - name: Collect Tier B parity data
+        env:
+          CPY_TIERB_N: "500000"
+        run: python scripts/perf_parity_report.py --tier-b --json > parity-tb-${{ matrix.python-version }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: parity-tb-${{ matrix.python-version }}
+          path: parity-tb-${{ matrix.python-version }}.json
+          if-no-files-found: error
+
   compare:
     name: Parity drift check
-    needs: bench
+    needs: [bench, bench-tierb]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

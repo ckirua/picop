@@ -66,7 +66,10 @@ As of **`1.0.0`**:
 
 ### Runtime (public and/or cimport)
 
-Public Runtime helpers include datetime, codecs, marshal, file, weakref, capsule, contextvars, `cytime` clocks, sentinel checks, and object-model / scalar modules (`cyfunction`, `cymethod`, `cylong`, …). Since 3.1/3.2, `cycall` adds tuple-free calls, and `cyframe`, `cycode`, `cytraceback`, and `cycellobject` add frame, code-object, traceback, and cell readers. Embedding / process helpers such as `cyerr`, `cymem`, `cythread`, and `cylock` are **cimport only** and are not documented here as Python callables.
+Public Runtime helpers include datetime, codecs, marshal, file, weakref, capsule, contextvars, `cytime` clocks, sentinel checks, and object-model / scalar modules (`cyfunction`, `cymethod`, `cylong`, …). `cylong` also offers cimport-only fixed-width conversions and `PyLongWriter` integer construction; see its [tracker](https://github.com/ckirua/picop/blob/main/docs/modules/021_cylong.md) and [Cython demo](https://github.com/ckirua/picop/blob/main/examples/cimport_ext/demo.pyx). Since 3.1/3.2, `cycall` adds tuple-free calls, and `cyframe`, `cycode`, `cytraceback`, and `cycellobject` add frame, code-object, traceback, and cell readers. Float pack/unpack wrappers validate buffer length before raw-pointer reads; trusted-caller contracts are in [SAFETY](https://github.com/ckirua/picop/blob/main/docs/SAFETY.md). Embedding / process helpers such as `cyerr`, `cymem`, `cythread`, and `cylock` are **cimport only** and are not documented here as Python callables.
+
+Python integer construction in `picop.uuid` uses CPython's public `PyLongWriter` where supported.
+
 
 ## Import surfaces
 

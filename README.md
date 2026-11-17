@@ -4,7 +4,7 @@ Fast CPython C-API helpers for Cython — typed hot-path wrappers plus C-backed 
 
 **Python 3.15 is primary**, with Python 3.14 backward compatibility and genuine GIL-disabled support on **3.14t and 3.15t**. Minimum Python remains 3.14. Map of what is covered: [`COVERAGE.md`](COVERAGE.md). Primary license: [`LICENSE`](LICENSE) (MIT); adapted UUID portions retain their notices in [`NOTICE`](NOTICE) and [`LICENSES/Apache-2.0.txt`](LICENSES/Apache-2.0.txt). Contributing: [`CONTRIBUTING.md`](CONTRIBUTING.md). Security: [`SECURITY.md`](SECURITY.md). Safety / footguns: [`docs/SAFETY.md`](docs/SAFETY.md).
 
-**3.0:** the `cypy` Python package and Cython cimport shims are removed. Use `picop` and rebuild downstream Cython extensions.
+**Import:** use `picop` for both Python and Cython. The `cypy` Python imports and Cython cimport shims were removed in 3.0; migrate imports and cimports to the corresponding `picop` path.
 
 ## Migrating from 2.x
 
@@ -35,7 +35,7 @@ PyPI distribution name and import package are both **`picop`**.
 pip install "picop==3.13.0"
 ```
 
-Build deps (`setuptools`, `wheel`, `Cython>=3.3.0`, `picobuild`) are pulled via `pyproject.toml` `[build-system]`. Source installs need a C toolchain only — UUID entropy comes from the operating system (BCrypt on Windows, `/dev/urandom` elsewhere), so no third-party library is linked. Compile extensions separately for each interpreter ABI; regular and free-threaded binaries are not interchangeable.
+Build deps (`setuptools`, `wheel`, `Cython>=3.3.0`, `picobuild`) are pulled via `pyproject.toml` `[build-system]`. Source installs need a C toolchain; UUID entropy uses the operating system (BCrypt on Windows, `/dev/urandom` elsewhere), with no third-party library linked. Compile extensions separately for each interpreter ABI; regular and free-threaded binaries are not interchangeable.
 
 ### From git (users)
 
@@ -122,14 +122,13 @@ from picop.uuid cimport UUID, uuid4, uuid4_bytes
 
 The C-backed `UUID` is a real final native subtype of `uuid.UUID`, accepts
 32–36 UTF-8 bytes of hexadecimal text or exactly 16 bytes, and is immutable.
-Its stdlib integer slot is initialized eagerly; hash and stdlib descriptor access
-use valid inherited storage rather than a fabricated MRO. Integer construction
-fills Python's public `PyLongWriter` digit buffer directly on compatible native
-layouts, retaining the general byte conversion on other layouts.
-Generation uses per-thread buffered OpenSSL entropy with fork-child invalidation.
+The integer slot is initialized eagerly; hash and stdlib descriptor access use valid inherited storage rather than a fabricated MRO. Integer construction fills Python's public `PyLongWriter` digit buffer directly on compatible native layouts, retaining the general byte conversion on other layouts. Cython callers can also use fixed-width checked integer conversions; see the [`cylong` tracker](docs/modules/021_cylong.md) and [Cython smoke demo](examples/cimport_ext/demo.pyx).
+Generation uses per-thread buffered operating-system entropy with fork-child invalidation.
 If the fork hook cannot be registered, import fails rather than allowing parent
 and child to reuse buffered entropy. Custom `UUID_RANDOM_BUFFER_SIZE` builds
-must use a positive multiple of 16 that fits OpenSSL's integer length limit.
+must use a positive multiple of 16 that fits the operating system entropy API's
+length limit.
+Float unpack wrappers validate input length before raw-pointer reads; see the trusted-caller [safety notes](docs/SAFETY.md). More Cython integer helper details are in the [`cylong` tracker](docs/modules/021_cylong.md) and [Cython smoke demo](examples/cimport_ext/demo.pyx).
 
 Downstream Cython extensions **must rebuild** for this migration and for the UUID layout change. Use `from picop.uuid cimport …` or `from picop cimport …` for UUID typed factories; direct and barrel imports are supported. The old private UUID instance fields and binary layout are not retained.
 
@@ -145,7 +144,7 @@ python examples/pydict.py
 
 ## Compatibility
 
-**1.0 policy:** **Core** (`picop.__all__` + `picop.hot`) and documented cimport contracts are frozen. Soft aliases were removed in **0.3**. Protocols / Runtime remain provisional under minors. See [`docs/RELEASE.md`](docs/RELEASE.md). Semantic twins like `dict_len`/`dict_size` stay dual (never identity-aliased). The 3.0 candidate is opt-in; unpinned stable installations remain on the latest stable release.
+**1.0 policy:** **Core** (`picop.__all__` + `picop.hot`) and documented cimport contracts are frozen. Soft aliases were removed in **0.3**. Protocols / Runtime remain provisional under minors. See [`docs/RELEASE.md`](docs/RELEASE.md). Semantic twins like `dict_len`/`dict_size` stay dual (never identity-aliased). The 3.0 migration is complete; current stable is 3.13.0.
 
 Product tiers (Core / Protocols / Runtime): [`COVERAGE.md`](COVERAGE.md).
 

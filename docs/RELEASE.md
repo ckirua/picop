@@ -21,12 +21,17 @@ Ship a tagged `picop` release from `main`. Version is sourced from [`src/picop/_
 
 **Version sketch:** `0.2` soft aliases + curated Core messaging → `0.3` hard trim of deprecated root names → `1.0` freeze **Core** public + documented cimport contracts. Protocols/Runtime may still evolve under minors after 1.0.
 
-**Current (`1.0.0`+):** **Core** public (`picop.__all__` + `picop.hot`) and documented
-cimport contracts are frozen. Soft root aliases were trimmed in `0.3`. Preferred
-names only on `picop`; ledger + `__getattr__` hints: [`picop.compat`](../src/picop/compat.py).
-Export gate: [`scripts/check_exports.py`](../scripts/check_exports.py).
-Protocols / Runtime remain **provisional** under post-1.0 minor policy (see
-[`CHANGELOG.md`](../CHANGELOG.md) / [`COVERAGE.md`](../COVERAGE.md)).
+**Current policy:** **Core** public (`picop.__all__` + `picop.hot`) and documented
+cimport contracts are frozen. Removals/semantic breaks require a major; additive
+public APIs follow the policy above. Protocols / Runtime remain **provisional**
+under post-1.0 minor policy (see [`CHANGELOG.md`](../CHANGELOG.md) / [`COVERAGE.md`](../COVERAGE.md)).
+
+Major-version readiness is a compatibility decision, not an automatic release
+gate: identify the intended breaking changes, audit affected public and
+documented cimport contracts and migration needs, update changelog/docs/tests,
+and validate the supported runtimes and release artifacts. The release workflow
+does not decide whether a major is warranted or certify downstream compatibility.
+This guidance does not schedule or promise a 4.0 release.
 
 **2.0 historical import rename:** preferred import became **`picop`**. The `cypy` compatibility package and cimport mirrors were removed in 3.0; migrate both Python and Cython callers to `picop`. Pip distribution name was already `picop`.
 
@@ -60,13 +65,20 @@ Protocols / Runtime remain **provisional** under post-1.0 minor policy (see
 | Step | Check |
 |------|-------|
 | 1 | On latest `main`; working tree clean |
-| 2 | If any `docs/modules/` Lifecycle lines changed: `python scripts/grade_trackers.py` → all trackers grade A |
-| 3 | Local smoke: `pip install -e . --no-build-isolation` then `from picop.hot import bytes_len, dict_get, str_len` |
-| 4 | Examples: `for f in examples/py*.py examples/wrap_ansi.py; do python "$f"; done` |
-| 5 | Export/compat: `python scripts/check_exports.py` |
-| 6 | Confirm [`future/MONKEY.md`](future/MONKEY.md) is **not** wired into `src/picop` |
-| 7 | Bump `__about__.__version__` (PEP 440), e.g. `2.0.0` |
-| 8 | Update [`CHANGELOG.md`](../CHANGELOG.md) / [`README.md`](../README.md) status / [`COVERAGE.md`](../COVERAGE.md) if surface/policy changed |
+| 2 | Review the changelog, compatibility impact, and release notes/title; confirm version/title before a real release |
+| 3 | If any `docs/modules/` Lifecycle lines changed: `python scripts/grade_trackers.py` → all trackers grade A |
+| 4 | Local smoke: `pip install -e . --no-build-isolation` then `from picop.hot import bytes_len, dict_get, str_len` |
+| 5 | Examples: `for f in examples/py*.py examples/wrap_ansi.py; do python "$f"; done` |
+| 6 | Export/compat: `python scripts/check_exports.py` |
+| 7 | Confirm [`future/MONKEY.md`](future/MONKEY.md) is **not** wired into `src/picop` |
+| 8 | Build/inspect release artifacts as below; check `publish.yml` matrix and workflow result |
+| 9 | Update [`CHANGELOG.md`](../CHANGELOG.md) / [`README.md`](../README.md) status / [`COVERAGE.md`](../COVERAGE.md) if surface/policy changed |
+
+Unless explicitly bypassed, `release.sh` runs export, tracker, shim and header
+delta preflights (the header delta is skipped locally if no 3.15 interpreter is
+available; CI covers it). It bumps version/changelog/install pins, commits,
+pushes `main`, tags, creates a GitHub Release and watches publish. Its preflight
+does not replace the full CI/release-artifact validation.
 
 ## Tag and GitHub Release
 
@@ -83,9 +95,9 @@ scripts/release.sh 2.0.0 --title "short highlight"
 scripts/release.sh --patch --dry-run
 ```
 
-For the first stable 3.0 release, select `3.0.0` explicitly after confirming the
-version and title. Bump flags increment the numeric base of `X.Y.Z.devN` just
-as they do for `X.Y.Z`; they do not promote a development version automatically.
+To promote a development version to stable, select the confirmed stable version
+explicitly. Bump flags increment the numeric base of `X.Y.Z.devN` just as they
+do for `X.Y.Z`; they do not promote a development version automatically.
 
 The helper performs its own version bump and uses `picop X.Y.Z` as the GitHub
 release title. If a release PR already merged and validated that exact version,
@@ -96,12 +108,12 @@ full title, verify green CI on the exact `main` commit, and use
 
 Manual equivalent:
 
-```bash
+````bash
 git checkout main && git pull
 # after version bump is on main:
 git tag -a "picop-vX.Y.Z" -m "picop X.Y.Z"
 git push origin "picop-vX.Y.Z"
-gh release create "picop-vX.Y.Z" --title "picop X.Y.Z" --notes-file - <<'EOF'
+gh release create "picop-vX.Y.Z" --verify-tag --title "picop X.Y.Z" --notes-file - <<'EOF'
 ## Highlights
 - …
 
@@ -114,20 +126,18 @@ pip install "picop==X.Y.Z"
 # or: pip install "picop @ git+https://github.com/ckirua/picop.git@picop-vX.Y.Z"
 ```
 EOF
-```
+````
 
-For release candidates, use the documented manual path: the current helper
-does not set GitHub prerelease/latest flags. After the confirmed version and
-notes are on green `main`, create the annotated tag as above and use
-`gh release create picop-v3.0.0rc1 --prerelease --latest=false --title "picop 3.0 RC1 — picop-only imports" --notes-file <notes-file>`.
-Do not publish a candidate as a stable/latest GitHub release. To promote a
-candidate to stable later, select the confirmed stable version explicitly.
+For release candidates, use the manual GitHub Release path: the helper does
+not set GitHub prerelease/latest flags. After the confirmed version and notes
+are on green `main`, create the annotated tag and GitHub prerelease with
+`--prerelease --latest=false`. Pushing any `picop-v*` tag also triggers the
+publish workflow; GitHub's prerelease flag does not suppress PyPI publication.
+Do not use a candidate tag unless publishing that candidate to PyPI is intended.
+To promote a candidate to stable later, select the confirmed stable version.
 
 
-Pushing the tag runs the repository-root [`.github/workflows/publish.yml`](../.github/workflows/publish.yml)
-(Trusted Publishing → PyPI project **`picop`**, **sdist only**). Python imports and
-Cython cimports use **`picop`**; the former `cypy` namespace was removed in 3.0.
-Plain `linux_*` wheels are rejected by PyPI; add manylinux via cibuildwheel later if needed.
+Pushing the tag runs the repository-root [`.github/workflows/publish.yml`](../.github/workflows/publish.yml) (Trusted Publishing → PyPI project **`picop`**). It builds one sdist and cibuildwheel wheels, validates the exact sdist on 3.14, 3.15, 3.14t and 3.15t, and publishes only after those validations and all wheel builds succeed. Python imports and Cython cimports use **`picop`**; the former `cypy` namespace was removed in 3.0.
 
 ### One-time PyPI Trusted Publisher
 
@@ -136,16 +146,18 @@ Plain `linux_*` wheels are rejected by PyPI; add manylinux via cibuildwheel late
 3. Optional: same on TestPyPI with environment `testpypi`
 4. Create GitHub Environments `pypi` / `testpypi` (optional reviewers)
 
-Manual dry-run: Actions → **publish** → Run workflow → `testpypi`.
+Test publication: Actions → **picop publish** → Run workflow → `testpypi`.
+This uploads artifacts to TestPyPI; it is not a dry-run.
 
 ## Artifacts / local PyPI check
 
-Build the source archive once with CPython 3.15, then validate that exact archive
-in clean 3.14, 3.15, 3.14t and 3.15t environments. A C compiler toolchain,
-OpenSSL development headers and Cython 3.3+ are required. Each ABI builds its
-own extensions. The publisher uploads one immutable sdist artifact and waits
-for all four validation jobs before publishing; it does not select a matrix
-build's arbitrary output.
+The publisher builds one source archive with CPython 3.15 and builds wheels with
+cibuildwheel on configured Linux, Windows and macOS runners for the CPython
+3.14/3.15 GIL and free-threaded ABI matrix in `pyproject.toml`. The exact sdist
+is installed and tested in clean 3.14, 3.15, 3.14t and 3.15t environments
+before publication; wheel builds run the configured pytest test command. This
+does not mean every OS/architecture or downstream consumer is tested. Local
+sdist commands below do not build release wheels.
 
 ```bash
 pip install build twine
@@ -176,6 +188,11 @@ evidence that the full package remains GIL-disabled.
 pip install "picop==X.Y.Z"
 python -c "from picop.hot import bytes_len; assert bytes_len(b'ok') == 2"
 ```
+After publication, confirm the workflow succeeded, inspect the files listed for
+the PyPI release, and perform this smoke check in a clean environment. The
+install will use a compatible wheel when available; otherwise pip may build
+from the sdist. This spot check is not a substitute for the four-ABI sdist
+validation and does not establish downstream compatibility.
 
 Portable builds are the default (`-O3` only). Contributors may set `CPY_NATIVE=1` for local tuned benches — do **not** require it for release artifacts.
 

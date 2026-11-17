@@ -31,7 +31,7 @@ Run the narrowest command that exercises the change, then the package gate when 
 ## CI and release
 
 - Keep workflows in [`.github/workflows/`](../.github/workflows/) with paths relative to the repository root.
-- [`publish.yml`](../.github/workflows/publish.yml) publishes **picop only**, as an sdist, after a `picop-v*` tag or an explicit dispatch. Each publisher builds one Python 3.15 source archive, uploads it once, and requires independent installed-artifact validation on 3.14, 3.15, 3.14t and 3.15t before publication.
+- [`publish.yml`](../.github/workflows/publish.yml) publishes **picop** through PyPI Trusted Publishing: one sdist and cibuildwheel wheels. The exact sdist is installed and tested on 3.14, 3.15, 3.14t and 3.15t; publication waits for those jobs and wheel builds. Tag pushes target PyPI; dispatch can target TestPyPI or PyPI.
 - Release PRs must pass picop's gate. Annotated `picop-vX.Y.Z` tags create a GitHub Release and publish through PyPI Trusted Publishing.
 - A picop release requires a clean, current `main`, green CI, an explicit user-confirmed version and title, and the process in [`docs/RELEASE.md`](../docs/RELEASE.md). Preserve `picop`'s API/version policy and existing `scripts/release.sh` flow. Do not create tags or publish as part of ordinary maintenance work.
 - [`.cursor/skills/`](../.cursor/skills/) contains the consumer, maintainer, and release skills. Refer to the relevant skill rather than duplicating a release process.

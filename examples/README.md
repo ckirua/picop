@@ -97,6 +97,8 @@ for f in examples/py*.py examples/wrap_ansi.py; do python "$f" || exit 1; done
 | 72 | `cydict` watchers | cython-recipe | [`cython/dict_watchers.md`](cython/dict_watchers.md) |
 | 73 | `cyunicode` UnicodeWriter | smoke | [`pyunicode_writer.py`](pyunicode_writer.py) |
 | 74 | `cybytes` BytesWriter | smoke | [`pybytes_writer.py`](pybytes_writer.py) |
+| — | `cylong` | cython-recipe | Fixed-width conversions / integer writer: [`cimport_ext/demo.pyx`](cimport_ext/demo.pyx); [`tracker`](../docs/modules/021_cylong.md) |
+| — | Wave examples | smoke | [`pylong.py`](pylong.py), [`pyfloat.py`](pyfloat.py), [`pytype.py`](pytype.py), [`pycellobject.py`](pycellobject.py); float unpack bounds contract: [`SAFETY.md`](../docs/SAFETY.md) |
 
 ## Cython recipes
 

@@ -1,26 +1,29 @@
 # Install
 
-PyPI distribution name and import package are both **`picop`**. Requires **Python ≥ 3.14**, a C toolchain for source builds, and OpenSSL headers (`libssl-dev` on Debian/Ubuntu) for UUID.
+Requires **Python ≥ 3.14**, with a C toolchain for source builds. UUID entropy
+uses the operating system (BCrypt on Windows, `/dev/urandom` elsewhere); no
+third-party library is linked.
 
-Python **3.15 is primary**; 3.14, 3.14t and 3.15t are also supported. On t
-interpreters imports do not enable the GIL. Each ABI needs its own extension
-build, and downstream Cython extensions must rebuild for the UUID layout change.
+Python **3.15 is primary**; 3.14, 3.14t and 3.15t are also supported. Imports on
+free-threaded interpreters do not enable the GIL. Each ABI needs its own
+extension build, and downstream Cython extensions must rebuild for the UUID
+layout change.
 
 ## From PyPI
 
 ```bash
-pip install "picop==3.0.0"
+pip install "picop==3.13.0"
 ```
 
-In 3.0, the `cypy` import and cimport namespace has been removed; migrate
-callers to `picop` and rebuild downstream Cython extensions.
+The `cypy` import and cimport namespace were removed in 3.0; migrate callers
+to `picop` and rebuild downstream Cython extensions.
 
 Build deps (`setuptools`, `wheel`, `Cython>=3.3.0`, `picobuild`) are pulled via `pyproject.toml` `[build-system]`.
 
 ## From git
 
 ```bash
-pip install "picop @ git+https://github.com/ckirua/picop.git@picop-v3.0.0"
+pip install "picop @ git+https://github.com/ckirua/picop.git@picop-v3.13.0"
 # or unpinned tip of main:
 # pip install "picop @ git+https://github.com/ckirua/picop.git"
 ```

@@ -92,10 +92,10 @@ html_theme_options = {
     "logo": {
         "text": "picop",
     },
-    # Stub for a future multi-version Pages layout; v1 ships a single latest build.
+    # Pages publishes one rolling main build, not versioned release snapshots.
     "switcher": {
         "json_url": "https://ckirua.github.io/picop/_static/switcher.json",
-        "version_match": release,
+        "version_match": "latest",
     },
     "check_switcher": False,
     "navbar_end": ["theme-switcher", "navbar-icon-links"],

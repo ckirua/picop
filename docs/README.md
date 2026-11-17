@@ -1,4 +1,4 @@
-# cypy docs
+# picop maintainer docs
 
 > **Maintainer process.** Strangers should start at the root [`README.md`](../README.md), [`examples/`](../examples/), [`COVERAGE.md`](../COVERAGE.md), and [`SAFETY.md`](SAFETY.md) — not this folder’s pipeline / trackers.
 
@@ -13,11 +13,11 @@ Process depth (trackers, Tier A/B benches, merge rules) stays under `docs/`. Pro
 
 ## Status (complete — not an open backlog)
 
-Phases 1–6 and the **1.0 Core freeze** are done. Per-module evidence lives in [`modules/`](modules/), not in Order tables here.
+The original Phases 1–6 and the **1.0 Core freeze** are complete; this is historical milestone evidence, not a blanket production-readiness certification. Later Orders extend existing module trackers. Release history lives in [`../CHANGELOG.md`](../CHANGELOG.md), and each release must satisfy [`RELEASE.md`](RELEASE.md).
 
 | Phase | Outcome |
 |-------|---------|
-| 1–2 | All 71 Orders indexed / decided |
+| 1–2 | Original 71 Orders indexed / decided |
 | 3 | Depth remaster — **68/68 trackers grade A** (`python scripts/grade_trackers.py`) |
 | 4 | Tier B microbenches pasted / n/a |
 | 5 | Git install + examples + release path |
@@ -36,7 +36,7 @@ Ship / remaster via [`PIPELINE.md`](PIPELINE.md) + [`TEMPLATE.md`](TEMPLATE.md).
 | [`RELEASE.md`](RELEASE.md) | Version / tag / GitHub Release / PyPI (`picop`) checklist |
 | [`../CHANGELOG.md`](../CHANGELOG.md) | Release notes; Core freeze at 1.0; Protocols/Runtime post-1.0 policy |
 | [`TEMPLATE.md`](TEMPLATE.md) | v2 tracker template |
-| [`modules/`](modules/) | **Trackers** — one `NNN_cy{name}.md` per module (Orders `001`…`071`; Orders 069 and 071 extend existing descriptor and function trackers) |
+| [`modules/`](modules/) | **Trackers** — one `NNN_cy{name}.md` per module; later Orders extend existing trackers rather than adding one file per PR |
 | [`EQ_INVENTORY.md`](EQ_INVENTORY.md) · [`EQ_INVENTORY_TIERB.md`](EQ_INVENTORY_TIERB.md) · [`EQ_RUNTIME.md`](EQ_RUNTIME.md) · [`AGENT_LOOPS.md`](AGENT_LOOPS.md) | Grind `[eq/…]` issues via chat `/loop` or CLI agent in tmux |
 | [`OPS_INVENTORY.md`](OPS_INVENTORY.md) · [`OPS_INVENTORY_TIERB.md`](OPS_INVENTORY_TIERB.md) | Full public-barrel ops checklist (Tier A/B / pending / n/a); gate: `scripts/ops_inventory_coverage.py` |
 | [`PERF_PARITY.md`](PERF_PARITY.md) | Helpers that are **slower** than the builtin from pure Python, with the call to use instead; cross-checked against `.pyi` docstrings by the same gate |
@@ -50,8 +50,8 @@ Bench harnesses: [`bench/BENCH.md`](../bench/BENCH.md). Coverage map: [`COVERAGE
 |-------|--------|---------|
 | Module presence | `present` / `absent` | Has `src/picop/cy*` or not |
 | Tracker lifecycle | `stub` → `indexed` → `implementing` → `measuring` → `decided` | Process stage |
-| Export | `public` / `cimport` / `cdef` / `—` | How a **cypy** symbol is exposed |
-| Inventory layer | `cypy` / `C-API` / `used-by` | Helper vs raw symbol vs consumed |
+| Export | `public` / `cimport` / `cdef` / `—` | How a **picop** symbol is exposed |
+| Inventory layer | `cypy` / `C-API` / `used-by` | Helper (historical `cypy` label) vs raw symbol vs consumed |
 | Workflow decision | `TODO` / `ONGOING` / `APPROVED` / `APPROVED (cimport)` / `REJECTED` | Keep public / keep Cython-only / drop |
 
 Do **not** overload one “Status” column for all of the above.
@@ -63,7 +63,7 @@ Do **not** overload one “Status” column for all of the above.
 | **A** | Plain Python | Public `cpdef` — `bench/cy*_bench.py` |
 | **B** | Typed Cython `cdef` loop | Extension hot path — `bench/tier_b/` (informational; A gate unchanged) |
 
-- **Primary metric:** mean wall time; **ratio = cypy / baseline**
+- **Primary metric:** mean wall time; **ratio = picop / baseline** (historical benchmark labels may say `cypy`)
 - **APPROVED:** mean ratio ≤ **0.95** (≥5% win), or ≤ **1.02** + API-clarity note
 - **APPROVED (cimport):** keep as `cdef` when useful but not public-worthy
 - **REJECTED:** no keep rationale after try; log why in the tracker
@@ -80,6 +80,7 @@ Copy [`TEMPLATE.md`](TEMPLATE.md). Gold exemplar: [`modules/001_cytuple.md`](mod
 ## Module index
 
 Trackers: [`modules/`](modules/) (present + absent). See that folder’s [`README.md`](modules/README.md) for the file list.
-Order 066 adds `cypicklebuf` for CPython 3.15 `PickleBuffer` handling; see
-[`modules/066_cypicklebuf.md`](modules/066_cypicklebuf.md) for header inventory,
+Order 066 adds `cypicklebuf`; Order 081 removed its incorrect 3.15-only guard
+because the APIs also exist in CPython 3.14. See
+[`modules/066_cypicklebuf.md`](modules/066_cypicklebuf.md) for inventory,
 ownership rules, probes, and benchmark evidence.

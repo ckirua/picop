@@ -88,6 +88,13 @@ python examples/pybytes.py
 python examples/pydict.py
 ```
 
+Additional shipped examples, including integer, float, type, and cell helpers,
+are indexed in the repository [examples README](https://github.com/ckirua/picop/blob/main/examples/README.md).
+The cimport-only integer writer and fixed-width conversions are demonstrated in
+[`demo.pyx`](https://github.com/ckirua/picop/blob/main/examples/cimport_ext/demo.pyx)
+and documented in the [`cylong` tracker](https://github.com/ckirua/picop/blob/main/docs/modules/021_cylong.md).
+Raw-pointer float unpack checks are covered in [Safety](safety).
+
 ## Footgun
 
 C-string helpers take **`bytes`**, not `str`. Prefer `*_cstr` (e.g. `map_getitem_cstr`) — see `examples/py_cstr_bytes.py`. Broader trusted-caller notes: {doc}`safety`.

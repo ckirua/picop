@@ -1,7 +1,7 @@
 # Per-module full feature pipeline
 
 Every module ships as its **own branch + PR**.  
-**Commit/push when ready.** Maintainers may merge when the Before-merge checklist is green; external PRs need review.
+**Commit/push when ready.** Maintainers may merge when the Before-merge checklist is green; external PRs need review. Coding agents require explicit user confirmation before merging.
 
 Process docs live under [`docs/`](.) — trackers only under [`docs/modules/`](modules/). Status overview: [`README.md`](README.md#status-complete--not-an-open-backlog) (complete — not an open backlog).
 
@@ -172,7 +172,7 @@ Use [`.github/PULL_REQUEST_TEMPLATE.md`](../.github/PULL_REQUEST_TEMPLATE.md). I
 |--------|-----|
 | Commit / push on module branch | **Yes** |
 | Open / update PR | **Yes** |
-| **Merge** to `main` | Maintainers after Before-merge checklist; external PRs need review |
+| **Merge** to `main` | Maintainers after Before-merge checklist; external PRs need review; coding agents require explicit user confirmation |
 
 After merge: next Order on a **new** branch from updated `main` (if any).
 
@@ -187,4 +187,4 @@ Every Order has a runnable **python** example, a **cython** recipe pointer, or h
 CI runs `scripts/grade_trackers.py` (68/68 A) and all `examples/py*.py`. Do not invent pure-Python demos for cimport-only modules.
 CI also runs `scripts/ops_inventory_coverage.py --strict`, which cross-checks [`PERF_PARITY.md`](PERF_PARITY.md) against the `.pyi` docstrings: a new public helper that loses **every** Tier A case must carry the `Slower than the plain-Python equivalent …` note and a row in [`PERF_PARITY.md`](PERF_PARITY.md).
 The weekly `picop perf parity` workflow re-measures the matrix on 3.14/3.15/3.14t/3.15t and runs `scripts/perf_parity_drift.py` against that table; when it fails, regenerate the doc **and** the stub notes in the same PR from the run's `parity-dumps` artifact — `python scripts/perf_parity_report.py --from-json parity-3.15.json --update-doc --sync-stubs` — so the table matches the machine the gate measures on. The same workflow also runs the Tier B matrix (`--tier-b`, every public helper against a typed Cython `cdef` loop) on 3.14 and 3.15; `perf_parity_drift.py` checks that table too — only the cases that do not win are listed, so a helper losing by 1.10x or more in every dump needs a row.
-[`INVENTORY_315.md`](INVENTORY_315.md) is machine-derived: `scripts/header_delta.py` diffs the target interpreter's public `PyAPI_FUNC` / `PyAPI_DATA` declarations against `scripts/header_baseline_314.json` and fails (`--fail-on-unaccounted`) on any added symbol that is neither referenced by picop code nor ledgered with a mechanism reason in `scripts/header_ledger.json`. It runs on 3.15 in `picop-smoke.yml` and in the `scripts/release.sh` preflight.
+[`INVENTORY_315.md`](INVENTORY_315.md) annotates a machine-derived delta: `scripts/header_delta.py` diffs the target interpreter's public `PyAPI_FUNC` / `PyAPI_DATA` declarations against `scripts/header_baseline_314.json` and fails (`--fail-on-unaccounted`) on any added symbol that is neither referenced by picop code nor ledgered with a mechanism reason in `scripts/header_ledger.json`. It runs on 3.15 in `picop-smoke.yml` and in the `scripts/release.sh` preflight. The script reports classifications (optionally JSON); it does not rewrite the Markdown annotations. This delta is not an inventory of every unwrapped API already present in 3.14.

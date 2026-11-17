@@ -4,7 +4,7 @@ Product contract for what `picop` is, what it ships, and how to choose helpers.
 
 `picop` is **not** a reimplementation of the Python standard library, and it is **not** a full 1:1 port of Cython’s `Includes/cpython`. It is a curated **CPython C-API accelerator** for Cython on **Python ≥ 3.14**.
 
-**Import:** use `picop` for both Python and Cython. The `cypy` Python imports and Cython cimport shims were removed in 3.0; migrate imports and cimports to the corresponding `picop` path. `3.0.0rc1` is a prerelease, not stable 3.0.
+**Import:** use `picop` for both Python and Cython. The `cypy` Python imports and Cython cimport shims were removed in 3.0; migrate imports and cimports to the corresponding `picop` path. Current stable release is 3.13.0.
 
 Authoritative symbol lists: `src/picop/__init__.py` / `__init__.pxd` `__all__`, plus `picop.hot` for micro-opt starters. Per-module decisions: [`docs/modules/`](docs/modules/).
 Timed public-ops checklist: [`docs/OPS_INVENTORY.md`](docs/OPS_INVENTORY.md) (gate: `scripts/ops_inventory_coverage.py --strict`).
@@ -96,6 +96,13 @@ As of **`1.0.0`**:
 | `cymonitoring` | **cimport only** | PEP 670 (`cpython/monitoring.h`): `monitoring_scope`, `monitoring_exit_scope`, `monitoring_active`, `monitoring_is_instrumented`, 17 `fire_*` helpers, and 18 `PY_MONITORING_EVENT_*` ids; `sys.monitoring` owns registration. Exercised by `examples/cimport_ext/demo.pyx` / `scripts/smoke_barrel_cimport.sh`. |
 | `cycriticalsection` | **cimport only** | `critical_section.h`: `cs_begin`, `cs_begin_mutex`, `cs_end`, `cs2_begin`, `cs2_begin_mutex`, `cs2_end`, and `critical_sections_enabled()`; callers stack-allocate an opaque `PicopCriticalSection` buffer instead of CPython's private struct. Exercised by `examples/cimport_ext/demo.pyx` / `scripts/smoke_barrel_cimport.sh`. |
 | `cyinstance` | **none** | Classic-class ABI gone on 3.14 |
+
+`cylong` includes cimport-only fixed-width checked conversions and `PyLongWriter`
+helpers; the [`tracker`](docs/modules/021_cylong.md) and
+[barrel Cython demo](examples/cimport_ext/demo.pyx) cover their contracts.
+Python UUID construction uses the public `PyLongWriter` where supported.
+Float unpack wrappers validate buffer length before raw-pointer reads; see
+[`SAFETY.md`](docs/SAFETY.md).
 
 ---
 

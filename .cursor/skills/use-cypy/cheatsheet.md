@@ -38,6 +38,16 @@ Orders 10–13, 22, 28, 38, 47–50, 52, 63: `cyerr`, `cymem`, `cythread`, `cyat
 
 Use `cimport` from `.pyx` only — see `examples/cython/README.md`. Prefer `from picop… cimport` (not `cypy`).
 
+## Integer construction and typed conversions
+
+The Python `BytesWriter` / `UnicodeWriter` smoke scripts are indexed above.
+For the cimport-only `PyLongWriter` digit-buffer API and fixed-width checked
+integer conversions, see [`cylong` tracker](../../../docs/modules/021_cylong.md)
+and [`examples/cimport_ext/demo.pyx`](../../../examples/cimport_ext/demo.pyx).
+The float, type-metadata, and cell examples are in [`examples/README.md`](../../../examples/README.md);
+raw-pointer unpack bounds and other trusted-caller caveats are in
+[`SAFETY.md`](../../../docs/SAFETY.md).
+
 ## n/a
 
 - `cyinstance` — classic-class ABI gone on 3.14; no helpers.

@@ -93,10 +93,10 @@ Or `cimport picop` / package `__init__.pxd` for wider cimport-only plumbing (`cy
 
 - **Return codes are not booleans.** Mutators like `list_append` / `dict_set` / `set_add` return **`0` on success** and **raise** on error (`except -1`). Never write `if list_append(xs, x):` — success looks false.
 - **C-string APIs want `bytes`.** Prefer `*_cstr` names (`map_getitem_cstr`, …). Pass **`bytes`** (ASCII/UTF-8), not Python `str`.
-- **Naming (N1/N5):** prefer `dict_*` / `list_*` / `str_*` / `ansi_*` (and siblings). Soft aliases keep letter glue (`dget`, `llen`, …) and bare `contains` / `fg8` / `strip_ansi`.
+- **Naming (N1/N5):** prefer `dict_*` / `list_*` / `str_*` / `ansi_*` (and siblings). Removed soft aliases such as `dget`, `llen`, bare `contains`, and `fg8` are not supported.
 - **Checks (N3):** prefer `{type}_check` / `{type}_check_exact`. `str_is` ≡ `str_check_exact` (exact `str`); prefer `str_check_exact` in check-pair tables.
 - **Len vs size (N4):** `*_len` = typed/unchecked; `*_size` = checked/`object`. **Never** treat as identity (`dict_len` ≠ `dict_size`).
-- **Spelling (N6):** prefer `dt_timedelta_*`, `method_get_function` / `method_get_self` (checked), and `time_wall`. Soft aliases keep `dt_delta_*`, `method_function` / `method_self`, and `time_time`. Unchecked method macros are `method_*_unchecked` (cimport) — not the same as checked `method_get_*`.
+- **Spelling (N6):** prefer `dt_timedelta_*`, `method_get_function` / `method_get_self` (checked), and `time_wall`. Unchecked method macros are `method_*_unchecked` (cimport) — not the same as checked `method_get_*`.
 - **Overlap:** known type → containers/`picop.hot`; unknown → `picop.protocols`. See `examples/py_overlap_*.py`.
 - **Ownership:** pick the right get (see also [`examples/cython/borrow_vs_owned.md`](../../../examples/cython/borrow_vs_owned.md)):
 
@@ -107,6 +107,9 @@ Or `cimport picop` / package `__init__.pxd` for wider cimport-only plumbing (`cy
   | List get; index known in range | `list_get` (unchecked) |
   | List get; may be OOB | `list_get_checked` / `list_get_ref` |
   | Bytes as C `char*` (Cython) | `bytes_as_string` (cimport; borrowed — do not outlive `bytes`) |
+
+- **Raw C-API buffers:** `float_unpack2/4/8` reject short byte strings before reading; keep the trusted-caller contracts in [`docs/SAFETY.md`](../../../docs/SAFETY.md) in view for unchecked APIs and borrowed pointers.
+- **Newer Cython helpers:** fixed-width integer conversions and the cimport-only `PyLongWriter` wrappers are discoverable through [`cylong` tracker](../../../docs/modules/021_cylong.md) and [`examples/cimport_ext/demo.pyx`](../../../examples/cimport_ext/demo.pyx). Float/type/cell examples are indexed in [`examples/README.md`](../../../examples/README.md).
 
 ## Audit mode (agents)
 

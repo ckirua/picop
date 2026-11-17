@@ -50,9 +50,9 @@ Only if the script cannot run. See **Tag and GitHub Release** in [`docs/RELEASE.
 
 ## PyPI
 
-- **Trusted Publishing (OIDC)** uses workflow `publish.yml` and environment `pypi`
-- **sdist only** — plain `linux_*` wheels are rejected; manylinux is a later follow-up
-- Tag push publishes to PyPI; `workflow_dispatch` can target TestPyPI
+- **Artifacts:** one sdist plus cibuildwheel wheels for CPython 3.14/3.15, GIL and free-threaded, on configured platforms. The exact sdist is installed/tested on 3.14, 3.15, 3.14t and 3.15t before publication; all wheel builds must also succeed.
+- Tag push publishes to PyPI; `workflow_dispatch` can target TestPyPI or PyPI
+- See `pyproject.toml` and `publish.yml` for current wheel matrix. CI coverage is not a promise of every platform/ABI combination beyond that matrix.
 
 ## Versioning (pointer)
 

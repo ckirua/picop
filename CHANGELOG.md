@@ -4,6 +4,7 @@
 
 ### Documentation
 - Reconcile release and agent guidance with wheel plus sdist publication, clarify release/major-version readiness evidence, and refresh consumer discovery and maintainer documentation. No API or version change.
+- Expand the consumer agent skill into a source-checked, module-organized replacement catalog covering Python and Cython access, semantic constraints, and existing evidence without promising speedups.
 
 ## [3.13.0] — 2026-11-17 — Direct-fill integer writer
 

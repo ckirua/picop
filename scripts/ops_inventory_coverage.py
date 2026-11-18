@@ -59,8 +59,10 @@ STATUS_OK = re.compile(
 CHECKLIST_HDR = re.compile(r"^##\s+Checklist\s*$", re.M)
 
 
-def public_barrel() -> list[str]:
-    tree = ast.parse(INIT_PY.read_text(encoding="utf-8"), filename=str(INIT_PY))
+def public_barrel(init_path: Path | None = None) -> list[str]:
+    """Return imported names from the package's public cy* barrel."""
+    path = init_path if init_path is not None else INIT_PY
+    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
     names: list[str] = []
     for node in tree.body:
         if not isinstance(node, ast.ImportFrom):

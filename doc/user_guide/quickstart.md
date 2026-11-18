@@ -17,6 +17,13 @@ Also supported: `from picop.cydict import dict_get` / `from picop import dict_ge
 
 Use `picop` for Python imports and Cython cimports. The `cypy` package and cimport shims were removed in 3.0; rebuild downstream Cython extensions.
 
+For replacement candidates, consult the repository's
+[consumer catalog](https://github.com/ckirua/picop/blob/main/.cursor/skills/use-cypy/catalog.md)
+and [agent skill](https://github.com/ckirua/picop/blob/main/.cursor/skills/use-cypy/SKILL.md).
+Check each helper's access mode, semantics and evidence; catalog coverage does
+not imply a speedup. Profile and test the actual caller, retaining only
+repeatable improvements of at least 5% beyond measurement noise.
+
 ## Hot starters
 
 ```python

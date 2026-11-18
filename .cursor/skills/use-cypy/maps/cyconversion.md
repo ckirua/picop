@@ -1,0 +1,10 @@
+# `cyconversion` consumer map
+
+Imports: `picop.cyconversion`; package barrel names may also exist. Cython cimport from `picop.cyconversion`.
+
+| Symbol | Kind | Access | Decision | Expression or use | Contract | Python evidence | Cython evidence |
+|---|---|---|---|---|---|---|---|
+| <a id="conv_cstr_to_double"></a>`picop.cyconversion.conv_cstr_to_double` | function | both | specialized | `float(s)` | Wraps `PyOS_string_to_double`; accepts bytes and uses C-string parsing rules, not general `float` text semantics; inputs must satisfy documented whitespace/NUL constraints. [stub](../../../../src/picop/cyconversion.pyi) | not-measured: no consumer comparison recorded | not-measured: no typed consumer baseline recorded |
+| <a id="conv_stricmp"></a>`picop.cyconversion.conv_stricmp` | function | both | specialized | `s1.lower() == s2.lower()` (not equivalent ordering) | C-string case-insensitive comparison, returns ordering integer; bytes only, embedded NUL behavior follows C string. [stub](../../../../src/picop/cyconversion.pyi) | not-measured: no direct comparable benchmark recorded | not-measured: no typed consumer baseline recorded |
+| <a id="conv_strnicmp"></a>`picop.cyconversion.conv_strnicmp` | function | both | specialized | No direct replacement: bytes lexicographic/casefold comparisons do not preserve bounded C-string ordering | Compares at most `size` bytes; bytes only; caller must supply valid nonnegative length and account for C-string termination. [stub](../../../../src/picop/cyconversion.pyi) | not-measured: no direct comparable benchmark recorded | not-measured: no typed consumer baseline recorded |
+| <a id="conv_double_to_string"></a>`picop.cyconversion.conv_double_to_string` | function | cimport | specialized | `repr(value)` | Native conversion helper; only use when caller needs its C-level output buffer/interface, not general formatting. [pxd](../../../../src/picop/cyconversion.pxd) | not-applicable: Cython-only declaration | not-measured: no consumer baseline recorded |

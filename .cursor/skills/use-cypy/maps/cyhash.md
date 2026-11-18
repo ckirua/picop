@@ -1,0 +1,10 @@
+# cyhash consumer map
+
+Python: `picop.cyhash`; package barrel: `picop`. Cython cimport path: `picop.cyhash` and package `picop`.
+
+| Symbol | Kind | Access | Decision | Expression or use | Contract | Python evidence | Cython evidence |
+|---|---|---|---|---|---|---|---|
+| <a id="hash_buffer"></a>`picop.cyhash.hash_buffer` | function | both | specialized | Hash a byte range without allocating a Python slice, especially for exporters that Python cannot hash directly. | Requires supported buffer exporter and in-range start/end; cached bytes/memoryview hashes can make Python `hash(x)` faster. [stub](../../../../src/picop/cyhash.pyi) | recorded: case-dependent; Tier A CPython 3.15.0rc2 Linux GIL: 0.40x for `array.array('B') n=6`, 0.54x for memoryview range, but 1.34x bytes cached and 3.09x memoryview cached. [tracker](../../../../docs/modules/064_cyhash.md) | recorded: Tier B CPython 3.15.0rc2 Linux GIL; 0.35x vs copy+hash, but 10.74x vs cached `hash(mv)`; [tracker](../../../../docs/modules/064_cyhash.md). |
+| <a id="hash_buffer_raw"></a>`picop.cyhash.hash_buffer_raw` | function | cimport | specialized | Hash exactly `length` bytes from a typed pointer in Cython. | Caller owns pointer and guarantees readable bytes for requested length; [pxd](../../../../src/picop/cyhash.pxd). | not-applicable: no Python-callable API. | not-measured: native pointer hash is not a consumer speed claim. |
+| <a id="hash_generic"></a>`picop.cyhash.hash_generic` | function | cimport | specialized | Use CPython generic identity hash for native object integration. | Ignores custom `__hash__`; object pointer must be valid; [pxd](../../../../src/picop/cyhash.pxd). | not-applicable: Python `hash(obj)` may call overridden `__hash__`. | not-measured: no Cython consumer benchmark recorded. |
+| <a id="hash_pointer"></a>`picop.cyhash.hash_pointer` | function | cimport | specialized | Hash a native pointer value for internal tables. | Pointer identity hash; do not treat as object hash or persistent identifier. [pxd](../../../../src/picop/cyhash.pxd) | not-applicable: no Python-callable API. | not-measured: no Cython consumer benchmark recorded. |

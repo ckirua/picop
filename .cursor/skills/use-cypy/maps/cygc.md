@@ -1,0 +1,14 @@
+# `cygc` consumer map
+
+Python import: `picop.cygc`; package barrel exports public GC wrappers. Cython cimport from `picop.cygc` also exposes `_c` forms.
+
+| Symbol | Kind | Access | Decision | Expression or use | Contract | Python evidence | Cython evidence |
+|---|---|---|---|---|---|---|---|
+| <a id="gc_collect"></a>`picop.cygc.gc_collect` | function | both | candidate | `gc.collect()` | Full collection, returns unreachable count; may run finalizers and affect process-wide GC state. [pxd](../../../../src/picop/cygc.pxd) | not-measured: no per-case benchmark result recorded | not-measured: no consumer baseline recorded |
+| <a id="gc_is_enabled"></a>`picop.cygc.gc_is_enabled` | function | both | candidate | `gc.isenabled()` | Reports automatic cyclic GC state, not reference-counting activity. [pxd](../../../../src/picop/cygc.pxd) | not-measured: no per-case benchmark result recorded | not-measured: no consumer baseline recorded |
+| <a id="gc_enable"></a>`picop.cygc.gc_enable` | function | both | specialized | `gc.enable()` | Mutates process-wide automatic GC setting and returns prior enabled state (0/1), unlike Python `None`; discard result only when prior-state value is irrelevant. [pxd](../../../../src/picop/cygc.pxd) | not-measured: no recorded benchmark result | not-measured: no consumer baseline recorded |
+| <a id="gc_disable"></a>`picop.cygc.gc_disable` | function | both | specialized | `gc.disable()` | Mutates process-wide setting and returns prior enabled state (0/1); not equivalent if caller observes Python `None`. [pxd](../../../../src/picop/cygc.pxd) | not-measured: no recorded benchmark result | not-measured: no consumer baseline recorded |
+| <a id="gc_collect_c"></a>`picop.cygc.gc_collect_c` | function | cimport | specialized | `gc.collect()` | Cython-facing collector operation; may run finalizers and alter process-wide state. [pxd](../../../../src/picop/cygc.pxd) | not-applicable: Cython-only API | not-measured: no Cython baseline recorded |
+| <a id="gc_enable_c"></a>`picop.cygc.gc_enable_c` | function | cimport | specialized | `gc.enable()` | Returns integer prior-state flag; not Python's `None`. [pxd](../../../../src/picop/cygc.pxd) | not-applicable: Cython-only API | not-measured: no Cython baseline recorded |
+| <a id="gc_disable_c"></a>`picop.cygc.gc_disable_c` | function | cimport | specialized | `gc.disable()` | Returns integer prior-state flag; process-wide mutation. [pxd](../../../../src/picop/cygc.pxd) | not-applicable: Cython-only API | not-measured: no Cython baseline recorded |
+| <a id="gc_is_enabled_c"></a>`picop.cygc.gc_is_enabled_c` | function | cimport | specialized | `gc.isenabled()` | Cython GC-state accessor. [pxd](../../../../src/picop/cygc.pxd) | not-applicable: Cython-only API | not-measured: no Cython baseline recorded |

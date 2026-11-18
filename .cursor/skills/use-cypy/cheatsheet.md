@@ -1,8 +1,23 @@
 # picop consumer cheatsheet
 
-Read only when the high-value table in `SKILL.md` is not enough. Prefer examples under `examples/py*.py`.
+Candidate map for the measured-migration workflow in [`SKILL.md`](SKILL.md). These are **not unconditional replacements or speed guarantees**. Prefer examples under `examples/py*.py`.
 
 Default imports: `from picop.hot import …` / `from picop… cimport …`. The former `cypy` namespace and cimport shims were removed in **3.0**.
+
+# Complete replacement map
+
+Use the [authoritative source-derived catalog](catalog.md) for exact per-symbol
+access mode, decision, equivalent expression/use, semantic contract and
+benchmark evidence. This cheatsheet intentionally has no competing helper
+decision table: coverage is not a speed guarantee, and only consumer-specific
+measurement can establish a KEEP.
+
+Follow the skill's [measured-migration workflow](SKILL.md#workflow-retain-only-measured-wins):
+profile, prove equivalence, benchmark the real call site repeatedly, require a
+repeatable ≥5% improvement beyond noise, then run consumer tests. Report KEEP,
+SKIP or UNMEASURED.
+
+## Module and example discovery
 
 ## Core containers / strings (public)
 

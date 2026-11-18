@@ -35,16 +35,18 @@ Requires **Python ≥ 3.14**.
 
 | Need | Where |
 |------|--------|
+| Complete consumer replacement catalog | [`catalog.md`](catalog.md) — source-derived module maps, access modes, contracts, and evidence |
 | Product tiers (Core / Protocols / Runtime) | [`COVERAGE.md`](../../../COVERAGE.md) |
 | Trusted-caller footguns | [`docs/SAFETY.md`](../../../docs/SAFETY.md) |
 | Compat / post-1.0 policy | [`docs/RELEASE.md`](../../../docs/RELEASE.md) |
 | Check / len naming (N3+N4) | [`docs/NAMING.md`](../../../docs/NAMING.md) |
 | Removed soft-alias ledger | `picop.compat.COMPAT_MAP` |
-| Runnable demos | [`examples/README.md`](../../../examples/README.md) — every Order + overlap playbooks |
+| Runnable demos | [`examples/README.md`](../../../examples/README.md) |
 | Exact signatures | installed `picop` / `*.pyi` under `src/picop/` |
 | Do **not** use for consumers | `docs/PIPELINE.md`, tracker Lifecycle, monkey-patch archive |
 
-If this skill is loaded from `~/.cursor/skills/` via symlink into a picop/cypy checkout, relative links above resolve. Otherwise open the GitHub repo / installed package.
+If this skill is loaded from `~/.cursor/skills/` via symlink into a picop checkout, relative links above resolve. Otherwise open the GitHub repo / installed package.
+
 
 ## Default import (Python)
 
@@ -65,17 +67,19 @@ Discourage `from picop import *`. Prefer a **PyPI pin** (`pip install "picop==�
 
 Letter/bare soft aliases (`dget`, `llen`, `contains`, `fg8`, …) were **removed in 0.3** — use word-prefix / `str_*` / `ansi_*`. See `picop.compat.COMPAT_MAP` / package `__getattr__` hints. **Core** (`picop.hot` / `picop.__all__`) is frozen at **1.0**; Protocols / Runtime may still evolve under minors.
 
-## Builtin / stdlib replacement map
+## Complete consumer map
 
-Use the [replacement map](cheatsheet.md#builtin--stdlib-replacement-map) to
-identify candidates and semantic boundaries. It covers container operations,
-bytes/str predicates, scalar `struct` pack/unpack, and integer sign checks.
-It is not a mandate to replace every matching expression.
+Use the [complete catalog](catalog.md), not a starter-only cheatsheet, to find
+an exact symbol row. Confirm its `Access`, `Decision`, contract restrictions,
+and Python/Cython evidence before considering a call-site change. Catalog
+coverage does not imply a speedup; `candidate` is not a measured KEEP.
 
-Read [`docs/PERF_PARITY.md`](../../../docs/PERF_PARITY.md) before selecting
-candidates. Use [`docs/OPS_INVENTORY.md`](../../../docs/OPS_INVENTORY.md) for
-broader API and benchmark-label discovery; verify signatures in the installed
-release. Repository timings rank candidates, not consumer-specific wins.
+Read [`docs/PERF_PARITY.md`](../../../docs/PERF_PARITY.md) for measured
+Python losses and input-dependent cases. Use
+[`docs/OPS_INVENTORY.md`](../../../docs/OPS_INVENTORY.md) for broader API and
+benchmark-label discovery; verify signatures in the installed release.
+Repository timings rank candidates, not consumer-specific wins.
+
 
 ### Cython call sites
 
@@ -99,8 +103,9 @@ Or `cimport picop` / package `__init__.pxd` for wider cimport-only plumbing (`cy
 
   | Need | Prefer |
   |------|--------|
-  | Dict get; miss/`None` both OK as `None` | `dict_get` |
-  | Dict get; must see stored `None` | `dict_get_ref` |
+  | Dict get; miss/`None` both OK as `None`, lookup errors may be suppressed | `dict_get` |
+  | Dict get; propagate lookup errors, miss/`None` both OK as `None` | `dict_get_ref` |
+  | Dict get; distinguish a miss from stored `None` | Preserve an explicit membership check or use a distinct sentinel |
   | List get; index known in range | `list_get` (unchecked) |
   | List get; may be OOB | `list_get_checked` / `list_get_ref` |
   | Bytes as C `char*` (Cython) | `bytes_as_string` (cimport; borrowed — do not outlive `bytes`) |
@@ -112,16 +117,17 @@ Or `cimport picop` / package `__init__.pxd` for wider cimport-only plumbing (`cy
 
 Before rewriting a call site:
 
-1. Known type? (typed `dict`/`list`/… or Cython-static)
-2. Hot path? (skip cold)
-3. Map builtin → symbol from `picop.hot` / high-value table
-4. Preserve `dict_get` None semantics?
-5. Bytes for `*_string` / C-string APIs?
-6. Ignore return-code-as-bool?
-7. Ownership: need `_ref` / `_checked`?
-8. Nearby tests / example pattern?
-9. If symbol missing → **stop** (do not invent)
-10. Prefer `picop` over legacy `cypy` imports
+1. Profile the actual caller; establish hotness, input distribution and static types.
+2. Locate the exact symbol/member row in the [catalog](catalog.md).
+3. Honor its access mode, decision and evidence state; do not treat `specialized`,
+   `companion` or `legacy` as ordinary Python replacements.
+4. Prove equivalence for the caller's admitted inputs, outputs, exceptions,
+   mutation, ownership, bounds, lifetime and concurrency behavior.
+5. Benchmark original and replacement at the actual call site with repeated
+   samples, matching runtime and import/cimport mode, then run consumer tests.
+6. Report **KEEP**, **SKIP**, or **UNMEASURED** with the evidence. Do not apply
+   an unmeasured rewrite.
+
 
 ## Usually skip (str coerce)
 
@@ -188,5 +194,6 @@ Hot path on known `str`: use `str_len` / `str_eq` / `str_contains` instead.
 
 ## More detail
 
-- Progressive API map: [cheatsheet.md](cheatsheet.md)
+- Complete consumer map and navigation: [catalog.md](catalog.md)
+- Compact navigation: [cheatsheet.md](cheatsheet.md)
 - Examples index: [`examples/README.md`](../../../examples/README.md)

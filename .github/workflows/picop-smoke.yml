@@ -10,6 +10,21 @@ permissions:
   contents: read
 
 jobs:
+
+  consumer-map:
+    name: Consumer catalog coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.15"
+      - name: Install pytest
+        run: python -m pip install pytest
+      - name: Validate complete consumer catalog
+        run: |
+          python scripts/check_consumer_map.py
+          python -m pytest tests/test_consumer_map.py -q
   shims:
     name: Shim headers (strict C11)
     runs-on: ubuntu-latest

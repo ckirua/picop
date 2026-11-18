@@ -21,10 +21,13 @@ Use `picop` for Python imports and Cython cimports. The former `cypy` imports an
 Not every helper beats the builtin. The Tier A bench finds helpers that lose to the
 builtin in **every** measured case, and a few that win or lose depending on the input —
 mostly Protocols/Runtime thin wrappers, with a handful of Core names (`dict_pop`,
-`set_add`, `tuple_get`, `tuple_pack2`). They stay in the API: the loss is the cpdef
-wrapper cost at the Python boundary, and it vanishes inside Cython. Each docstring says
-so, and `docs/PERF_PARITY.md` in the repository lists each one with the builtin to use
-instead.
+`set_add`, `tuple_get`, `tuple_pack2`). They stay in the API. A Python wrapper
+loss does not establish whether the corresponding typed Cython call wins:
+benchmark the actual calling mode and input shape. The repository's
+[`PERF_PARITY.md`](https://github.com/ckirua/picop/blob/main/docs/PERF_PARITY.md)
+records measured Python losses, and the
+[consumer catalog](https://github.com/ckirua/picop/blob/main/.cursor/skills/use-cypy/catalog.md)
+describes access modes, contracts, and available evidence.
 
 ### Core (prefer for micro-opts)
 

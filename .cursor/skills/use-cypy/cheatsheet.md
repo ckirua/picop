@@ -1,8 +1,53 @@
 # picop consumer cheatsheet
 
-Read only when the high-value table in `SKILL.md` is not enough. Prefer examples under `examples/py*.py`.
+Candidate map for the measured-migration workflow in [`SKILL.md`](SKILL.md). These are **not unconditional replacements or speed guarantees**. Prefer examples under `examples/py*.py`.
 
 Default imports: `from picop.hot import …` / `from picop… cimport …`. The former `cypy` namespace and cimport shims were removed in **3.0**.
+
+## Builtin / stdlib replacement map
+
+Use the exact signature from the installed release, not just this table.
+Restrict container/string substitutions to known concrete builtin types; subclass
+overrides and arbitrary protocols may change behavior. Preserve evaluation order
+and evaluate operands once. The full exported-operation index is
+[`OPS_INVENTORY.md`](../../../docs/OPS_INVENTORY.md); benchmark labels there locate
+candidates, not proof that a caller will be faster.
+
+| Existing expression | Candidate (`picop.hot` unless a module is named) | Eligibility / semantic boundary |
+|---|---|---|
+| `len(d)`, `len(xs)`, `len(t)`, `len(b)`, `len(s)` | `dict_len`, `list_len`, `tuple_len`, `bytes_len`, `str_len` | Known corresponding type; preserve subclass `__len__` behavior or skip. |
+| `k in d` | `dict_contains(d, k)` | Dict, not generic mapping; test key hashing/equality failures. |
+| `d.get(k)` | `dict_get(d, k)` | Missing key versus stored `None`, lookup errors, and any explicit default must match the caller; not a replacement for `d[k]` raising `KeyError`. |
+| `d[k] = v` | `dict_set(d, k, v)` | Statement-only use; helper returns status `0`, not `None`. Preserve hashing/equality errors. |
+| `xs[i]` | `list_get_checked(xs, i)` | Nonnegative integer index; do not assume Python negative-index normalization or slicing. Never substitute unchecked `list_get` without a proven valid index and safe lifetime/concurrency contract. |
+| `xs.append(v)` | `list_append(xs, v)` | Discarded return only: `0` versus `None`. |
+| `x in s` | `set_contains(s, x)` | Known set; test exceptional inputs, including unhashable keys. |
+| `s.add(x)` | `set_add(s, x)` | Discarded return only; check input-specific performance losses before considering this candidate. |
+| `needle in b`, `a == b` (bytes) | `bytes_contains(b, needle)`, `bytes_eq(a, b)` | Known bytes operands; integer membership and mixed types are not covered by the bytes-needle mapping. |
+| `sub in s`, `a == b` (str) | `str_contains(s, sub)`, `str_eq(a, b)` | Known strings; preserve Unicode and subclass semantics. |
+| `struct.pack("<d", x)` / `"<f"` / `"<e"` | `picop.cyfloat.float_pack8` / `float_pack4` / `float_pack2` | Single scalar format only; `little_endian=False` for `>`; compare rounding, overflow, NaN and signed zero. Not native-aligned/mixed records. |
+| `struct.unpack("<d", b)[0]` / `"<f"` / `"<e"` | `picop.cyfloat.float_unpack8` / `float_unpack4` / `float_unpack2` | Bytes of exactly 8/4/2 bytes for equivalent accepted inputs. Check trailing bytes and exception types: `struct.error` and picop errors need not match. |
+| `x == 0`, `x < 0`, `x > 0` | `picop.cylong.long_is_zero`, `long_is_negative`, `long_is_positive` | Known integers, not arbitrary comparable objects or floats; preserve subclass comparison behavior. |
+
+For each row, use the corresponding module's `bench/<module>_bench.py` for
+Python-call evidence or `bench/tier_b/<module>.py` for Cython evidence.
+Read [`PERF_PARITY.md`](../../../docs/PERF_PARITY.md) first: **Always slower**
+is a default skip for Python; input-specific losses require matching workload
+evidence. Absence from a loss table is not evidence of a win.
+
+### Not drop-in substitutions
+
+- `int(x)` / `float(x)` → fixed-width C conversions: range, accepted inputs and
+  C return types differ. Consider only when the consumer needs that C contract.
+- `t.__dict__` → `type_get_dict(t)`: mapping proxy versus real dictionary;
+  the latter is read-only by contract, not a general replacement.
+- `int.from_bytes` → integer writer: requires native digit layout and ownership;
+  the published writer benchmark uses shift/OR, **not** `int.from_bytes`.
+- `struct.Struct` methods, bulk/vectorized operations, I/O, regex, JSON, and
+  other stdlib APIs: no blanket mapping here. Keep the existing implementation
+  unless an exact documented candidate and representative measurement exist.
+- A helper losing in Python does not automatically win through Cython;
+  benchmark the actual compiled caller against its original typed expression.
 
 ## Core containers / strings (public)
 

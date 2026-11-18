@@ -4,6 +4,7 @@
 
 ### Documentation
 - Reconcile release and agent guidance with wheel plus sdist publication, clarify release/major-version readiness evidence, and refresh consumer discovery and maintainer documentation. No API or version change.
+- Add a semantics-aware builtin/stdlib replacement map and a measured-win workflow to the consumer agent skill; require consumer tests and repeatable performance evidence before retaining substitutions.
 
 ## [3.13.0] — 2026-11-17 — Direct-fill integer writer
 

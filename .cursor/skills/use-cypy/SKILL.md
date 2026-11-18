@@ -65,20 +65,17 @@ Discourage `from picop import *`. Prefer a **PyPI pin** (`pip install "picop==�
 
 Letter/bare soft aliases (`dget`, `llen`, `contains`, `fg8`, …) were **removed in 0.3** — use word-prefix / `str_*` / `ansi_*`. See `picop.compat.COMPAT_MAP` / package `__getattr__` hints. **Core** (`picop.hot` / `picop.__all__`) is frozen at **1.0**; Protocols / Runtime may still evolve under minors.
 
-## High-value swaps (start here)
+## Builtin / stdlib replacement map
 
-Prefer these in hot paths when types are known (all available via `picop.hot`):
+Use the [replacement map](cheatsheet.md#builtin--stdlib-replacement-map) to
+identify candidates and semantic boundaries. It covers container operations,
+bytes/str predicates, scalar `struct` pack/unpack, and integer sign checks.
+It is not a mandate to replace every matching expression.
 
-| Instead of | Prefer |
-|------------|--------|
-| `len(d)` / `k in d` / `d.get(k)` | `dict_len`, `dict_contains`, `dict_get` |
-| `d[k]=v` / `d.pop` / `d.setdefault` | `dict_set`, `dict_pop`, `dict_setdefault` |
-| `len(xs)` / `xs[i]` / `xs.append` | `list_len`/`list_get`/`list_append` (use `list_get_checked` when bounds matter) |
-| `x in s` / `s.add` | `set_contains`, `set_add` |
-| `len(t)` / `t[i]` / small packs | `tuple_len`, `tuple_get`, `tuple_pack2`… |
-| `len(b)` / `needle in hay` / `a == b` (bytes) | `bytes_len`, `bytes_contains`, `bytes_eq` |
-| `len(s)` / `a == b` / `sub in s` | `str_len`, `str_eq`, `str_contains` |
-| ANSI color wrap | `ansi_wrap`, `ansi_fg8`, `ansi_strip` |
+Read [`docs/PERF_PARITY.md`](../../../docs/PERF_PARITY.md) before selecting
+candidates. Use [`docs/OPS_INVENTORY.md`](../../../docs/OPS_INVENTORY.md) for
+broader API and benchmark-label discovery; verify signatures in the installed
+release. Repository timings rank candidates, not consumer-specific wins.
 
 ### Cython call sites
 
@@ -139,13 +136,46 @@ These are **not** in `picop.hot`. Prefer only when a boundary needs coerce — n
 
 Hot path on known `str`: use `str_len` / `str_eq` / `str_contains` instead.
 
-## Workflow
+## Workflow: retain only measured wins
 
-1. Confirm hot path + known types (or Cython static types).
-2. Map builtin → picop helper (cheatsheet above + examples).
-3. Replace; preserve semantics (especially missing-key / errors).
-4. Keep changes minimal — don’t “picop-ify” cold code.
-5. Run nearby tests; optionally compare with existing module benches in trackers if ratios matter.
+1. **Profile first.** Identify a costly caller and its input distribution. Record
+   the picop version, CPython version, GIL/free-threaded mode, OS/CPU, and whether
+   this is Python `import` or compiled Cython `cimport`. Skip cold/unknown paths.
+2. **Select from the map.** Check exact types, signatures, Python-vs-Cython
+   availability and parity warnings. Keep generic protocol/subclass behavior
+   unless the caller's contract explicitly excludes it. No invented helpers.
+3. **Prove equivalence before timing.** Compare results, identity/ownership where
+   relevant, mutation, return values and exceptions. Cover representative empty,
+   hit/miss, size, boundary and invalid-input cases admitted by the caller.
+   Preserve evaluation order. Never weaken bounds, lifetime, or concurrency
+   guarantees for a faster number; reject a mismatched candidate.
+4. **Benchmark both actual paths.** Use the project's benchmark harness or
+   `pyperf`; warm up, take at least five independent samples per path, and
+   alternate comparison order to reduce drift. Match inputs and isolate mutable
+   state between samples. Include any adapter/type-check/conversion cost the
+   replacement requires. Exclude setup only when it is outside both real hot
+   paths. Preserve output use so compiled work cannot be optimized away.
+5. **Apply the performance gate.** Ratio = candidate mean / original mean.
+   Retain only a repeatable ratio **≤ 0.95** (at least 5% faster), with the
+   improvement larger than run-to-run variation and no material regression on
+   representative cases or the enclosing workload. Otherwise leave the original.
+   Repository API-clarity retention rules do not override this consumer gate.
+6. **Validate the consumer.** Run nearby behavior tests and the enclosing
+   workload benchmark after substitution. Python benchmarks cannot justify a
+   Cython substitution or vice versa; a GIL build cannot prove a no-GIL win.
+   Limit recommendations to measured runtimes and input shapes.
+7. **Report decisions.** For each candidate record location, old expression,
+   helper/import, semantic checks, benchmark command/environment, input shapes,
+   sample count, means and variation, ratio, and **KEEP / SKIP** with reason.
+   If execution is unavailable, mark **UNMEASURED** and do not apply the rewrite.
+   No blanket search-and-replace or automatic fallback wrappers.
+
+### Agent invocation
+
+> Use the use-cypy skill to find measured picop wins in this project. Profile
+> first, consult the replacement map and parity warnings, preserve behavior,
+> benchmark Python and Cython separately, and retain only repeatable ≥5% wins.
+> Run consumer tests and report KEEP/SKIP evidence. Leave unmeasured code unchanged.
 
 ## Do not
 
@@ -154,7 +184,7 @@ Hot path on known `str`: use `str_len` / `str_eq` / `str_contains` instead.
 - Restore builtin **monkey-patches** (`docs/future/MONKEY.md` is archive-only)
 - Wrap everything “for completeness” or force losses from cold/dynamic code
 - Touch internal PIPELINE/QUEUE unless the user is developing picop itself
-- Introduce new `cypy` call sites when `picop` is available (soft alias is for compat only)
+- Introduce `cypy` imports: the legacy compatibility package and shims were removed
 
 ## More detail
 

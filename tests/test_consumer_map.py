@@ -77,9 +77,9 @@ def _fixture(root: Path, *, row: str | None = None) -> None:
         ("finish", "specialized", "Finish and obtain the bytes result", "Closes writer; subsequent operations raise RuntimeError."),
         ("discard", "specialized", "Close without producing bytes", "Closes writer; subsequent operations raise RuntimeError."),
     )
-    _put(root, ".cursor/skills/use-cypy/maps/cydict.md",
+    _put(root, ".cursor/skills/use-picop/maps/cydict.md",
          "# cydict\n\n" + HEADER + "\n|---|---|---|---|---|---|---|---|\n" + table + "\n")
-    _put(root, ".cursor/skills/use-cypy/maps/cybytes.md",
+    _put(root, ".cursor/skills/use-picop/maps/cybytes.md",
          "# cybytes\n\n" + HEADER + "\n|---|---|---|---|---|---|---|---|\n"
          + _row("picop.cybytes.BytesWriter", kind="class", decision="companion",
                 expression="Construct or use a typed byte writer",
@@ -111,13 +111,13 @@ def _fixture(root: Path, *, row: str | None = None) -> None:
                        contract="Native pointer is writer-owned; preserve the writer lifecycle and requested bounds.",
                        symbol="BytesWriter-grow")
          + "\n")
-    _put(root, ".cursor/skills/use-cypy/maps/uuid.md",
+    _put(root, ".cursor/skills/use-picop/maps/uuid.md",
          "# UUID\n\n" + HEADER + "\n|---|---|---|---|---|---|---|---|\n"
          + "| <a id=\"UUID\"></a>`picop.uuid._uuid.UUID` | class | python | companion | UUID value type | Public UUID class. | not-applicable: separate UUID suite | not-applicable: no Cython baseline |\n"
          + "| <a id=\"UUID-bytes\"></a>`picop.uuid._uuid.UUID.bytes` | method | python | companion | Read UUID bytes | Public UUID member. | not-applicable: separate UUID suite | not-applicable: no Cython baseline |\n"
          + "| <a id=\"uuid4\"></a>`picop.uuid._uuid.uuid4` | function | python | candidate | `uuid.uuid4()` | UUID generation. | not-measured: separate UUID suite; no superiority claim | not-applicable: no Cython baseline |\n"
          + "| <a id=\"uuid4_bytes\"></a>`picop.uuid._uuid.uuid4_bytes` | function | python | candidate | `uuid.uuid4().bytes` | UUID bytes. | not-measured: separate UUID suite; no superiority claim | not-applicable: no Cython baseline |\n")
-    _put(root, ".cursor/skills/use-cypy/catalog.md",
+    _put(root, ".cursor/skills/use-picop/catalog.md",
          "# Catalog\n\n## Module maps\n\n| Module | Map | Surface |\n|---|---|---|\n"
          "| cydict | [map](maps/cydict.md) | Python and Cython exports |\n"
          "| cybytes | [map](maps/cybytes.md) | Python and Cython exports, writer members |\n"
@@ -167,7 +167,7 @@ def test_duplicate_rows_fail_before_key_collapse(tmp_path: Path, monkeypatch: py
 def test_cimport_only_access_cannot_be_claimed_as_python(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
     _fixture(tmp_path)
     _put(tmp_path, "src/picop/__init__.py", "from .cydict import dict_get\n")
-    path = tmp_path / ".cursor/skills/use-cypy/maps/cydict.md"
+    path = tmp_path / ".cursor/skills/use-picop/maps/cydict.md"
     path.write_text(path.read_text().replace("| function | both |", "| function | cimport |"), encoding="utf-8")
     assert _run(tmp_path, monkeypatch)[0] != 0
     assert "dict_get" in capsys.readouterr().out
@@ -175,7 +175,7 @@ def test_cimport_only_access_cannot_be_claimed_as_python(tmp_path: Path, monkeyp
 
 def test_broken_catalog_link_is_rejected(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
     _fixture(tmp_path)
-    path = tmp_path / ".cursor/skills/use-cypy/catalog.md"
+    path = tmp_path / ".cursor/skills/use-picop/catalog.md"
     path.write_text(path.read_text().replace("maps/cydict.md", "maps/missing.md"), encoding="utf-8")
     assert _run(tmp_path, monkeypatch)[0] != 0
     assert "missing.md" in capsys.readouterr().out
@@ -283,7 +283,7 @@ def test_broken_catalog_fragment_is_rejected(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     _fixture(tmp_path)
-    index = tmp_path / ".cursor/skills/use-cypy/catalog.md"
+    index = tmp_path / ".cursor/skills/use-picop/catalog.md"
     index.write_text(
         index.read_text(encoding="utf-8")
         + "\n## Navigate\n\n[dict lookup](maps/cydict.md#missing-row)\n",

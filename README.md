@@ -105,8 +105,8 @@ Use only `picop` for Python imports and Cython cimports; there is no `cypy` comp
 **Footgun:** C-string helpers take **`bytes`**, not `str`. Prefer `*_cstr` (`map_getitem_cstr`) — see `examples/py_cstr_bytes.py`. Broader trusted-caller notes (unchecked OOB, borrowed pointers, `marshal_loads`): [`docs/SAFETY.md`](docs/SAFETY.md).
 
 For builtin or stdlib replacement candidates, use the
-[consumer catalog](.cursor/skills/use-cypy/catalog.md) and
-[agent skill](.cursor/skills/use-cypy/SKILL.md). The catalog records access
+[consumer catalog](.cursor/skills/use-picop/catalog.md) and
+[agent skill](.cursor/skills/use-picop/SKILL.md). The catalog records access
 mode, semantic constraints, and available Python/Cython evidence; coverage is
 not a speed guarantee. Profile the actual caller, prove equivalence, and retain
 only repeatable improvements of at least 5% beyond measurement noise.

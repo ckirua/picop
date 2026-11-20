@@ -9,7 +9,7 @@ description: >-
 
 # Add or promote a picop helper
 
-**Audience:** maintainers after the **1.0 Core freeze**. Consumers should use `use-cypy` guidance for picop call sites. The skill directory name and historical `cy*` helper names remain unchanged.
+**Audience:** maintainers after the **1.0 Core freeze**. Consumers should use `use-picop` guidance for picop call sites. The skill directory name and historical `cy*` helper names remain unchanged.
 ## When
 
 User asks to implement a tracker TODO, promote a candidate, or add a `cy*` helper.

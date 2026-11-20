@@ -10,7 +10,7 @@ disable-model-invocation: true
 
 # Release picop
 
-**Audience:** maintainers shipping a tagged **`picop`** release. Consumers use `use-cypy` guidance for picop; policy and checklists live in [`docs/RELEASE.md`](../../../docs/RELEASE.md).
+**Audience:** maintainers shipping a tagged **`picop`** release. Consumers use `use-picop` guidance for picop; policy and checklists live in [`docs/RELEASE.md`](../../../docs/RELEASE.md).
 
 ## When
 

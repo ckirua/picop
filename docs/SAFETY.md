@@ -11,7 +11,7 @@ Prefer:
 - `list_get_checked` / `list_get_ref` when the index may be OOB
 - Bounds you own in Cython (`0 <= i < list_len(xs)`) before calling unchecked getters
 
-See also the ownership matrix in [`.cursor/skills/use-cypy/SKILL.md`](../.cursor/skills/use-cypy/SKILL.md).
+See also the ownership matrix in [`.cursor/skills/use-picop/SKILL.md`](../.cursor/skills/use-picop/SKILL.md).
 
 ## Fixed-size reads have no length argument
 

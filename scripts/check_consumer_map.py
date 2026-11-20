@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate source-derived coverage and integrity of the use-cypy consumer catalog."""
+"""Validate source-derived coverage and integrity of the use-picop consumer catalog."""
 from __future__ import annotations
 
 import argparse
@@ -40,7 +40,7 @@ def _validate(root: Path) -> tuple[list[str], Counter[str], Counter[str], dict[s
     source_module = _load_sources(root)
     expected = source_module.enumerate_sources(root)
     source_totals = source_module.source_counts(root, expected)
-    mapdir = root / ".cursor/skills/use-cypy/maps"
+    mapdir = root / ".cursor/skills/use-picop/maps"
     files = sorted(mapdir.glob("*.md")) if mapdir.is_dir() else []
     actual: dict[str, tuple[dict[str, str], Path, int]] = {}
     module_files = {p.stem: p for p in files}
@@ -174,7 +174,7 @@ def _check_link(root: Path, source: Path, line: int, target: str, errors: list[s
 
 
 def _check_index(root: Path, module_files: dict[str, Path], errors: list[str]) -> None:
-    index = root / ".cursor/skills/use-cypy/catalog.md"
+    index = root / ".cursor/skills/use-picop/catalog.md"
     if not index.is_file():
         errors.append(f"missing {index.relative_to(root)}")
         return
@@ -188,7 +188,7 @@ def _check_index(root: Path, module_files: dict[str, Path], errors: list[str]) -
             errors.append(f"{index.relative_to(root)}: module {module} must appear exactly once (found {counts[target]})")
     for target in entries:
         _check_link(root, index, 1, target, errors)
-    for path in (index, root / ".cursor/skills/use-cypy/SKILL.md"):
+    for path in (index, root / ".cursor/skills/use-picop/SKILL.md"):
         if path.is_file():
             for n, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
                 for target in re.findall(r"\]\(([^)]+)\)", line):

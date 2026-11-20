@@ -1,5 +1,5 @@
 ---
-name: use-cypy
+name: use-picop
 description: >-
   Prefer picop CPython C-API helpers for small Cython/Python hot-path
   micro-optimizations (dict/list/set/tuple/bytes/str len/get/set/contains/pack,
@@ -12,7 +12,7 @@ description: >-
 
 `picop` is a curated **CPython C-API accelerator** for Cython (Python ≥ 3.14) — typed hot-path helpers, not a stdlib reimplementation.
 
-**3.0:** use `from picop…` / `from picop… cimport`. The `cypy` Python package and Cython cimport shims have been removed; rebuild downstream Cython extensions. This skill directory name remains `use-cypy`.
+**3.0:** use `from picop…` / `from picop… cimport`. The `cypy` Python package and Cython cimport shims have been removed; rebuild downstream Cython extensions.
 
 ## When to apply
 
@@ -178,7 +178,7 @@ Hot path on known `str`: use `str_len` / `str_eq` / `str_contains` instead.
 
 ### Agent invocation
 
-> Use the use-cypy skill to find measured picop wins in this project. Profile
+> Use the use-picop skill to find measured picop wins in this project. Profile
 > first, consult the replacement map and parity warnings, preserve behavior,
 > benchmark Python and Cython separately, and retain only repeatable ≥5% wins.
 > Run consumer tests and report KEEP/SKIP evidence. Leave unmeasured code unchanged.

@@ -31,7 +31,7 @@ Run `python scripts/check_exports.py` and the relevant examples.
 
 | Skill | Role |
 |-------|------|
-| [`.cursor/skills/use-cypy/SKILL.md`](.cursor/skills/use-cypy/SKILL.md) | **Consumer** guidance — prefer this for call-site migrations |
+| [`.cursor/skills/use-picop/SKILL.md`](.cursor/skills/use-picop/SKILL.md) | **Consumer** guidance — prefer this for call-site migrations |
 | `add-cypy-helper` / `index-cypy-module` | **Maintainer / post-1.0 Core freeze** — tracker work only; new modules or Core removals need major policy, not casual PRs |
 | [`.cursor/skills/release-picop/SKILL.md`](.cursor/skills/release-picop/SKILL.md) | **Maintainer release** — tag / PyPI publish via `scripts/release.sh` (confirm with user; `@`-mention skill) |
 

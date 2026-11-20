@@ -37,7 +37,7 @@ This guidance does not schedule or promise a 4.0 release.
 
 **Alternative (not default):** Strategy A — single breaking `0.2` with **no** aliases (only if maintainers confirm near-zero external pins). Do not mix A and B halfway. **Chosen path was Strategy B** (soft then hard); do not reopen A for 1.x.
 
-**Always:** update `use-cypy` skill, examples, and `__all__`/`.pyi` in the **same** rename wave; bare `cystr` names need extra care. Naming so far: **N2** `*_cstr`, **N6** spelling, **N1** word-prefix, **N5** `str_*`/`ansi_*`, **N3+N4** check/len conventions (docs + CI). Soft aliases **removed in 0.3**.
+**Always:** update `use-picop` skill, examples, and `__all__`/`.pyi` in the **same** rename wave; bare `cystr` names need extra care. Naming so far: **N2** `*_cstr`, **N6** spelling, **N1** word-prefix, **N5** `str_*`/`ansi_*`, **N3+N4** check/len conventions (docs + CI). Soft aliases **removed in 0.3**.
 
 ### 0.3 hard-trim checklist
 

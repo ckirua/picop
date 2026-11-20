@@ -26,7 +26,7 @@ loss does not establish whether the corresponding typed Cython call wins:
 benchmark the actual calling mode and input shape. The repository's
 [`PERF_PARITY.md`](https://github.com/ckirua/picop/blob/main/docs/PERF_PARITY.md)
 records measured Python losses, and the
-[consumer catalog](https://github.com/ckirua/picop/blob/main/.cursor/skills/use-cypy/catalog.md)
+[consumer catalog](https://github.com/ckirua/picop/blob/main/.cursor/skills/use-picop/catalog.md)
 describes access modes, contracts, and available evidence.
 
 ### Core (prefer for micro-opts)

@@ -209,7 +209,7 @@ p.write_text(text)
 fi
 
 info "refresh install pins (${OLD} → ${VERSION})"
-pin_files=(README.md .cursor/skills/use-cypy/SKILL.md)
+pin_files=(README.md .cursor/skills/use-picop/SKILL.md)
 if [[ "$DRY_RUN" -eq 1 ]]; then
   echo "dry-run: replace $OLD with $VERSION in: ${pin_files[*]}"
 else
